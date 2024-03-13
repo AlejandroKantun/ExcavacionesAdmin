@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
-import { StyleSheet, View, Dimensions, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown';
+import { StyleSheet, View, Dimensions, TouchableOpacity, Image } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { MaterialQty } from '../hooks/useMaterialQty';
@@ -10,6 +10,8 @@ import { StackActions } from '@react-navigation/native';
 
 import { openDatabase } from 'react-native-sqlite-storage';
 import { useTicketsDB } from '../hooks/useTicketsDB';
+import { useTicketsDBByValeID } from '../hooks/useTicketsDBByValeID';
+import { btoa } from '../data/base64BLOBConverter';
 
 var db = openDatabase({
     name: 'UserDatabase',
@@ -32,6 +34,7 @@ export const SearchTicketScreen = () => {
     const [value, setValue] = useState(0);
     const {tickets}=useTicketsDB()
     const navigation = useNavigation()
+    const {tickets:ticketByID,getTicketsByID} =useTicketsDBByValeID()
 
   return (
     
@@ -54,13 +57,11 @@ export const SearchTicketScreen = () => {
                                 valueField="valeID"
                                 placeholder={!isFocus ? '            Buscar Ticket' : '...'}
                                 searchPlaceholder="Buscar Ticket"
-                                value={value.toString()}
-                                //onFocus={() => setIsFocus(true)}
                                 onBlur={() => setIsFocus(false)}
                                 renderItem={ (item) => <CustomText style={{marginVertical:6, fontSize:18}}>Vale ID: {item.valeID} -  Folio Físico: {item.folioFisico}</CustomText>}
                                 onChange={item => {
                                     setValue(item.valeID);
-                                    //setIsFocus(false);
+                                    getTicketsByID(item.valeID);
                                 }}
                                 renderLeftIcon={() => (
                                     <Icon style={localStyles.renderLeftIcon} 
@@ -72,6 +73,19 @@ export const SearchTicketScreen = () => {
                     
                    
                      </View>
+                     <View>
+                       <CustomText>
+                         valeId: {JSON.stringify(ticketByID[0]?ticketByID[0].valeID:null)}
+                       </CustomText>
+                       <CustomText>
+                         ClienteID:{JSON.stringify(ticketByID[0]?ticketByID[0].clienteID:null)}
+                       </CustomText>
+                       <CustomText>
+                         fecha vale: {JSON.stringify(ticketByID[0]?ticketByID[0].fechaVale:null)}
+                       </CustomText>
+                  
+
+                    </View>
                    
 
                     <View style={localStyles.buttonsContainer}>

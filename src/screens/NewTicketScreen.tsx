@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, Button } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomText from '../components/CustomText';
@@ -23,6 +23,8 @@ import { useVehiclesDB } from '../hooks/useVehicles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
 import { dateFormated } from '../data/dateFormated';
+import { StackActions } from '@react-navigation/native';
+import { AuthContext } from '../context/AuthContext';
 
 
 
@@ -31,6 +33,7 @@ const MateriasInTicket:MaterialQty[] = [];
 const windowWidth = Dimensions.get('window').width;
 
 export const NewTicketScreen = () => {
+  const {authState,logOut} = useContext(AuthContext)
   const [newMaterialVisible, setNewMaterialVisible] = useState(false)
   const [saveModalVisible, setSaveModalVisible] = useState(false)
   const [signModalVisible, setSignModalVisible] = useState(false)
@@ -62,7 +65,10 @@ export const NewTicketScreen = () => {
     })
     setPropertyOnTicket("formadepago",paymentSelected)
   }
-
+  const logOutHandler=()=>{
+    navigation.dispatch(StackActions.replace('SplashScreen'))
+    logOut();
+  }
   useEffect(() => {
     setPropertyOnTicket("creadoPor",1)
   }, [])
@@ -76,18 +82,26 @@ export const NewTicketScreen = () => {
           flexDirection:'row',
           justifyContent:'flex-end'
           }}>
-            <View style={localStyles.HeaderTitleText}>
-          <CustomText style={localStyles.headerText} >
-                        Nuevo Vale 
-          </CustomText>
-        </View>
-        <TouchableOpacity 
+             <TouchableOpacity 
                   style={localStyles.SearchTicketButton}
                   onPress={()=>{
                     navigation.navigate('SearchTicketScreen' as never)
                   }}>
                   <Icon style={{marginRight:10}} name="search-outline" size={30} color="#fff" />
                   <CustomText style={{color:'#fff'}}>Buscar</CustomText>
+                </TouchableOpacity>
+          <View style={localStyles.HeaderTitleText}>
+          <CustomText style={localStyles.headerText} >
+                        Nuevo Vale 
+          </CustomText>
+        </View>
+        <TouchableOpacity 
+                  style={localStyles.logOutButton}
+                  onPress={()=>{
+                    logOutHandler()
+                  }}>
+                  <Icon style={{marginRight:10}} name="log-out-outline" size={30} color="#fff" />
+                  <CustomText style={{color:'#fff'}}>Salir</CustomText>
                 </TouchableOpacity>
         </View>
         
@@ -259,7 +273,7 @@ export const NewTicketScreen = () => {
               <View style={localStyles.PayInfoRow}>
                 <CustomText> Nombre de despachador: </CustomText>
                 <View>
-                  <CustomText> CodyExpert </CustomText>
+                  <CustomText> {authState.userName} </CustomText>
                 </View>
               </View>
               <View style={localStyles.BtnPayRow}>
@@ -305,30 +319,43 @@ const localStyles = StyleSheet.create({
       backgroundColor:globalStyles.colors.white
     },
     headerContainer:{
+      flex:1,
       paddingTop:20,
       paddingBottom:10,
       backgroundColor:globalStyles.colors.primary,
+      flexDirection:'row',
+      justifyContent:'space-around',
     },
     HeaderTitleText:{
       justifyContent:'center', 
       alignItems:'center'},
+    headerText:{
+        fontSize:25,
+        marginHorizontal:windowWidth*0.08,
+        color:globalStyles.colors.white
+      },
     SearchTicketButton:{
       flex:0,
       flexDirection:'row',
-      justifyContent:'flex-end',
+      //justifyContent:'flex-end',
       alignItems:'center',
       alignSelf:'baseline',
       borderRadius:2,
       paddingVertical:6,
-      marginRight:5, 
-      paddingHorizontal:15, 
-
+      //marginRight:50, 
+      paddingHorizontal:windowWidth*0.03,
       backgroundColor:globalStyles.colors.primary
-    },
-    headerText:{
-      fontSize:25,
-      marginRight:windowWidth*0.08,
-      color:globalStyles.colors.white
+    },logOutButton:{
+      flex:0,
+      flexDirection:'row',
+      //justifyContent:'flex-end',
+      alignItems:'center',
+      alignSelf:'baseline',
+      borderRadius:2,
+      paddingVertical:6,
+      //marginRight:3, 
+      paddingHorizontal:windowWidth*0.04, 
+      backgroundColor:globalStyles.colors.primary
     },
     companyClientContainer:{
       borderWidth:1,

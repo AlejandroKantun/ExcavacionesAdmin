@@ -14,6 +14,8 @@ const queryInsertTickets="INSERT INTO vales (bancoID, serie, folio, folioDigital
 
 const queryInsertTicketsMaterials="INSERT INTO valesmateriales (materialNombre, cantidadm3, valeID, materialID, EnviadoABaseDeDatosCentral) VALUES  ('Material A', 10.5, 1, 1, 0), ('Material B', 15.2, 2, 2, 0), ('Material C', 20.0, 3, 3, 0);"
 //INSERT INTO valesmateriales (materialNombre, cantidadm3, valeID, materialID, EnviadoABaseDeDatosCentral) VALUES  ('Material B', 10.5, 1, 2, 0)
+//insert into usuarios (usuario,contrasena,tipo_user,fechacreacion)values('Usuario5','$2y$10$roX30/LLBKRA5.YGmbvrauS9KolmCOyltE6HkK3jsrMT2.kpQUmxy','Administrador',date('now'))
+
 
 export const devData = () => {
   return (

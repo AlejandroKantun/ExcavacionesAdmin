@@ -24,7 +24,7 @@ export const MainDrawerNavigator = () => {
 
       <Drawer.Screen name="NewTicketScreen" component={NewTicketScreen}  options={{headerShown: false}}/>
       <Drawer.Screen name="SketchCanvasWithInteraction" component={SketchCanvasWithInteraction} />
-      <Drawer.Screen name="SearchTicketScreen" component={SearchTicketScreen} />
+      <Drawer.Screen name="SearchTicketScreen" component={SearchTicketScreen} options={{headerShown: false}} />
 
       {/* Screens */}
     </Drawer.Navigator>

@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { View, StyleSheet, TextInput, Text, Modal, Button,TouchableOpacity} from 'react-native';
 import CustomText from '../components/CustomText'
 import globalStyles from '../theme/appTheme';
@@ -8,6 +8,9 @@ import { HeaderTitle } from '../components/HeaderTittle';
 import  Icon  from 'react-native-vector-icons/Ionicons';
 import { getUserLogin, loginResult } from '../data/UserLogin';
 import { connectToDatabase } from '../data/dbStructure';
+import { WrongUserDataModal } from '../components/WrongUserDataModal';
+import { AuthContext } from '../context/AuthContext';
+import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 global.Buffer = require('buffer').Buffer;
 
 const db = connectToDatabase();
@@ -20,7 +23,9 @@ export const LoginScreen = () => {
     const [user, setUser] = useState('');
     const [pass, setPass] = useState('');
     const [isVisible, setIsVisible] = useState(false)
- 
+    const {token,getToken} =useTokenByUserPass()
+    const {changeUserName,changeUserID,changeToken,signIn} = useContext(AuthContext)
+
     
     const loginHandler=async ()=>{
         const loginResult:loginResult = await getUserLogin(user,pass);
@@ -29,10 +34,14 @@ export const LoginScreen = () => {
             setIsVisible(true)
         else if(loginResult.authorized ) {
             if(loginResult.path=='MainDrawerNavigator'){
+                signIn();
+                changeUserName(user);
+                changeUserID(Number(loginResult.userID));
+                //await getToken(user,pass);
+                //changeToken(token);
                 navigation.dispatch(StackActions.replace(loginResult.path))
                 } 
             else{
-                
                 navigation.navigate(loginResult.path as never,{
                     userId:loginResult.userID,
                     userName:user,
@@ -42,14 +51,14 @@ export const LoginScreen = () => {
             }
         }    
   return (
-    <View style={localSytles.mainContainer}>
-        <View style={localSytles.mainContainer}>
-            <CustomText style={localSytles.tittleText}>
+    <View style={localStyles.mainContainer}>
+        <View style={localStyles.mainContainer}>
+            <CustomText style={localStyles.tittleText}>
                 Sistema {'\n' }Administrativo
             </CustomText>
             <View style={{paddingBottom:10}}>
                 <TextInput
-                    style={localSytles.inputText}
+                    style={localStyles.inputText}
                     placeholder= '  Usuario  '
                     placeholderTextColor={globalStyles.colors.textLoginPlaceHolder}
                     autoCorrect={false}
@@ -57,7 +66,7 @@ export const LoginScreen = () => {
                     onChangeText={(Text)=>setUser(Text)}
                 />
             <TextInput
-                    style={localSytles.inputText}
+                    style={localStyles.inputText}
                     placeholder= 'Contraseña'
                     placeholderTextColor={globalStyles.colors.textLoginPlaceHolder}
                     autoCorrect={false}
@@ -67,49 +76,26 @@ export const LoginScreen = () => {
                 />
             </View>
 
-            <TouchableOpacity style={localSytles.loginButton}
+            <TouchableOpacity style={localStyles.loginButton}
             onPress={()=>{
                 loginHandler()
             }}
                 >
-                    <CustomText style={localSytles.loginButtonText}>
+                    <CustomText style={localStyles.loginButtonText}>
                         Iniciar sesión
                     </CustomText>
             </TouchableOpacity> 
-            <Modal
-            animationType='fade'
-            visible={isVisible}
-            transparent={true}
-            >
-            <View
-                style={localSytles.modalView}
-                >
-                <View
-                    style={localSytles.modalContainer}
-                        >
-                    <HeaderTitle title='Usuario o Password incorrectos'/>
-                    <View style={localSytles.iconErrorModal}>
-                        <Icon style={{marginTop:3}} name="close-circle-outline" size={55} color={globalStyles.colors.danger} />
-                    </View>
-                    <Text style={localSytles.textModal}>
-                        Verifica tus datos e intenta nuevamente
-                    </Text>
-                    <Button 
-                        title='Cerrar'
-                        onPress={()=>{setIsVisible(false)}}
-                        />
-                </View>
-                
-
-            </View>
-        </Modal>
+        
+        <WrongUserDataModal             
+                visible={isVisible}
+                setIsVisible={setIsVisible}/>
         </View>    
     </View>
   )
 }
 
 
-const localSytles= StyleSheet.create({
+const localStyles= StyleSheet.create({
     mainContainer:{
         flex:1,
         justifyContent:'center',

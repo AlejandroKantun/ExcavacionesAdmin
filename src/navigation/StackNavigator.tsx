@@ -26,7 +26,7 @@ export function MyStack() {
   return (
     <Stack.Navigator
         //initialRouteName="SplashScreen"
-        initialRouteName="MainDrawerNavigator"
+        initialRouteName="SplashScreen"
         screenOptions={{
         headerMode: 'float',
         headerTintColor: 'white',
