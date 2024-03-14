@@ -1,7 +1,7 @@
 export interface Banco {
     activoBanco:             number;
     creadoPor:               number;
-    fechaEliminacion:        null;
+    fechaEliminacion:        Date|null;
     nombreBanco:             string;
     estadoBanco:             number;
     fechaUltimaModificacion: Date;

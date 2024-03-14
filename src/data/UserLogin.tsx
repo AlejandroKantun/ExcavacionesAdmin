@@ -10,7 +10,8 @@ const db = connectToDatabase();
 export interface loginResult{
     authorized:boolean,
     path:string,
-    userID:string
+    userID:string,
+    zoneID:string,
 }
 
 interface dataResponse{
@@ -22,7 +23,8 @@ export const getUserLogin = async (userName:string,pass:string) => {
         {
             authorized:false,
             path:'',
-            userID:''
+            userID:'',
+            zoneID:''
         }
     
     const promise =   new Promise<Usuario[]>(
@@ -52,7 +54,8 @@ export const getUserLogin = async (userName:string,pass:string) => {
                 loginResult={
                                 authorized:true,
                                 path:'ChangePasswordScreen',
-                                userID:res[0].usuarioID.toString()
+                                userID:res[0].usuarioID.toString(),
+                                zoneID:res[0].bancoID.toString(),
                             }
                 return loginResult;
             }    
@@ -61,7 +64,9 @@ export const getUserLogin = async (userName:string,pass:string) => {
                 loginResult={
                                 authorized:true,
                                 path:'MainDrawerNavigator',
-                                userID:res[0].usuarioID.toString()
+                                userID:res[0].usuarioID.toString(),
+                                zoneID:res[0].bancoID.toString(),
+
                             }
                 return loginResult;
             }

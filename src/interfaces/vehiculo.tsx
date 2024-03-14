@@ -6,9 +6,9 @@ export interface VehiculoResponse {
 export interface Vehiculo {
     estadoVehiculo:             number;
     empresaID:                  number;
-    fechaSincronizacion:        null;
+    fechaSincronizacion:        Date|null;
     numeroEconomico:            string;
-    fechaEliminacion:           null;
+    fechaEliminacion:           Date|string;
     activoVehiculo:             number|boolean; 
     fechaCreacion:              Date;
     placa:                      string;
@@ -19,4 +19,5 @@ export interface Vehiculo {
     tipoUnidad:                 string;
     EnviadoABaseDeDatosCentral?: number;
     vehiculoID:                 number;
+    numeroTolva:                string|null;
 }

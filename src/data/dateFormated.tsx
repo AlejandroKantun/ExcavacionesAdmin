@@ -22,3 +22,22 @@ export const dateFormated=(date?:Date):String=>{
 
     return resultDate;
 }
+
+export const dateFormatedff=(date?:Date):String=>{
+    var a:Date;
+    if(date){
+             a= date;
+
+    }else{
+             a= new Date();
+
+    }
+    var resultDate=''
+    resultDate=
+    [a.getFullYear(),
+        a.getMonth()>9?(a.getMonth()+1):'0'+(a.getMonth()+1),
+        a.getDate()>9?a.getDate():'0'+a.getDate(),
+    ].join('-');
+   resultDate=resultDate.substring(2,resultDate.length)
+    return resultDate;
+}

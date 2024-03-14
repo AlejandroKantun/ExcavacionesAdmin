@@ -22,9 +22,11 @@ import { useDestinationsDB } from '../hooks/useDestinations';
 import { useVehiclesDB } from '../hooks/useVehicles';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
-import { dateFormated } from '../data/dateFormated';
+import { dateFormated, dateFormatedff } from '../data/dateFormated';
 import { StackActions } from '@react-navigation/native';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext, AuthState } from '../context/AuthContext';
+import { getLastRowTickets } from '../data/getLastRowTickets';
+import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
 
 
 
@@ -34,20 +36,23 @@ const windowWidth = Dimensions.get('window').width;
 
 export const NewTicketScreen = () => {
   const {authState,logOut} = useContext(AuthContext)
+  const [nextRow, setNextRow] = useState(0);
   const [newMaterialVisible, setNewMaterialVisible] = useState(false)
   const [saveModalVisible, setSaveModalVisible] = useState(false)
   const [signModalVisible, setSignModalVisible] = useState(false)
-  const [datePickerModalVisible, setDatePickerModalVisible] = useState(false)
+  const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
+  const [datePickerModalEndVisible, setDatePickerModalEndVisible] = useState(false)
   const {date}=useDate();
   const {materialsQty,addMaterialsQty,removeMaterialsQty} =useMaterialQty(MateriasInTicket)
   const navigation =useNavigation()
   const{companies}=useCompaniesDB()
+  const{vehicles}=useVehiclesDB()
   const{clients}=useClientsDB()
   const{destinations}=useDestinationsDB()
-  const{vehicles}=useVehiclesDB()
   const{ticket,setPropertyOnTicket}=useTicket()
-  const [placa, setPlaca] = useState(false)
-  const [noECO, setNoECO] = useState(false)
+  const{vehicles:vehiclesById,getVehicles}=useVehiclesByVehicleID()
+  const [placa, setPlaca] = useState('')
+  const [noTolva, setNoTolva] = useState('')
   const [paymentSelected, setPaymentSelected] = useState({
     cash:false,
     credit:false
@@ -70,7 +75,14 @@ export const NewTicketScreen = () => {
     logOut();
   }
   useEffect(() => {
-    setPropertyOnTicket("creadoPor",1)
+    getLastRowTickets().then(
+      (res)=>{
+        setNextRow(res)
+        setPropertyOnTicket("folioDigital",authState.zoneID?.toString()+'-'+authState?.userID?.toString()+'-'+res)
+        setPropertyOnTicket("folioFisico",dateFormatedff()+'-'+res.toString())
+
+      }
+    );
   }, [])
   
   return (
@@ -80,7 +92,8 @@ export const NewTicketScreen = () => {
         <View style={localStyles.headerContainer}>
         <View style={{
           flexDirection:'row',
-          justifyContent:'flex-end'
+          justifyContent:'flex-end',
+        
           }}>
              <TouchableOpacity 
                   style={localStyles.SearchTicketButton}
@@ -111,17 +124,18 @@ export const NewTicketScreen = () => {
           <View style={localStyles.dateFolioNumberView}>
             <View style={{flexDirection:'row', marginHorizontal:10}}>
                 <CustomText style={{textAlign:'center', fontSize:18}} >
-                            fecha:{'   '} 
+                      NoTicket:{'   '} 
                 </CustomText>
                 <CustomText style={{textAlign:'center', fontWeight:'bold',fontSize:16}} >
-                            {date}
+                    {authState.zoneID}-{authState.userID}-{nextRow}
                 </CustomText>
             </View>
             <View style={{flexDirection:'row', marginHorizontal:10}}>
                 <View style={localStyles.companyClientItemContainer}> 
                 <CustomText  >   Folio Fisico:</CustomText>
                 <TextInput style={localStyles.textInputDataHeader}
-                placeholder=  {'N/A'}
+                value={ticket.folioFisico}
+                placeholder=  {'aa-mm-dd-#'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 onChangeText={(text)=>{setPropertyOnTicket("folioFisico",text)}}
                 >
@@ -162,7 +176,7 @@ export const NewTicketScreen = () => {
             </View>
           :null
           }
-          <AssignRowTo label='Unidad' assignTo='unidad' data={vehicles} setPropertyOnTicket={setPropertyOnTicket} setPlaca={setPlaca} setNoECO={setNoECO}/>
+          <AssignRowTo label='Unidad' assignTo='unidad' data={vehicles} setPropertyOnTicket={setPropertyOnTicket} getVehicles={getVehicles}/>
           {ticket.vehiculoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
@@ -179,18 +193,25 @@ export const NewTicketScreen = () => {
               <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {''}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
-                onChangeText={(text)=>{setPropertyOnTicket("placa",text)}}
-
+                onChangeText={(text)=>{
+                                        setPropertyOnTicket("placa",text)
+                                        setPlaca(text);
+                                      }}
+                editable={vehiclesById[0]?.placa?false:true}
+                value={vehiclesById[0]?.placa?vehiclesById[0]?.placa:placa}
                 >
               </TextInput>
             </View>
             <View style={{flex:1, flexDirection:'row',alignItems:'center'}}>
-              <CustomText  >No. ECO:</CustomText>
-              <TextInput style={localStyles.textInputDataHeader}
-                placeholder=  {'S / U'}
+              <CustomText  >No Tolva:</CustomText>
+              <TextInput style={localStyles.textInputTolva}
+                placeholder=  {'S / N'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
-                onChangeText={(text)=>{setPropertyOnTicket("numeroEconomico",text)}}
-
+                onChangeText={(text)=>{
+                    setNoTolva(text);
+                }}
+                editable={vehiclesById[0]?.numeroTolva?false:true}
+                value={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.numeroTolva:noTolva}
                 >
               </TextInput>
             </View>
@@ -265,9 +286,18 @@ export const NewTicketScreen = () => {
                 <CustomText> Hora de entrada : </CustomText>
                 <TouchableOpacity 
                   style={localStyles.datePickerBtn}
-                  onPress={()=>{setDatePickerModalVisible(true)}}>
+                  onPress={()=>{setDatePickerModalStartVisible(true)}}>
                   <Icon style={{marginRight:10}} name="time-outline" size={30} color="#000" />
-                  <CustomText>{ticket.fechaVale?dateFormated(ticket.fechaVale):'Selecciona'}</CustomText>
+                  <CustomText>{ticket.fechaEntradaVehiculo?dateFormated(ticket.fechaEntradaVehiculo):'Selecciona'}</CustomText>
+                </TouchableOpacity>
+              </View>
+              <View style={localStyles.PayInfoRow}>
+                <CustomText> Hora de salida:{'    '} </CustomText>
+                <TouchableOpacity 
+                  style={localStyles.datePickerBtn}
+                  onPress={()=>{setDatePickerModalEndVisible(true)}}>
+                  <Icon style={{marginRight:10}} name="time-outline" size={30} color="#000" />
+                  <CustomText>{ticket.fechaSalidaVehiculo?dateFormated(ticket.fechaSalidaVehiculo):'Selecciona'}</CustomText>
                 </TouchableOpacity>
               </View>
               <View style={localStyles.PayInfoRow}>
@@ -299,12 +329,25 @@ export const NewTicketScreen = () => {
             <View>
               <DateTimePickerModal
                 mode="time"
-                isVisible={datePickerModalVisible}
+                isVisible={datePickerModalStartVisible}
                 onConfirm={(datePicked)=>{
                   setPropertyOnTicket("fechaVale",datePicked)
+                  setPropertyOnTicket("fechaEntradaVehiculo",datePicked)
+
                 }}
-                onCancel={()=>{setDatePickerModalVisible(false)}}
-                onHide={()=>{setDatePickerModalVisible(false)}}
+                onCancel={()=>{setDatePickerModalStartVisible(false)}}
+                onHide={()=>{setDatePickerModalStartVisible(false)}}
+              />
+            </View>
+            <View>
+              <DateTimePickerModal
+                mode="time"
+                isVisible={datePickerModalEndVisible}
+                onConfirm={(datePicked)=>{
+                  setPropertyOnTicket("fechaSalidaVehiculo",datePicked)
+                }}
+                onCancel={()=>{setDatePickerModalEndVisible(false)}}
+                onHide={()=>{setDatePickerModalEndVisible(false)}}
               />
             </View>
     </ScrollView>
@@ -382,13 +425,21 @@ const localStyles = StyleSheet.create({
       marginHorizontal:10
     },
     textInputDataHeader:{
-      paddingHorizontal:windowWidth*0.1, 
+      paddingHorizontal:windowWidth*0.05, 
       paddingVertical:4,
       borderColor:'#ccc',
       borderWidth:1,
       borderRadius:8, 
-      marginHorizontal:10,
+      marginHorizontal:5,
       color:'#000'},
+    textInputTolva:{
+        paddingHorizontal:windowWidth*0.08, 
+        paddingVertical:4,
+        borderColor:'#ccc',
+        borderWidth:1,
+        borderRadius:8, 
+        marginHorizontal:5,
+        color:'#000'},
     headerMaterialsToDispatch:{
       flex:1,
       flexDirection:'row', 

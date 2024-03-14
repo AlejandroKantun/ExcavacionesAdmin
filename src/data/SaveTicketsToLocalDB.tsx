@@ -33,8 +33,9 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
     "clienteNombre, "+
     "destinoNombre, "+
     "vehiculoNombre, "+
-    "firma "+
-    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    "firma, "+
+    "importe"+
+    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     
     const sentToCentralDB=0;                
     let countItemsInserted=0;
@@ -65,8 +66,8 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
                 ticket.clienteID==1?ticket.clienteNombre:"",
                 ticket.destinoID==1?ticket.destinoNombre:"",
                 ticket.vehiculoID==1?ticket.vehiculoNombre:"",
-                ticket.firma 
-                
+                ticket.firma ,
+                ticket.Importe
             ],
             async (res,ResultSet)=>{
                 if (ResultSet.rowsAffected >0 ){

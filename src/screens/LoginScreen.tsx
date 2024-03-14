@@ -24,7 +24,7 @@ export const LoginScreen = () => {
     const [pass, setPass] = useState('');
     const [isVisible, setIsVisible] = useState(false)
     const {token,getToken} =useTokenByUserPass()
-    const {changeUserName,changeUserID,changeToken,signIn} = useContext(AuthContext)
+    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID} = useContext(AuthContext)
 
     
     const loginHandler=async ()=>{
@@ -37,6 +37,7 @@ export const LoginScreen = () => {
                 signIn();
                 changeUserName(user);
                 changeUserID(Number(loginResult.userID));
+                changeZoneID(Number(loginResult.zoneID));
                 //await getToken(user,pass);
                 //changeToken(token);
                 navigation.dispatch(StackActions.replace(loginResult.path))

@@ -8,8 +8,8 @@ export interface Chofer {
     estadoChofer:               number;
     activoChofer:               number;
     EnviadoABaseDeDatosCentral?: number;
-    fechaSincronizacion:        null;
-    fechaEliminacion:           null;
+    fechaSincronizacion:        Date|null;
+    fechaEliminacion:           Date|null;
     creadoPor:                  number;
     nombreChofer:               string;
     fechaUltimaModificacion:    Date;

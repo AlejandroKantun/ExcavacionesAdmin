@@ -8,9 +8,9 @@ export interface Material {
     appID?:                  null | string;
     nombreMaterial:          string;
     fechaCreacion:           Date;
-    fechaUltimaModificacion: null;
-    fechaEliminacion:        null;
-    fechaSincronizacion:     null;
+    fechaUltimaModificacion: Date|null;
+    fechaEliminacion:        Date|null;
+    fechaSincronizacion:     Date|null;
     creadoPor:               number | null;
     activoMaterial:          boolean;
     estadoMaterial:          boolean;

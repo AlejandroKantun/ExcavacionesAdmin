@@ -10,6 +10,8 @@ import { Cliente } from '../interfaces/cliente';
 import { Destino } from '../interfaces/destino';
 import { Vehiculo } from '../interfaces/vehiculo';
 import { Vale } from '../interfaces/vale';
+import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
+import { Alert } from 'react-native';
 
 enum AssignType{
     empresa="Empresa",
@@ -24,15 +26,19 @@ interface Props{
   label:string,
   data: any[],
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
-  setPlaca?: React.Dispatch<React.SetStateAction<boolean>>
-  setNoECO?: React.Dispatch<React.SetStateAction<boolean>>
-
+  getVehicles?: (vehicleId: number) => Promise<void>
 }
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,setPlaca,setNoECO}:Props ) => {
+export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles}:Props ) => {
   const [isFocus, setIsFocus] = useState(false);
+
+  const onSelectVehicle=async(vehicleID:number)=>{
+    setPropertyOnTicket( "vehiculoID",vehicleID);
+    await getVehicles!(vehicleID)
+
+  }
   return (
     <View style={localStyles.companyClientItemContainer}> 
             <CustomText style={{flex:1,marginLeft:10}} >
@@ -148,14 +154,12 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,setPlaca,se
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Vehiculo) =>
-                                            
                                                                       <View style={localStyles.renderItemContainer}>
                                                                               <CustomText> {item.vehiculoID} - {item.tipoUnidad}</CustomText>
                                                                          </View>}
                                           onChange={item => {
                                             const setting =async ()=>{
-                                                     setPropertyOnTicket("vehiculoID",item.vehiculoID);
-                                            
+                                                    onSelectVehicle(item.vehiculoID);
                                                      
                                             } 
                                             setting()

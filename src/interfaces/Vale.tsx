@@ -9,7 +9,7 @@ export interface Vale {
     empresaID:                  number;
     destinoID:                  number;
     clienteID:                  number;
-    fechaEntradaVehiculo:       string|null;
+    fechaEntradaVehiculo:       Date|null;
     estadoVale:                 number;
     activoVale:                 number;
     fechaEliminacion:           Date|null;
@@ -36,7 +36,9 @@ export interface Vale {
     observaciones:              string;
     vehiculoID:                 number;
     folioDigital:               string;
-    Importe?:                   string|null
-    formadepago?:               string|null
-    empresaNombre?:             string|null
+    Importe?:                   number|null;
+    formadepago?:               string|null;
+    empresaNombre?:             string|null;
+    observacionesEliminar?:     string|null;
+   
 }

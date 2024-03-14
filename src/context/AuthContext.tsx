@@ -7,7 +7,7 @@ export interface AuthState{
     userName?:string,
     userID?:number,
     token?:string,
-    emresaId?:string
+    zoneID?:number,
 }
 //Initial State
 
@@ -16,7 +16,7 @@ export const authInitialState:AuthState={
     userName:undefined,
     userID:undefined,
     token:undefined,
-    emresaId:undefined
+    zoneID:undefined
 }
 
 //Usar la interface para decirle a react como luce y que expone el context
@@ -24,9 +24,11 @@ export interface AuthContextProps{
     authState:AuthState,
     signIn:()=>void,
     logOut: () => void;
-    changeUserID:(iconnName:number)=>void,
+    changeUserID:(userId:number)=>void,
     changeUserName:(userName:string)=>void,
     changeToken:(userName:string)=>void,
+    changeZoneID:(zoneId:number)=>void,
+
 }
 
 //Crear el contexto
@@ -52,6 +54,11 @@ export const AuthProvider = ({children}:any) => {
     const changeToken =(token:string)=>{
         dispatch({type:'changeUserName',payload:token})   
     }
+    const changeZoneID=(zoneId:number)=>{
+        dispatch({type:'changeZoneId',payload:zoneId})   
+
+    }
+
 
 return(
     <AuthContext.Provider value={{
@@ -60,7 +67,8 @@ return(
         logOut,
         changeUserID,
         changeUserName,
-        changeToken
+        changeToken,
+        changeZoneID
     }}>
         {children}
     </AuthContext.Provider>

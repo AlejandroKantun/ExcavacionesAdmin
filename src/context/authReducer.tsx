@@ -5,6 +5,8 @@ type AuthAction=
     |{type:'changeUserID', payload:number}
     |{type:'changeUserName',payload:string}
     |{type:'changeToken',payload:string}
+    |{type:'changeZoneId',payload:number}
+
 
 
 export const authReducer=(state:AuthState, action:AuthAction): AuthState =>{
@@ -21,8 +23,8 @@ export const authReducer=(state:AuthState, action:AuthAction): AuthState =>{
                 isLoggedIn:false,
                 userID:undefined,
                 userName:undefined,
-                token:undefined
-
+                token:undefined,
+                zoneID:undefined
             }
         case'changeUserID':
             return{
@@ -39,6 +41,12 @@ export const authReducer=(state:AuthState, action:AuthAction): AuthState =>{
             ...state,
             token:action.payload
         }
+        case'changeZoneId':
+        return{
+            ...state,
+            zoneID:action.payload
+        }
+        
         default:
             return state;
     }

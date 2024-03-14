@@ -9,9 +9,9 @@ export interface Destino {
     creadoPor:                  number;
     nombreDestino:              string;
     estadoDestino:              number;
-    fechaSincronizacion:        null;
+    fechaSincronizacion:        Date|null;
     activoDestino:              number;
-    fechaEliminacion:           null;
+    fechaEliminacion:           Date|null;
     fechaUltimaModificacion:    Date;
     codigoPostal:               string;
     direccionDestino:           string;

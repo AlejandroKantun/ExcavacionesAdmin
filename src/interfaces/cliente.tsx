@@ -8,8 +8,8 @@ export interface Cliente {
     estadoCliente:              number;
     activoCliente:              number;
     empresaID:                  number;
-    fechaSincronizacion:        null;
-    fechaEliminacion:           null;
+    fechaSincronizacion:        Date|null;
+    fechaEliminacion:           Date|null;
     fechaUltimaModificacion:    Date;
     fechaCreacion:              Date;
     nombreCliente:              string;
