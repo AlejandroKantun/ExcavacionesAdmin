@@ -24,7 +24,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
 import { dateFormated, dateFormatedff } from '../data/dateFormated';
 import { StackActions } from '@react-navigation/native';
-import { AuthContext, AuthState } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { getLastRowTickets } from '../data/getLastRowTickets';
 import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
 
@@ -33,6 +33,7 @@ import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
 const MateriasInTicket:MaterialQty[] = [];
 
 const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const NewTicketScreen = () => {
   const {authState,logOut} = useContext(AuthContext)
@@ -80,9 +81,11 @@ export const NewTicketScreen = () => {
         setNextRow(res)
         setPropertyOnTicket("folioDigital",authState.zoneID?.toString()+'-'+authState?.userID?.toString()+'-'+res)
         setPropertyOnTicket("folioFisico",dateFormatedff()+'-'+res.toString())
+        setPropertyOnTicket("fechaEntradaVehiculo",today)
 
       }
     );
+    const today= new Date()
   }, [])
   
   return (
@@ -130,10 +133,12 @@ export const NewTicketScreen = () => {
                     {authState.zoneID}-{authState.userID}-{nextRow}
                 </CustomText>
             </View>
-            <View style={{flexDirection:'row', marginHorizontal:10}}>
+            <View style={localStyles.folioFisicoContainer}>
                 <View style={localStyles.companyClientItemContainer}> 
                 <CustomText  >   Folio Fisico:</CustomText>
-                <TextInput style={localStyles.textInputDataHeader}
+                <TextInput style={localStyles.textInputFolioFisico}
+                maxLength={15}
+                multiline={true}
                 value={ticket.folioFisico}
                 placeholder=  {'aa-mm-dd-#'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
@@ -288,7 +293,10 @@ export const NewTicketScreen = () => {
                   style={localStyles.datePickerBtn}
                   onPress={()=>{setDatePickerModalStartVisible(true)}}>
                   <Icon style={{marginRight:10}} name="time-outline" size={30} color="#000" />
-                  <CustomText>{ticket.fechaEntradaVehiculo?dateFormated(ticket.fechaEntradaVehiculo):'Selecciona'}</CustomText>
+                  <CustomText>
+                    {ticket.fechaEntradaVehiculo?
+                    dateFormated(ticket.fechaEntradaVehiculo).substring(0,dateFormated(ticket.fechaEntradaVehiculo).length-3)
+                    :'Selecciona'}</CustomText>
                 </TouchableOpacity>
               </View>
               <View style={localStyles.PayInfoRow}>
@@ -297,7 +305,10 @@ export const NewTicketScreen = () => {
                   style={localStyles.datePickerBtn}
                   onPress={()=>{setDatePickerModalEndVisible(true)}}>
                   <Icon style={{marginRight:10}} name="time-outline" size={30} color="#000" />
-                  <CustomText>{ticket.fechaSalidaVehiculo?dateFormated(ticket.fechaSalidaVehiculo):'Selecciona'}</CustomText>
+                  <CustomText> 
+                      {ticket.fechaSalidaVehiculo?
+                        dateFormated(ticket.fechaSalidaVehiculo).substring(0,dateFormated(ticket.fechaSalidaVehiculo).length-3)
+                        :'Selecciona'}</CustomText>
                 </TouchableOpacity>
               </View>
               <View style={localStyles.PayInfoRow}>
@@ -305,6 +316,16 @@ export const NewTicketScreen = () => {
                 <View>
                   <CustomText> {authState.userName} </CustomText>
                 </View>
+              </View>
+              <View style={localStyles.PayInfoRow}>
+                      <TextInput style={localStyles.textInpuComments}
+                        multiline={true}
+                        value={ticket.folioFisico}
+                        placeholder=  {'Comentarios'}
+                        placeholderTextColor='rgba(0,0,0,0.5)'
+                        onChangeText={(text)=>{setPropertyOnTicket("folioFisico",text)}}
+                        >
+                        </TextInput>
               </View>
               <View style={localStyles.BtnPayRow}>
               <TouchableOpacity 
@@ -412,17 +433,26 @@ const localStyles = StyleSheet.create({
     },
     dateFolioNumberView:{
       flexDirection:'row', 
-      justifyContent:'space-between', 
       alignItems:'center', 
       paddingVertical:4,
       }
-    ,
+    ,folioFisicoContainer:{
+      flexDirection:'row', 
+      flex:1},
+    textInputFolioFisico:{
+        paddingHorizontal:windowWidth*0.03, 
+        flex:1,
+        paddingVertical:4,
+        borderColor:'#ccc',
+        borderWidth:1,
+        borderRadius:8, 
+        marginHorizontal:5,
+        color:'#000'},
     companyClientItemContainer:{
       flexDirection:'row',
       justifyContent:'flex-start',
       alignItems:'center',
       paddingVertical:3,
-      marginHorizontal:10
     },
     textInputDataHeader:{
       paddingHorizontal:windowWidth*0.05, 
@@ -519,7 +549,14 @@ const localStyles = StyleSheet.create({
       borderRadius:8, 
       marginHorizontal:10,
       color:'#000',
+    },
+    textInpuComments:{
+      width:windowWidth*0.85,
+      height:windowHeight*0.13,
+      paddingHorizontal:windowWidth*0.08, 
+      borderColor:'#ccc',
+      borderWidth:1,
+      borderRadius:4, 
       
-         
-    }
+      color:'#000'}
 });

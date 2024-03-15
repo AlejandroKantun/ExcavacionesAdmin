@@ -7,6 +7,9 @@ import CustomText from './CustomText';
 import { useMaterialsDB } from '../hooks/useMaterialsDB';
 import { MaterialQty } from '../hooks/useMaterialQty';
 import { HeaderTitle } from './HeaderTittle';
+import { useMaterialsByMaterialID } from '../hooks/useMaterialsByMaterialID';
+import { Material } from '../interfaces/material';
+import { number } from 'yup';
 
 const windowWidth = Dimensions.get('window').width;
 const windowheight= Dimensions.get('window').height;
@@ -25,7 +28,16 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
     const [materialName, setMaterialName] = useState('')
     const {materials}=useMaterialsDB()
     const [materialM3, setMaterialM3] = useState(0)
+    const{materials:material,getMaterialById}=useMaterialsByMaterialID()
+    const [importUpdated, setImportUpdated] = useState(false)
+    const [newImport, setNewImport] = useState(0)
 
+    const onChangeItem=(item:Material)=>{
+        setValue(item.materialID);
+        setMaterialName(item.nombreMaterial);
+        getMaterialById(item.materialID);
+        setNewImport(Number(item.importe))
+    }
   return (
     <Modal
             animationType='slide'
@@ -59,8 +71,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                 valueField="materialID"
                                 placeholder={!isFocus ? 'Selec Material' : '...'}
                                 searchPlaceholder="Buscar material"
-                                //value={value.toString()}
-                                //onFocus={() => setIsFocus(true)}
+
                                 onBlur={() => setIsFocus(false)}
                                 renderItem={ (item) => 
                                     <View style={localStyles.renderItemContainer}>
@@ -70,9 +81,9 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     </View>
                                 }
                                 onChange={item => {
-                                    setValue(item.materialID);
-                                    setMaterialName(item.nombreMaterial);
-                                    //setIsFocus(false);
+
+                                    onChangeItem(item)
+                                    
                                 }}
                                 renderLeftIcon={() => (
                                     <Icon style={localStyles.renderLeftIcon} 
@@ -103,16 +114,36 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             <TextInput style={localStyles.textInputDataMaterial}
                                 placeholder=  {'Material'}  
                                 placeholderTextColor='rgba(0,0,0,0.5)'
+                                maxLength={30}
                                 onChangeText={(text)=>{
                                     setMaterialName(text);
                                 }}>
                             </TextInput>
                             </View>
                         :null
-          }
+                    }
+                    {material[0]?
+                        <View>  
+                            <TextInput style={localStyles.textInputDataMaterial}
+                                placeholder=  {'Importe: '}  
+                                maxLength={30}
+                                placeholderTextColor='rgba(0,0,0,0.5)'
+                                keyboardType='numeric'
+                                onChangeText={(text)=>{
+                                    setImportUpdated(true)
+                                    setNewImport(Number(text))
+                                }}>
+                            </TextInput>
+                            </View>
+                        :null
+                    }
+                   
 
                     <View >
-                        <View style={localStyles.buttonsContainer}>
+                        <View style={[  
+                                        localStyles.buttonsContainer,
+                                        {marginTop:value==1?0:windowheight*0.05}
+                                                    ]}>
                             <TouchableOpacity 
                             style={localStyles.btnCancel}
                             onPress={()=>{
@@ -129,7 +160,9 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     ID: lengthData+1,
                                     materialName: materialName,
                                     quantity:materialM3,
-                                    materialID: value
+                                    materialID: value,
+                                    importUpdated:importUpdated,
+                                    newImport:newImport
                                      })
                                 setIsVisible(false)
                             }}>
@@ -159,7 +192,7 @@ const localStyles = StyleSheet.create({
     },
     modalContainer:{
         backgroundColor:'white',
-        height:300,
+        height:windowheight*0.4,
         width:windowWidth*0.95,
         //justifyContent:'center',
         alignItems:'center',

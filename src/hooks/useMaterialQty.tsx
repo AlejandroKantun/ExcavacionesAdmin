@@ -3,7 +3,9 @@ export interface MaterialQty{
     ID:number,
     materialName:string,
     quantity:number,
-    materialID:number
+    materialID:number,
+    importUpdated:boolean,
+    newImport:number
   }
 
 export const useMaterialQty = (data:MaterialQty[]) => {

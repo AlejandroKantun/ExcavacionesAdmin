@@ -3,12 +3,8 @@ import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
+import { MaterialQty } from '../hooks/useMaterialQty';
 
-interface MaterialQty{
-    ID:number,
-    materialName:string,
-    quantity:number
-}
 
 interface Props{
     material:MaterialQty,
@@ -19,9 +15,22 @@ interface Props{
 export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty}:Props) => {
   return (
     <View style={localStyles.mainContainer}>
-        <CustomText style={localStyles.dataText}>
-            {material.materialName} - {material.quantity} [m3]
-        </CustomText> 
+        <View
+            style={localStyles.materialDetailContainer}>
+            <CustomText style={localStyles.dataText}>
+                {material.materialName} 
+            </CustomText> 
+            <CustomText style={localStyles.subDataText}>
+                {material.quantity} [m3]
+            </CustomText> 
+            <CustomText style={localStyles.subDataText}>
+                {material.newImport} [$/m3]
+            </CustomText> 
+            <CustomText style={localStyles.subTotal}>
+                {material.newImport*material.quantity} [$/m3]
+            </CustomText> 
+        </View>
+       
         <View style={{marginLeft:'auto'}}>
             <TouchableOpacity 
                 style={localStyles.btnDelete}
@@ -44,8 +53,26 @@ const localStyles = StyleSheet.create({
         marginVertical:4,
         marginLeft:10
     },
+    materialDetailContainer:{
+        flex:1,
+        paddingHorizontal:10,
+        flexDirection:'row',
+        justifyContent:'space-around',
+        alignItems:'center'
+    },
     dataText:{
-        fontSize:18
+        fontSize:18,
+        fontWeight:'400'
+    },
+    subDataText:{
+        fontSize:14,
+        fontWeight:'400',
+        
+    },
+    subTotal:{
+        fontSize:14,
+        fontWeight:'600',
+        
     },
     btnDelete:{
         backgroundColor:globalStyles.colors.danger,
@@ -55,6 +82,7 @@ const localStyles = StyleSheet.create({
         width:30,
         height:30,
         alignItems:'center',
-        justifyContent:'center'
+        justifyContent:'center',
+        paddingHorizontal:0,
     }
 });

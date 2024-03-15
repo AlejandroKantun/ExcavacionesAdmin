@@ -14,7 +14,8 @@ export interface Material {
     creadoPor:               number | null;
     activoMaterial:          boolean;
     estadoMaterial:          boolean;
-    EnviadoABaseDeDatosCentral?: number
+    EnviadoABaseDeDatosCentral?: number,
+    importe:                 number|null
 }
 
 export interface MaterialDB {
