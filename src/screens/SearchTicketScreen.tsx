@@ -12,6 +12,7 @@ import { openDatabase } from 'react-native-sqlite-storage';
 import { useTicketsDB } from '../hooks/useTicketsDB';
 import { useTicketsDBByValeID } from '../hooks/useTicketsDBByValeID';
 import { btoa } from '../data/base64BLOBConverter';
+import { TicketToLoadItem } from '../components/TicketToLoadItem';
 
 var db = openDatabase({
     name: 'UserDatabase',
@@ -39,11 +40,10 @@ export const SearchTicketScreen = () => {
   return (
     
             <View
-                style={localStyles.mainContainer}
-                >
-               
+                style={localStyles.mainContainer}> 
+                  
                     <View style={localStyles.searchTab}>
-                      
+  
                     <Dropdown
                                 style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                 placeholderStyle={localStyles.placeholderStyle}
@@ -70,21 +70,9 @@ export const SearchTicketScreen = () => {
                                     color="rgba(0,0,0,0.5)" />
                                 )}
                                 />
-                    
-                   
                      </View>
                      <View>
-                       <CustomText>
-                         valeId: {JSON.stringify(ticketByID[0]?ticketByID[0].valeID:null)}
-                       </CustomText>
-                       <CustomText>
-                         ClienteID:{JSON.stringify(ticketByID[0]?ticketByID[0].clienteID:null)}
-                       </CustomText>
-                       <CustomText>
-                         fecha vale: {JSON.stringify(ticketByID[0]?ticketByID[0].fechaVale:null)}
-                       </CustomText>
-                  
-
+                      <TicketToLoadItem ticketByID={ticketByID}/>
                     </View>
                    
 
@@ -93,7 +81,6 @@ export const SearchTicketScreen = () => {
                             style={localStyles.btnCancel}
                             onPress={()=>{
                                
-
                                 navigation.dispatch(
                                     //login process
                                         StackActions.replace('MainDrawerNavigator')
@@ -106,8 +93,6 @@ export const SearchTicketScreen = () => {
                             style={localStyles.btnSave}
                             onPress={()=>{
                                 //VALIDATION
-
-
                             }}>
                             <Icon style={{marginTop:3, paddingRight:10}} name="open-outline" size={30} color="#fff" />
                             <CustomText style={{color:'#fff'}} >Cargar</CustomText>
@@ -123,8 +108,6 @@ const localStyles = StyleSheet.create({
     mainContainer:{
         flex:1,
         backgroundColor:'white',
-        alignItems:'center',
-        justifyContent:'space-between'
     },
 
     searchTab:{

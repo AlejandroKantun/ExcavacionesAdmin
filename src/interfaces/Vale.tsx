@@ -40,5 +40,5 @@ export interface Vale {
     formadepago?:               string|null;
     empresaNombre?:             string|null;
     observacionesEliminar?:     string|null;
-   
+    numeroTolva?:               string|null;
 }

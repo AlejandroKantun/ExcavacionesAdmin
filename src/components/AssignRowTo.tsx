@@ -26,32 +26,27 @@ interface Props{
   label:string,
   data: any[],
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
-  getVehicles?: (vehicleId: number) => Promise<void>
+  getVehicles?: (vehicleId: number) => Promise<void>,
+  vehicleById?: Vehiculo[]
 }
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles}:Props ) => {
+export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById}:Props ) => {
   const [isFocus, setIsFocus] = useState(false);
 
-  const onSelectVehicle=async(vehicleID:number)=>{
-    setPropertyOnTicket( "vehiculoID",vehicleID);
+  const onSelectVehicle=async(vehicleID:number,)=>{
     await getVehicles!(vehicleID)
-
+    await setPropertyOnTicket( "vehiculoID",vehicleID);
+    await setPropertyOnTicket("placa",vehicleById![0]?.placa)
   }
+  
   return (
     <View style={localStyles.companyClientItemContainer}> 
             <CustomText style={{flex:1,marginLeft:10}} >
                         {label}: 
             </CustomText>
-            {/*
-            <TextInput style={localStyles.textInputSearch}
-            placeholder={'Buscar '+AssignType[assignTo]}
-            placeholderTextColor='rgba(0,0,0,0.5)'
-            
-            >
-            </TextInput>
-            */}
             {
 
                AssignType[assignTo]==='Empresa'? 
@@ -159,8 +154,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                                                          </View>}
                                           onChange={item => {
                                             const setting =async ()=>{
-                                                    onSelectVehicle(item.vehiculoID);
-                                                     
+                                                    onSelectVehicle(item.vehiculoID);   
                                             } 
                                             setting()
 
