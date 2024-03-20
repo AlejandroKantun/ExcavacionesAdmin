@@ -22,7 +22,7 @@ interface Props{
     setPlaca: React.Dispatch<React.SetStateAction<string>>,
     noTolva:string,
     setNoTolva: React.Dispatch<React.SetStateAction<string>>,
-
+    FolioFisico:string
 }
 export const TicketAssignDetail = ({
                                     nextRow,
@@ -31,7 +31,8 @@ export const TicketAssignDetail = ({
                                     placa,
                                     setPlaca,
                                     noTolva,
-                                    setNoTolva}:Props) => {
+                                    setNoTolva,
+                                    FolioFisico}:Props) => {
     const {authState} = useContext(AuthContext)
     const{companies}=useCompaniesDB()
     const{vehicles}=useVehiclesDB()
@@ -42,6 +43,7 @@ export const TicketAssignDetail = ({
   return (
     <View style={localStyles.companyClientContainer}>
           <View style={localStyles.dateFolioNumberView}>
+            {/*
             <View style={{flexDirection:'row', marginHorizontal:10}}>
                 <CustomText style={{textAlign:'center', fontSize:18}} >
                       NoTicket:{'   '} 
@@ -50,13 +52,16 @@ export const TicketAssignDetail = ({
                     {authState.zoneID}-{authState.userID}-{nextRow}
                 </CustomText>
             </View>
+            */}
+            
             <View style={localStyles.folioFisicoContainer}>
                 <View style={localStyles.companyClientItemContainer}> 
                 <CustomText  >   Folio Fisico:</CustomText>
                 <TextInput style={localStyles.textInputFolioFisico}
                 maxLength={15}
                 multiline={true}
-                value={ticket.folioFisico}
+                defaultValue={FolioFisico}
+                //value={ticket.folioFisico}
                 placeholder=  {'aa-mm-dd-#'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 onChangeText={(text)=>{setPropertyOnTicket("folioFisico",text)}}

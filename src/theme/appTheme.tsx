@@ -8,11 +8,14 @@ const globalStyles = {
         textPrimary:"#24292e",
         textSecondary:"#586069",
         primary:"#0366d6",
+        primaryRGB:'3,102,214',
         white:"#fefefe",
         textLoginPlaceHolder:"#1572e8",
         danger:'#f25961',
         sucess:'#5cb85c',
-        shadowBtn:'#ededed'
+        shadowBtn:'#ededed',
+        ambar:'#ffbf00',
+        dangerShadow:'rgba(242, 89, 97,0.5)',
     },
     fontSizes:{
         body:14,

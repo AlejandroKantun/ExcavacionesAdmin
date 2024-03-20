@@ -43,3 +43,21 @@ export const dateFormatedff=(date?:Date):String=>{
    resultDate=resultDate.substring(2,resultDate.length)
     return resultDate;
 }
+
+export const dateFormatedDateFiltered=(date?:Date):String|undefined=>{
+    var a:Date;
+    if(date){
+             a= date;
+
+    }else{
+             return undefined;
+
+    }
+    var resultDate=''
+    resultDate=
+    [a.getFullYear(),
+        a.getMonth()>9?(a.getMonth()+1):'0'+(a.getMonth()+1),
+        a.getDate()>9?a.getDate():'0'+a.getDate(),
+    ].join('-');
+    return resultDate;
+}

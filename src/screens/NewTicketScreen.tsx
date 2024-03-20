@@ -79,7 +79,7 @@ export const NewTicketScreen = () => {
     );
     const today= new Date()
   }, [])
-  
+  const today = new Date()
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView  style={localStyles.mainContainer}>
@@ -93,6 +93,7 @@ export const NewTicketScreen = () => {
           setPlaca={setPlaca}
           noTolva={noTolva}
           setNoTolva={setNoTolva}
+          FolioFisico={dateFormatedff(today).substring(0,dateFormatedff(today).length) +'-'+ nextRow}
         />
           <View>
             <View style={localStyles.headerMaterialsToDispatch}>
@@ -168,7 +169,9 @@ export const NewTicketScreen = () => {
                     :'Selecciona'}</CustomText>
                 </TouchableOpacity>
               </View>
-              <View style={localStyles.PayInfoRow}>
+              {
+                /*
+                <View style={localStyles.PayInfoRow}>
                 <CustomText> Hora de salida:{'    '} </CustomText>
                 <TouchableOpacity 
                   style={localStyles.datePickerBtn}
@@ -180,6 +183,9 @@ export const NewTicketScreen = () => {
                         :'Selecciona'}</CustomText>
                 </TouchableOpacity>
               </View>
+                */
+              }
+              
               <View style={localStyles.PayInfoRow}>
                 <CustomText> Nombre de despachador: </CustomText>
                 <View>
@@ -336,6 +342,5 @@ const localStyles = StyleSheet.create({
       borderColor:'#ccc',
       borderWidth:1,
       borderRadius:4, 
-      
       color:'#000'}
 });
