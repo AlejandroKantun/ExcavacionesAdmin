@@ -18,7 +18,7 @@ interface Props{
 
 
 
-export const ProcessSuccessModal = ({visible,setIsVisible}:Props) => {
+export const ProcessSuccessModal = ({visible,setIsVisible}:Props,{children}:any) => {
     const [value, setValue] = useState(0);
     const [animating, setAnimating] = useState(visible);
     useEffect(() => {
@@ -63,9 +63,10 @@ export const ProcessSuccessModal = ({visible,setIsVisible}:Props) => {
                     </TouchableOpacity>
                     </View> 
                     <View style={{alignItems:'center',marginTop:20}}>
-                        <CustomText >
+                            <CustomText >
                                 Procesado exitosamente
                             </CustomText>
+                            {children}
                             <TouchableOpacity
                                 onPress={()=>{
                                 }}>

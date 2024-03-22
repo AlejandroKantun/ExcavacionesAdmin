@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import {Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import CustomText from '../components/CustomText'
 import { requestToken } from '../data/UserLogin';
@@ -11,13 +11,14 @@ import { useEffect } from 'react';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 
 import DeviceInfo from 'react-native-device-info';
-import { changePassResult, ChangePassWordRequest } from '../api/operationsToDB';
+import { changePassResult, ChangePassWordRequest, requestAndSaveUsers } from '../api/operationsToDB';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParams } from '../navigation/StackNavigator';
 import { SavePassModal } from '../components/SavePassModal';
-
-const userName= 'Checador1';
-const pass='PasswordApp';
+import { AuthContext } from '../context/AuthContext';
+import { useUsersDB } from '../hooks/useUsersDB';
+import { storeUser } from '../data/persistantData';
+import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -26,51 +27,61 @@ interface Props extends StackScreenProps<RootStackParams,'ChangePasswordScreen'>
 
 
 export const ChangePasswordScreen = ({route}:Props) => {
-
+    const {authState,changeZoneID,changeUserID}=useContext(AuthContext)
    const navigation =useNavigation()
    const {token,getToken} =useTokenByUserPass();
    const [deviceId, setdeviceId] = useState('')
    const ChangePassParams= route.params;
     const [isVisible, setIsVisible] = useState(false)
+    const {users,getUserByUserName}=useUsersDB()
 
-   const submitChangeRequest=async(newPassValidated:string)=>{
-    const  changeResult:changePassResult = await ChangePassWordRequest(ChangePassParams.userId,newPassValidated,token,deviceId);
+const submitChangeRequest=async(newPassValidated:string)=>{
+    const  changeResult:changePassResult = await ChangePassWordRequest(
+            users[0].usuarioID.toString(),
+            newPassValidated,
+            authState.token!,
+            deviceId);
     if (changeResult.success){
         setIsVisible(true);
+        //storing user for next login
+        storeUser(authState.userName!);
+        changeZoneID(users[0].bancoID);
+        changeUserID(users[0].usuarioID);
+
+
         setTimeout(() => {
                 navigation.dispatch(StackActions.replace(changeResult.path))
-        }, 3000);
+        }, 2000);
     }
     else{
         Alert.alert('Ha ocurrido un error en el proceso de actualización');
     }
-   }
+}
+
    useEffect( () => {
+    getUserByUserName(authState.userName!);
+
     DeviceInfo.getUniqueId().then((result)=>{
         setdeviceId(result)
+        requestAndSaveUsers(authState.token!,result)
     });
-    const executeToken=async()=>{
-        await getToken(
-                        ChangePassParams.userName,
-                        ChangePassParams.pass)//replace for new ones
-    }
-    executeToken();
    }, [])
    
 
 
   return (
     <View style={localStyles.mainCointainer}>
-        
+        <HeaderSearchTicket
+        title={'Cambiar Contraseña'}
+        />
         <View style={localStyles.itemsContainer}>
-            {/*
-                            <CustomText> user: {userName} pass: {pass} token: {token} deviceId: {deviceId}</CustomText>
-            */}
+            
                 <Formik
-                        initialValues={{ password:'' , confirmPassword:'null'}}
+                        initialValues={{ password:'' , confirmPassword:''}}
                         validationSchema={changePasswordSchema}
                         onSubmit={values => 
                             submitChangeRequest(values.confirmPassword)
+
                         }
                         >
                         {({ handleChange, handleBlur, handleSubmit, values,errors, }) => (
@@ -110,7 +121,9 @@ export const ChangePasswordScreen = ({route}:Props) => {
                         
                             <TouchableOpacity style={localStyles.cancel}
                                 onPress={()=>{
+                                    
                                     navigation.dispatch(StackActions.pop())
+                                    
                                 }}
                                     >
                                         <CustomText style={localStyles.submitReplaceButtonText}>
@@ -145,13 +158,14 @@ export const ChangePasswordScreen = ({route}:Props) => {
 const localStyles = StyleSheet.create({
     mainCointainer:{
         flex:1,
-        justifyContent:'center',
+        //justifyContent:'center',
         alignContent:'center',
     },
+
     itemsContainer:{
         alignItems:'center',
         justifyContent:'center',
-        height:windowHeight*0.5,
+        height:windowHeight*0.8,
         borderRadius:15,
     },
     submitReplaceButton:{

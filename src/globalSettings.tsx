@@ -1,6 +1,6 @@
 const globalSettings = {
-    passDefaultCody:"Q29keWV4cGVydA==",
-    passDefault:"$2y$10$roX30/LLBKRA5.YGmbvrauS9KolmCOyltE6HkK3jsrMT2.kpQUmxy",
+    passDefaultCody:"***********************************************",
+    passDefault:"*********************************************************",
     Api:{
         devEndPoint:'https://csm.cody.mx/api/web',
         prodEndPoint:'https://csm.cody.mx/api/web'

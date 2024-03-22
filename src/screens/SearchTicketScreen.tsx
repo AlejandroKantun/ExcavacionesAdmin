@@ -1,23 +1,18 @@
 import React, { useState } from 'react'
-import { Dropdown } from 'react-native-element-dropdown';
-import { StyleSheet, View, Dimensions, TouchableOpacity, Image, FlatList } from 'react-native'
+import { StyleSheet, View, Dimensions, TouchableOpacity, Image, FlatList, SafeAreaView, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { MaterialQty } from '../hooks/useMaterialQty';
 import CustomText from '../components/CustomText';
 import { useNavigation } from '@react-navigation/core';
-import { StackActions } from '@react-navigation/native';
-
 import { openDatabase } from 'react-native-sqlite-storage';
-import { useTicketsDB } from '../hooks/useTicketsDB';
-import { useTicketsDBByValeID } from '../hooks/useTicketsDBByValeID';
-import { btoa } from '../data/base64BLOBConverter';
 import { TicketToLoadItem } from '../components/TicketToLoadItem';
 import { TextInput } from 'react-native';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { dateFormatedDateFiltered } from '../data/dateFormated';
 import { useTicketsWithFilter } from '../hooks/useTicketsWithFilter';
 import { ItemSeparatorTickets } from '../components/ItemSeparatorTickets';
+import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 
 var db = openDatabase({
     name: 'UserDatabase',
@@ -36,12 +31,9 @@ interface Props{
 
 
 export const SearchTicketScreen = () => {
-    const [isFocus, setIsFocus] = useState(false);
-    const [value, setValue] = useState(0);
     const navigation = useNavigation()
     const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
     const [datePickerModalEndVisible, setDatePickerModalEndVisible] = useState(false)
-    const {tickets:ticketByID,getTicketsByID} =useTicketsDBByValeID()
     const {tickets,
       dateMin, 
       setDateMin,
@@ -52,10 +44,10 @@ export const SearchTicketScreen = () => {
 
     
   return (
-    
-            <View
+    <SafeAreaView style={{flex: 1}}>
+      <View
                 style={localStyles.mainContainer}> 
-                      
+                    <HeaderSearchTicket title={'Buscar Vale'}/>
                     <View style={localStyles.filterOptionsContainer}>
                     <View style={localStyles.dateFilterOptionscontainer}>
                       <View style={localStyles.dateAndTextContainer}>
@@ -101,19 +93,23 @@ export const SearchTicketScreen = () => {
                       </TextInput>
                     
                      <View>
-                     <View>
-                        <FlatList
-                                    ItemSeparatorComponent={ItemSeparatorTickets}
-                                    data={tickets}
-                                    renderItem={({item,index})=> 
-                                    <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
-                                    }
-                              ></FlatList>
+                      <View >
+                      
+                          <FlatList 
+                                      ItemSeparatorComponent={ItemSeparatorTickets}
+                                      data={tickets}
+                                      horizontal={false}
+                                      keyExtractor={(item) => item.valeID.toString()}
+                                      renderItem={({item,index})=> 
+                                      <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
+                                      }
+                                      ListFooterComponent={(<View style={{height:windowHeight*0.27}}> 
+
+                                      </View>)}
+                          ></FlatList>
+
+                        
                     </View>
-                       <CustomText>
-                         {JSON.stringify(tickets)}
-                       </CustomText>
-                     
                     </View>
 
                     <View>
@@ -149,6 +145,9 @@ export const SearchTicketScreen = () => {
               </View>
                    
             </View>
+    </SafeAreaView>
+
+            
   )
 
   

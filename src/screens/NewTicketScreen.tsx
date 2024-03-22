@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, Button } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, Button, StyleProp, Text, Alert } from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomText from '../components/CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -15,18 +15,18 @@ import { CustomCheckBox } from '../components/CustomCheckBox';
 import { SaveTicketModal } from '../components/SaveTicketModal';
 import { SignAndSaveModal } from '../components/SignAndSaveModal';
 import { useNavigation } from '@react-navigation/core';
-import { useCompaniesDB } from '../hooks/useCompaniesDB';
-import { useClientsDB } from '../hooks/useClientsDB';
-import { useDestinationsDB } from '../hooks/useDestinations';
-import { useVehiclesDB } from '../hooks/useVehicles';
+import { StackActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
 import { dateFormated, dateFormatedff } from '../data/dateFormated';
 import { AuthContext } from '../context/AuthContext';
 import { getLastRowTickets } from '../data/getLastRowTickets';
-import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
-import { HeaderNewTicket } from '../components/HeaderNewTicket';
 import { TicketAssignDetail } from '../components/TicketAssignDetail';
+import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
+import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
+import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
+import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
+import { postTicketsToDB, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveTickets, requestAndSaveVehicles } from '../api/operationsToDB';
 
 
 
@@ -38,15 +38,34 @@ const windowHeight = Dimensions.get('window').height;
 export const NewTicketScreen = () => {
   const {authState} = useContext(AuthContext)
   const [nextRow, setNextRow] = useState(0);
+  const {date}=useDate();
+
+  //ticket Data
+  const{ticket,
+    setPropertyOnTicket,
+    loadTicket,
+    setPlacaNoTolvaNoTriturador,
+    setFolioFisicoFolioDigitalFechaEntrada}=useTicket()
+  const {materialsQty,
+        addMaterialsQty,
+        removeMaterialsQty,
+        subtotal} =useMaterialQty(MateriasInTicket,setPropertyOnTicket)
+
+  //Modals states 
+  const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
+  const [datePickerModalEndVisible, setDatePickerModalEndVisible] = useState(false)
   const [newMaterialVisible, setNewMaterialVisible] = useState(false)
   const [saveModalVisible, setSaveModalVisible] = useState(false)
   const [signModalVisible, setSignModalVisible] = useState(false)
-  const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
-  const [datePickerModalEndVisible, setDatePickerModalEndVisible] = useState(false)
-  const {date}=useDate();
-  const {materialsQty,addMaterialsQty,removeMaterialsQty} =useMaterialQty(MateriasInTicket)
+  const [successModalVisible, setSuccessModalVisible] = useState(false)
+
+  //Navigation
   const navigation =useNavigation()
-  const{ticket,setPropertyOnTicket}=useTicket()
+
+  //test for refreshing
+  const {token,getToken} =useTokenByUserPass();
+
+
   const [placa, setPlaca] = useState('')
   const [noTolva, setNoTolva] = useState('')
   const [paymentSelected, setPaymentSelected] = useState({
@@ -66,25 +85,97 @@ export const NewTicketScreen = () => {
     })
     setPropertyOnTicket("formadepago",paymentSelected)
   }
- 
+ const resetAllValues=()=>{
+  setPropertyOnTicket("empresaNombre",null)
+  setPropertyOnTicket("empresaID",null);
+
+ }
   useEffect(() => {
     getLastRowTickets().then(
       (res)=>{
         setNextRow(res)
-        setPropertyOnTicket("folioDigital",authState.zoneID?.toString()+'-'+authState?.userID?.toString()+'-'+res)
-        setPropertyOnTicket("folioFisico",dateFormatedff()+'-'+res.toString())
-        setPropertyOnTicket("fechaEntradaVehiculo",today)
-
+        setFolioFisicoFolioDigitalFechaEntrada(
+          dateFormatedff()+'-'+res.toString(),
+          authState.zoneID?.toString()+'-'+authState?.userID?.toString()+'-'+res,
+          today
+        )
       }
     );
     const today= new Date()
+    if (authState.ticket){
+      loadTicket(authState.ticket);
+      console.log('loading before ticket')
+    }
   }, [])
   const today = new Date()
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView  style={localStyles.mainContainer}>
-        <HeaderNewTicket/>
         
+        <HeaderSearchTicket
+          title={'Nuevo Vale'}
+          
+        />
+        {/*TEST BUTTON
+          
+
+         */}
+        <TouchableOpacity 
+                                style={{height:100,width:100, backgroundColor:globalStyles.colors.primary, justifyContent:'center',alignItems:'center', borderRadius:12}}
+                                onPress={()=>
+                                  
+                                  {
+
+                                    
+                                    
+                                  //storeUser('Test3');
+
+                                      
+                                   // requestAndSaveVehicles(token,);
+                                   // requestAndSaveMaterials(token);
+                                   // requestAndSaveDrivers(token);
+                                   // requestAndSaveDestinations(token);
+                                   // requestAndSaveClients(token);
+                                   // requestAndSaveTickets(token);
+                                   postTicketsToDB(1,token,)
+
+                                    }
+                                    //resetAllValues();
+                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                                    //setPlacaNoTolvaNoTriturador('TEST','TEST',1)
+                                  }
+
+                                >
+                                <Icon style={{marginTop:3}} name="add-outline" size={30} color="#fff" />
+                                <CustomText style={{color:'#fff'}} >Hola</CustomText>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                                style={{height:100,width:100, backgroundColor:globalStyles.colors.primary, justifyContent:'center',alignItems:'center', borderRadius:12}}
+                                onPress={()=>
+                                  
+                                  {
+                                    //storeUser('Test12');
+
+                                    //Alert.alert(dateFormated (date))                               
+                                   //console.log(JSON.stringify(authState.token))
+                          
+                                    requestAndSaveVehicles(authState.token!,authState.appUniqueID!);
+                                    requestAndSaveMaterials(authState.token!,authState.appUniqueID!);
+                                    requestAndSaveDrivers(authState.token!,authState.appUniqueID!);
+                                    requestAndSaveDestinations(authState.token!,authState.appUniqueID!);
+                                    requestAndSaveClients(authState.token!,authState.appUniqueID!);
+                                    requestAndSaveTickets(authState.token!,authState.appUniqueID!);
+
+                                    }
+                                    //resetAllValues();
+                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                                    //setPlacaNoTolvaNoTriturador('TEST','TEST',1)
+                                  }
+
+                                >
+                                <Icon style={{marginTop:3}} name="add-outline" size={30} color="#fff" />
+                                <CustomText style={{color:'#fff'}} >H</CustomText>
+                  </TouchableOpacity>
         <TicketAssignDetail
           nextRow={nextRow}
           ticket={ticket}
@@ -94,6 +185,7 @@ export const NewTicketScreen = () => {
           noTolva={noTolva}
           setNoTolva={setNoTolva}
           FolioFisico={dateFormatedff(today).substring(0,dateFormatedff(today).length) +'-'+ nextRow}
+          setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
         />
           <View>
             <View style={localStyles.headerMaterialsToDispatch}>
@@ -112,6 +204,7 @@ export const NewTicketScreen = () => {
                     visible={newMaterialVisible} 
                     setIsVisible={setNewMaterialVisible} 
                     addMaterialsQty={addMaterialsQty} 
+                    materialsQty={materialsQty}
                     lengthData={materialsQty.length} />
             </View>
             <View style={localStyles.flatListContainer}> 
@@ -122,6 +215,7 @@ export const NewTicketScreen = () => {
                       <CustomText  style={{fontSize:20,fontWeight:'200'}}>Materiales en la unidad:</CustomText>
                       </View>}
                     ListFooterComponent={<View><CustomText>Total: {materialsQty.length}</CustomText></View>}
+                    keyExtractor={(item) => item.ID.toString()}
                     renderItem={({item,index})=> 
                     <MaterialQuantityFlatListItem 
                         material={item} 
@@ -140,6 +234,7 @@ export const NewTicketScreen = () => {
                   placeholder={''}
                   placeholderTextColor='rgba(0,0,0,0.5)'
                   keyboardType='number-pad'
+                  defaultValue={ticket.Importe?.toString()}
                   onChangeText={(text)=>{setPropertyOnTicket("Importe",text)}}
                   ></TextInput>
               </View>
@@ -161,6 +256,7 @@ export const NewTicketScreen = () => {
                 <CustomText> Hora de entrada : </CustomText>
                 <TouchableOpacity 
                   style={localStyles.datePickerBtn}
+                  disabled={true}
                   onPress={()=>{setDatePickerModalStartVisible(true)}}>
                   <Icon style={{marginRight:10}} name="time-outline" size={30} color="#000" />
                   <CustomText>
@@ -195,10 +291,10 @@ export const NewTicketScreen = () => {
               <View style={localStyles.PayInfoRow}>
                       <TextInput style={localStyles.textInpuComments}
                         multiline={true}
-                        value={ticket.folioFisico}
-                        placeholder=  {'Comentarios'}
+                        value={ticket.observaciones}
+                        placeholder=  {'Observaciones'}
                         placeholderTextColor='rgba(0,0,0,0.5)'
-                        onChangeText={(text)=>{setPropertyOnTicket("folioFisico",text)}}
+                        onChangeText={(text)=>{setPropertyOnTicket("observaciones",text)}}
                         >
                         </TextInput>
               </View>
@@ -206,7 +302,21 @@ export const NewTicketScreen = () => {
               <TouchableOpacity 
                       style={localStyles.btnSave}
                       onPress={()=>{
-                        setSaveModalVisible(true)
+                        //setSaveModalVisible(true)
+                        SaveTicketsToLocalDB(ticket!,materialsQty).then(
+                          (res)=>{
+                             if (res>0){
+                                                    setSuccessModalVisible(true); 
+                                                    setTimeout(() => { 
+                                                        setSuccessModalVisible(false);
+                                                        navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+
+                                                    }, 2000);
+                                                    
+                                                }
+                          }
+                        )
+
                         }}>
                       <Icon style={{marginTop:3, paddingRight:10}} name="save-outline" size={30} color="#fff" />
                       <CustomText style={{color:'#fff'}} >Guardar</CustomText>
@@ -221,7 +331,13 @@ export const NewTicketScreen = () => {
               <View/>
             </View> 
             <SaveTicketModal setIsVisible={setSaveModalVisible} visible={saveModalVisible} ticket={ticket} MaterialsInTicket={materialsQty}/>       
-            <SignAndSaveModal setIsVisible={setSignModalVisible} setIsVisibleSave={setSaveModalVisible} visible={signModalVisible} setPropertyOnTicket={setPropertyOnTicket}/>
+            <SignAndSaveModal 
+                    ticket={ticket}
+                    materialsQty={materialsQty}
+                    setSuccessModalVisible={setSuccessModalVisible} 
+                    setIsVisible={setSignModalVisible} 
+                    visible={signModalVisible} 
+                    setPropertyOnTicket={setPropertyOnTicket}/>
             <View>
               <DateTimePickerModal
                 mode="time"
@@ -246,6 +362,22 @@ export const NewTicketScreen = () => {
                 onHide={()=>{setDatePickerModalEndVisible(false)}}
               />
             </View>
+            <View>
+              <CustomText>
+                {JSON.stringify(authState.ticket)}
+              </CustomText>
+              <CustomText style={{color:'blue'}}>
+                {JSON.stringify(authState)}
+              </CustomText>
+              <CustomText style={{color:'red'}}>
+                {JSON.stringify(ticket)}
+              </CustomText>
+            </View>
+            <ProcessSuccessModal
+                visible={successModalVisible}
+                setIsVisible={setSuccessModalVisible}
+            />
+
     </ScrollView>
     </SafeAreaView>
     

@@ -11,8 +11,11 @@ export const useVehiclesByVehicleID = () => {
  let tempArray :Vehiculo[]=[] ;
 
 const getVehicles=async (vehicleId:number)=>{
-     try {
-   
+  let result:Vehiculo[]=[] ;
+
+  const promise =   new Promise(
+    async (resolve, reject) => {
+      try {
         await(await db).transaction((tx) => {
           tx.executeSql("SELECT * FROM vehiculos where vehiculoID=?", [vehicleId]).then(
             ([tx,results]) => {
@@ -20,7 +23,7 @@ const getVehicles=async (vehicleId:number)=>{
                 tempArray.push(results.rows.item(i) as Vehiculo)
               }
               setVehicles(tempArray);
-    
+              resolve(tempArray);
             }
           );
         });
@@ -29,6 +32,15 @@ const getVehicles=async (vehicleId:number)=>{
         throw Error("Failed to get data from database")
       }
     
+}
+);
+await promise.then((res)=>{
+    result=res as Vehiculo[];
+    console.log(JSON.stringify(result))
+    return result;
+})
+
+return result;
     
 }
 

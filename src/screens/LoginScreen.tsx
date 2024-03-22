@@ -1,5 +1,5 @@
 import { useNavigation } from '@react-navigation/core';
-import React, { useContext, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import { View, StyleSheet, TextInput, Text, Modal, Button,TouchableOpacity} from 'react-native';
 import CustomText from '../components/CustomText'
 import globalStyles from '../theme/appTheme';
@@ -11,12 +11,13 @@ import { connectToDatabase } from '../data/dbStructure';
 import { WrongUserDataModal } from '../components/WrongUserDataModal';
 import { AuthContext } from '../context/AuthContext';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
+import { useNetInfo } from "@react-native-community/netinfo";
+import { getUserslogged } from '../data/persistantData';
+import DeviceInfo from 'react-native-device-info';
+
 global.Buffer = require('buffer').Buffer;
 
 const db = connectToDatabase();
-
-
-
 
 export const LoginScreen = () => {
     const navigation = useNavigation();
@@ -24,33 +25,77 @@ export const LoginScreen = () => {
     const [pass, setPass] = useState('');
     const [isVisible, setIsVisible] = useState(false)
     const {token,getToken} =useTokenByUserPass()
-    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID} = useContext(AuthContext)
+    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID} = useContext(AuthContext)
+    const [deviceId, setdeviceId] = useState('')
 
-    
+    //Network State
+    const { type, isConnected } = useNetInfo();
+
     const loginHandler=async ()=>{
-        const loginResult:loginResult = await getUserLogin(user,pass);
+        if (isConnected){
+            //If there is connection to internet
 
-        if (!loginResult.authorized )
-            setIsVisible(true)
-        else if(loginResult.authorized ) {
-            if(loginResult.path=='MainDrawerNavigator'){
-                signIn();
-                changeUserName(user);
-                changeUserID(Number(loginResult.userID));
-                changeZoneID(Number(loginResult.zoneID));
-                //await getToken(user,pass);
-                //changeToken(token);
-                navigation.dispatch(StackActions.replace(loginResult.path))
-                } 
-            else{
-                navigation.navigate(loginResult.path as never,{
-                    userId:loginResult.userID,
-                    userName:user,
-                    pass:pass,
-                  } as never)
+            getToken(user,pass).then(
+                (response)=>{
+                  if (response){ 
+                    //if response exist, it means that user is authorized
+                      changeToken(response);
+                      signIn();
+                      changeUserName(user);
+                      changeUniqueAppID(deviceId);
+                      getUserslogged().then((usersInDB)=>{
+                          console.log('users in phone' + usersInDB)
+                          if(usersInDB.includes(user)){
+                              //it is not the first time
+                              //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                              navigation.navigate("RefreshDataFromDatabase" as never)
+
+                          }
+                          else{
+                              //first time, need to change password
+                              navigation.navigate("ChangePasswordScreen" as never)
+
+                          }
+                      })
+                  }
+                  else{
+                      //it means that userPass is not correct
+                      setIsVisible(true)
+                  }
                 }
+              )
+        }else{
+            //If there is no connection to internet
+            const loginResult:loginResult = await getUserLogin(user,pass);
+
+            if (!loginResult.authorized )
+            setIsVisible(true)
+            else if(loginResult.authorized ) {
+                if(loginResult.path=='MainDrawerNavigator'){
+                    signIn();
+                    changeUserName(user);
+                    changeUserID(Number(loginResult.userID));
+                    changeZoneID(Number(loginResult.zoneID));
+                    //navigation.dispatch(StackActions.replace(loginResult.path))
+                    navigation.navigate("ChangePasswordScreen" as never)
+                    } 
+                else{
+                    navigation.navigate(loginResult.path as never,{
+                        userId:loginResult.userID,
+                        userName:user,
+                        pass:pass,
+                    } as never)
+                    }
             }
-        }    
+        }
+        }  
+        
+    useEffect(() => {
+    DeviceInfo.getUniqueId().then((result)=>{
+        setdeviceId(result)
+    });
+    }, [])
+    
   return (
     <View style={localStyles.mainContainer}>
         <View style={localStyles.mainContainer}>

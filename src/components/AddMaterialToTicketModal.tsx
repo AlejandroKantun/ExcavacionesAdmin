@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Button, Modal, StyleSheet, View,Text, TextInput, Dimensions, TouchableOpacity } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -18,11 +18,13 @@ interface Props{
     visible?: boolean,
     setIsVisible: React.Dispatch<React.SetStateAction<boolean>>,
     addMaterialsQty: (newMaterialQty: MaterialQty) => void,
+    materialsQty: MaterialQty[],
     lengthData:number
 }
+let subtotal=0;
 
 
-export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,lengthData}:Props) => {
+export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,lengthData,materialsQty}:Props) => {
     const [isFocus, setIsFocus] = useState(false);
     const [value, setValue] = useState(0);
     const [materialName, setMaterialName] = useState('')
@@ -31,7 +33,12 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
     const{materials:material,getMaterialById}=useMaterialsByMaterialID()
     const [importUpdated, setImportUpdated] = useState(false)
     const [newImport, setNewImport] = useState(0)
-
+    useEffect(() => {
+        if (material[0]){
+        setNewImport(Number(material[0].importe))
+        }
+    }, [material])
+    
     const onChangeItem=(item:Material)=>{
         setValue(item.materialID);
         setMaterialName(item.nombreMaterial);
@@ -129,6 +136,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                 maxLength={30}
                                 placeholderTextColor='rgba(0,0,0,0.5)'
                                 keyboardType='numeric'
+                                defaultValue={newImport.toString()}
                                 onChangeText={(text)=>{
                                     setImportUpdated(true)
                                     setNewImport(Number(text))
@@ -156,6 +164,15 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             style={localStyles.btnSave}
                             onPress={()=>{
                                 //VALIDATION
+                              
+                                setIsVisible(false);
+                                getMaterialById(-1); //to reset this variable
+                                for(let i =0; i<materialsQty.length; i++){
+                                    subtotal= subtotal+ (materialsQty[i].quantity*materialsQty[i].newImport)
+
+                                }  
+                                subtotal= subtotal+ (materialM3*newImport);
+                                
                                 addMaterialsQty({
                                     ID: lengthData+1,
                                     materialName: materialName,
@@ -164,7 +181,6 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     importUpdated:importUpdated,
                                     newImport:newImport
                                      })
-                                setIsVisible(false)
                             }}>
                             <Icon style={{marginTop:3, paddingRight:10}} name="add-circle-outline" size={30} color="#fff" />
                             <CustomText style={{color:'#fff'}} >Agregar</CustomText>

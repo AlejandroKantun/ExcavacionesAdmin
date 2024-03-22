@@ -22,7 +22,8 @@ interface Props{
     setPlaca: React.Dispatch<React.SetStateAction<string>>,
     noTolva:string,
     setNoTolva: React.Dispatch<React.SetStateAction<string>>,
-    FolioFisico:string
+    FolioFisico:string,
+    setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number) => void
 }
 export const TicketAssignDetail = ({
                                     nextRow,
@@ -32,7 +33,9 @@ export const TicketAssignDetail = ({
                                     setPlaca,
                                     noTolva,
                                     setNoTolva,
-                                    FolioFisico}:Props) => {
+                                    FolioFisico,
+                                    setPlacaNoTolvaNoTriturador
+                                  }:Props) => {
     const {authState} = useContext(AuthContext)
     const{companies}=useCompaniesDB()
     const{vehicles}=useVehiclesDB()
@@ -43,17 +46,6 @@ export const TicketAssignDetail = ({
   return (
     <View style={localStyles.companyClientContainer}>
           <View style={localStyles.dateFolioNumberView}>
-            {/*
-            <View style={{flexDirection:'row', marginHorizontal:10}}>
-                <CustomText style={{textAlign:'center', fontSize:18}} >
-                      NoTicket:{'   '} 
-                </CustomText>
-                <CustomText style={{textAlign:'center', fontWeight:'bold',fontSize:16}} >
-                    {authState.zoneID}-{authState.userID}-{nextRow}
-                </CustomText>
-            </View>
-            */}
-            
             <View style={localStyles.folioFisicoContainer}>
                 <View style={localStyles.companyClientItemContainer}> 
                 <CustomText  >   Folio Fisico:</CustomText>
@@ -103,7 +95,13 @@ export const TicketAssignDetail = ({
             </View>
           :null
           }
-          <AssignRowTo label='Unidad' assignTo='unidad' data={vehicles} setPropertyOnTicket={setPropertyOnTicket} getVehicles={getVehicles} vehicleById={vehiclesById}/>
+          <AssignRowTo                 
+                      setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
+                      label='Unidad' 
+                      assignTo='unidad' 
+                      data={vehicles} 
+                      setPropertyOnTicket={setPropertyOnTicket} 
+                      getVehicles={getVehicles} vehicleById={vehiclesById}/>
           {ticket.vehiculoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
@@ -135,9 +133,11 @@ export const TicketAssignDetail = ({
               <TextInput style={localStyles.textInputPlacaTolvaTriturador}
                 placeholder=  {'S / N'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
-                defaultValue={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.placa:noTolva}
+                defaultValue={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.numeroTolva:noTolva}
                 maxLength={20}
                 onChangeText={(text)=>{
+                  setPropertyOnTicket("numeroTolva",text)
+
                 }}
                 >
               </TextInput>
@@ -148,8 +148,9 @@ export const TicketAssignDetail = ({
                 placeholder=  {'S / N'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 maxLength={20}  
-                defaultValue={ticket.placa?ticket.placa:''}
+                defaultValue={ticket.placa?ticket.numeroValeTriturador:''}
                 onChangeText={(text)=>{
+                  setPropertyOnTicket("numeroValeTriturador",text)
                 }}
                 >
               </TextInput>

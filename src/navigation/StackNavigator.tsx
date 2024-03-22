@@ -5,6 +5,8 @@ import { SplashScreen } from '../screens/SplashScreen';
 import { MainDrawerNavigator } from './MainDrawerNavigator';
 import { Usuario } from '../interfaces/usuarios';
 import { RefreshDataFromDatabase } from '../screens/RefreshDataFromDatabase';
+import { StackActions } from '@react-navigation/routers';
+import { ReloadScreen } from '../screens/ReloadScreen';
 
 //const Stack = createStackNavigator();
 
@@ -17,7 +19,8 @@ export type RootStackParams={
     pass:string,
   },
   MainDrawerNavigator:undefined,
-  RefreshDataFromDatabase:undefined
+  RefreshDataFromDatabase:undefined,
+  ReloadScreen:undefined
 }
 
 const Stack = createStackNavigator<RootStackParams>();
@@ -62,7 +65,6 @@ export function MyStack() {
         options={{
             headerShown:false
                     }}/>
-
     </Stack.Navigator>
   );
 }

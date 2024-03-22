@@ -31,6 +31,8 @@ export const HeaderNewTicket = () => {
                   style={localStyles.SearchTicketButton}
                   onPress={()=>{
                     navigation.navigate('SearchTicketScreen' as never)
+                    //navigation.dispatch(StackActions.push('SearchTicketScreen'))
+
                   }}>
                   <Icon style={{marginRight:10}} name="search-outline" size={30} color="#fff" />
                   <CustomText style={{color:'#fff'}}>Buscar</CustomText>
@@ -40,7 +42,7 @@ export const HeaderNewTicket = () => {
                         Nuevo Vale 
           </CustomText>
         </View>
-        <TouchableOpacity 
+            <TouchableOpacity 
                   style={localStyles.logOutButton}
                   onPress={()=>{
                     logOutHandler()
@@ -59,6 +61,7 @@ export const HeaderNewTicket = () => {
 const localStyles = StyleSheet.create({
     headerContainer:{
         flex:1,
+        height:windowHeight*0.07,
         paddingTop:windowHeight*0.01,
         paddingBottom:windowHeight*0.015,
         backgroundColor:globalStyles.colors.primary,

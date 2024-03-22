@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { TouchableOpacity, View } from 'react-native';
 import { Dimensions, StyleSheet } from 'react-native';
 import { Vale } from '../interfaces/vale';
@@ -6,6 +6,9 @@ import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { DeleteTicketModal } from './DeleteTicketModal';
+import { AuthContext } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/core';
+import { StackActions } from '@react-navigation/native';
 
 interface Props{
     ticketByID: Vale,
@@ -18,7 +21,10 @@ const windowHeight = Dimensions.get('window').height;
 
 export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
     const [visible, setIsVisible] = useState(false)
-  return (
+    const {authState,ChangeTicket} = useContext(AuthContext)
+    const navigation =useNavigation()
+
+    return (
       <View style={localStyles.mainContainer}>
         <View style={localStyles.ticketToLoadContainer}>
             <View style={localStyles.ticketItemsContainer}>
@@ -70,7 +76,9 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                     <TouchableOpacity 
                         style={localStyles.btnLoad}
                         onPress={()=>{
-                            
+                            ChangeTicket(ticketByID);
+                            navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+
                         }}>
                         <Icon style={{marginTop:3, paddingRight:10}} name="arrow-up-circle-outline" size={25} color="#fff" />
                         <CustomText style={{color:'#fff'}} >Cargar</CustomText>

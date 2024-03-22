@@ -8,7 +8,7 @@ import { SaveTicketsMaterialsToLocal } from './SaveTicketsMaterialsToLocalDB';
 const db = connectToDatabase();
 const dateCreation =new Date();
 export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQty[])=>{
-    console.log('Insert')
+    let ticketId=0;
     let insertTicketsSentence = "INSERT INTO vales ("+
     "bancoID, "+
     "serie, "+
@@ -34,62 +34,80 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
     "destinoNombre, "+
     "vehiculoNombre, "+
     "firma, "+
-    "importe"+
-    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    "importe, "+
+    "fechaEntradaVehiculo, "+
+    "numeroTolva, "+
+    "fechaSalidaVehiculo "+
+    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     
     const sentToCentralDB=0;                
     let countItemsInserted=0;
+    const promise =   new Promise(
+        async (resolve, reject) => {
+            
 
-    await (await db).transaction(
-        async(tx)=>{
-            tx.executeSql(insertTicketsSentence,[
-                ticket.bancoID, 
-                ticket.serie, 
-                ticket.folio, 
-                ticket.folioFisico, 
-                dateFormated(ticket.fechaVale!), 
-                ticket.tipoUnidad, 
-                'UNODOSTRES', 
-                ticket.numeroEconomico, 
-                ticket.numeroValeTriturador, 
-                ticket.observaciones, 
-                dateFormated(dateCreation), 
-                ticket.activoVale, 
-                1, 
-                ticket.clienteID, 
-                ticket.destinoID, 
-                ticket.vehiculoID, 
-                ticket.empresaID, 
-                ticket.creadoPor, 
-                sentToCentralDB,
-                ticket.empresaID==1?ticket.empresaNombre:"",
-                ticket.clienteID==1?ticket.clienteNombre:"",
-                ticket.destinoID==1?ticket.destinoNombre:"",
-                ticket.vehiculoID==1?ticket.vehiculoNombre:"",
-                ticket.firma ,
-                ticket.Importe
-            ],
-            async (res,ResultSet)=>{
-                if (ResultSet.rowsAffected >0 ){
-                    console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT SUCCESS, ' )
-                    console.log(JSON.stringify(ResultSet))
-                    
-                    for (let i=0;i<ticketsMaterials.length;i++){
-                        const result= await SaveTicketsMaterialsToLocal(
-                            ticketsMaterials[i].quantity,
-                            ResultSet.insertId,
-                            ticketsMaterials[i].materialID,
-                            countItemsInserted,
-                            ticketsMaterials[i].materialName)
+            await (await db).transaction(
+                async(tx)=>{
+                    tx.executeSql(insertTicketsSentence,[
+                        ticket.bancoID, 
+                        ticket.serie, 
+                        ticket.folio, 
+                        ticket.folioFisico, 
+                        dateFormated(ticket.fechaVale!), 
+                        ticket.tipoUnidad, 
+                        ticket.placa, 
+                        ticket.numeroEconomico, 
+                        ticket.numeroValeTriturador, 
+                        ticket.observaciones, 
+                        dateFormated(dateCreation), 
+                        1, 
+                        1, 
+                        ticket.clienteID, 
+                        ticket.destinoID, 
+                        ticket.vehiculoID, 
+                        ticket.empresaID, 
+                        ticket.creadoPor, 
+                        sentToCentralDB,
+                        ticket.empresaID==1?ticket.empresaNombre:"",
+                        ticket.clienteID==1?ticket.clienteNombre:"",
+                        ticket.destinoID==1?ticket.destinoNombre:"",
+                        ticket.vehiculoID==1?ticket.vehiculoNombre:"",
+                        ticket.firma ,
+                        ticket.Importe,
+                        dateFormated(ticket.fechaEntradaVehiculo!),
+                        ticket.numeroTolva,
+                        ticket.fechaSalidaVehiculo?dateFormated(ticket.fechaSalidaVehiculo):null
+                    ],
+                    async (res,ResultSet)=>{
+                        if (ResultSet.rowsAffected >0 ){
+                            console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT SUCCESS, ' )
+                            console.log(JSON.stringify(ResultSet))
+                            
+                            for (let i=0;i<ticketsMaterials.length;i++){
+                                const result= await SaveTicketsMaterialsToLocal(
+                                    ticketsMaterials[i].quantity,
+                                    ResultSet.insertId,
+                                    ticketsMaterials[i].materialID,
+                                    countItemsInserted,
+                                    ticketsMaterials[i].materialName)
+                            }
+                            console.log('items inserted in materialticket '+ countItemsInserted )
+                            resolve(ResultSet.insertId)
+                        }
+                        
+                    },
+                    (error)=>{
+                       console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT FAIL Reason:' + JSON.stringify(error) )
                     }
-                    console.log('items inserted in materialticket '+ countItemsInserted )
+                    );
+            });
 
-                }
-                
-            },
-            (error)=>{
-               console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT FAIL Reason:' + JSON.stringify(error) )
-            }
-            );
-    });
+        });
+    await promise.then((res)=>{
+        ticketId=res as number;
+        console.log('FINAL ticketID inserted: '+ JSON.stringify(ticketId))
+        return ticketId;
+    })
+    
+    return ticketId;
 }

@@ -21,13 +21,13 @@ export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty}
                 {material.materialName} 
             </CustomText> 
             <CustomText style={localStyles.subDataText}>
-                {material.quantity} [m3]
+                {material.quantity} 
             </CustomText> 
             <CustomText style={localStyles.subDataText}>
-                {material.newImport} [$/m3]
+                {material.newImport} [$]
             </CustomText> 
             <CustomText style={localStyles.subTotal}>
-                {material.newImport*material.quantity} [$/m3]
+                {material.newImport*material.quantity}
             </CustomText> 
         </View>
        

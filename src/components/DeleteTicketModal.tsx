@@ -90,8 +90,9 @@ export const DeleteTicketModal = ({visible,setIsVisible,ticketByID,reloadItem}:P
                                                 if (res==='Success'){
                                                     setIsVisible(false);
                                                     setSuccessVisible(true);
-                                                    reloadItem();
-                                                    setTimeout(() => {
+    
+                                                    setTimeout(() => { 
+                                                        reloadItem();
                                                         setSuccessVisible(false);
                                                     }, 1500);
                                                 }

@@ -1,5 +1,5 @@
-export const dateFormated=(date?:Date):String=>{
-    var a:Date;
+export const dateFormated=(date?:Date):string=>{
+    let a:Date;
 
     if(date){
              a= date;
@@ -8,7 +8,7 @@ export const dateFormated=(date?:Date):String=>{
              a= new Date();
 
     }
-    console.log(JSON.stringify(a)); 
+    console.log(typeof(a) + 'a: '+a); 
     var resultDate=''
     resultDate=
     [a.getFullYear(),

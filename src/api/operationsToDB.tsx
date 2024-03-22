@@ -9,11 +9,20 @@ import { DestinationsResponse, Destino } from '../interfaces/destino';
 import { Cliente, ClientsResponse } from '../interfaces/cliente';
 import { Vale, valessResponse } from '../interfaces/vale';
 import { Valematerial } from '../interfaces/valematerial';
+import { Usuario, UsuarioResponse } from '../interfaces/usuarios';
 
 
 export interface changePassResult{
     success:boolean,
     path:string
+}
+
+export interface ticketDetail{
+    valeMaterialID : string,
+    folioDigital : string,
+    materialID : string,
+    materialNombre : string,
+    cantidadm3 : string,
 }
 const db = connectToDatabase();
 
@@ -30,7 +39,7 @@ export const ChangePassWordRequest =async (userId:string,newPass:string,token:st
     const excavacionesDB = axios.create({
         baseURL:globalSettings.Api.prodEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -116,7 +125,7 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -255,7 +264,7 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -383,7 +392,7 @@ export const requestAndSaveDrivers =async (token:string,deviceId?:string)=>{
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -517,7 +526,7 @@ export const requestAndSaveDestinations =async (token:string,deviceId?:string)=>
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -656,7 +665,7 @@ export const requestAndSaveClients =async (token:string,deviceId?:string)=>{
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -803,7 +812,7 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'3',
+            appUniqueID:deviceId,
             token:token,
         }
      });   
@@ -972,13 +981,11 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
 }
 
 export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:string)=>{
-    const selectTicketsPendingSentence=" SELECT * FROM vales WHERE empresaID= ? AND EnviadoABaseDeDatosCentral=0"
+    const selectTicketsPendingSentence=" SELECT * FROM vales WHERE EnviadoABaseDeDatosCentral=0"
     let ticketsPending:Vale[]=[];
     await (await db).transaction(
         async(tx)=>{
-            tx.executeSql(selectTicketsPendingSentence,[
-                empresaID
-            ],
+            tx.executeSql(selectTicketsPendingSentence,[],
             (res,ResultSet)=>{
                 ticketsPending =ResultSet.rows.raw() as Vale[];
                 
@@ -998,7 +1005,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
         const excavacionesDB = axios.create({
             baseURL: globalSettings.Api.devEndPoint,
             params:{
-                appUniqueID:'3',
+                appUniqueID:deviceId,
                 token:token,
             }
          });   
@@ -1008,9 +1015,9 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
         };
         
         for ( let i=0; i< ticketsPending.length; i++){
-            let ticketDetails:{}[]=[]
+            let ticketDetails:ticketDetail[]=[]
             let itemsFound=false;
-            const selectTicketsMaterialsPendingSentence=" select * from valesmateriales where valeId=?"
+            const selectTicketsMaterialsPendingSentence="select * from valesmateriales where valeId=?"
             let ticketsMaterialsPending:Valematerial[]=[];
             try {
                 await (await db).transaction(
@@ -1019,6 +1026,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                         ticketsPending[i].valeID.toString()
                         ],
                         (res,ResultSet)=>{
+                            console.log('RESULTADO DE VALE ID: ' + ticketsPending[i].valeID.toString() +JSON.stringify(ResultSet.rows.raw()) )
                             ticketsMaterialsPending =ResultSet.rows.raw() as Valematerial[];
                             if (ticketsMaterialsPending.length > 0){     
                                 for (let j=0; j<ticketsMaterialsPending.length; j++){
@@ -1026,9 +1034,9 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                                     itemsFound=true;
                                     ticketDetails.push({
                                         valeMaterialID : ticketsMaterialsPending[j].valeMaterialID.toString(),
-                                        folioDigital : 'N/A',
+                                        folioDigital : ticketsPending[i].folioFisico?ticketsPending[i].folioFisico:'',
                                         materialID : ticketsMaterialsPending[j].materialID.toString(),
-                                        materialNombre : ticketsMaterialsPending[j].materialNombre.toString(),
+                                        materialNombre : ticketsMaterialsPending[j].materialNombre?ticketsMaterialsPending[j].materialNombre.toString():'',
                                         cantidadm3 : ticketsMaterialsPending[j].cantidadm3.toString(),
                                     })
                                 }                   
@@ -1043,49 +1051,57 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                 
                 if (itemsFound){
                     console.log('tickets materials before body: ' +JSON.stringify(ticketDetails))
+                    //console.log('FECHA VALE: ' + dateFormated (ticketsPending[i].fechaVale!))
 
                     let bodyParameters = {
                         transaccionID : '1000',
-                        valeID : ticketsPending[i].valeID.toString(),
-                        bancoID :  ticketsPending[i].bancoID.toString(),
-                        empresaID :  ticketsPending[i].empresaID.toString(),
-                        serie:ticketsPending[i].serie.toString(),
-                        folio : ticketsPending[i].folio.toString(),
-                        folioDigital : ticketsPending[i].folioDigital.toString(),
-                        folioFisico : ticketsPending[i].folioFisico.toString(),
-                        fechaVale : dateFormated (ticketsPending[i].fechaVale!),
-                        clienteID : ticketsPending[i].clienteID.toString(),
+                        valeID :   ticketsPending[i].valeID? ticketsPending[i].valeID.toString():'',
+                        bancoID : ticketsPending[i].bancoID?ticketsPending[i].bancoID.toString():'',
+                        empresaID :  ticketsPending[i].empresaID?ticketsPending[i].empresaID.toString():'',
+                        serie: ticketsPending[i].serie? ticketsPending[i].serie.toString():'',
+                        folio : ticketsPending[i].folio?ticketsPending[i].folio.toString():'',
+                        folioDigital : ticketsPending[i].folioDigital? ticketsPending[i].folioDigital.toString():'',
+                        folioFisico : ticketsPending[i].folioFisico?ticketsPending[i].folioFisico.toString():'',
+                        fechaVale : ticketsPending[i].fechaVale!,
+                        clienteID : ticketsPending[i].clienteID?ticketsPending[i].clienteID.toString():'',
                         clienteNombre :ticketsPending[i].clienteNombre?ticketsPending[i].clienteNombre:"",
-                        destinoID : ticketsPending[i].destinoID.toString(),
+                        destinoID : ticketsPending[i].destinoID?ticketsPending[i].destinoID.toString():'',
                         destinoNombre : ticketsPending[i].destinoNombre?ticketsPending[i].destinoNombre:"",
-                        vehiculoID : ticketsPending[i].vehiculoID.toString(),
+                        vehiculoID : ticketsPending[i].vehiculoID?ticketsPending[i].vehiculoID.toString():'',
                         vehiculoNombre : ticketsPending[i].vehiculoNombre?ticketsPending[i].vehiculoNombre:"",
-                        tipoUnidad : ticketsPending[i].tipoUnidad.toString(),
-                        placa : ticketsPending[i].placa.toString(),
-                        numeroEconomico : ticketsPending[i].numeroEconomico.toString(),
-                        numeroValeTriturador : ticketsPending[i].numeroValeTriturador.toString(),
-                        observaciones : ticketsPending[i].observaciones.toString(),
+                        tipoUnidad : ticketsPending[i].tipoUnidad?ticketsPending[i].tipoUnidad.toString():'',
+                        placa : ticketsPending[i].placa?ticketsPending[i].placa.toString():'',
+                        numeroEconomico : ticketsPending[i].numeroEconomico?ticketsPending[i].numeroEconomico.toString():'',
+                        numeroValeTriturador : ticketsPending[i].numeroValeTriturador?ticketsPending[i].numeroValeTriturador.toString():'',
+                        observaciones : ticketsPending[i].observaciones?ticketsPending[i].observaciones.toString():'',
                         fechaEntradaVehiculo : ticketsPending[i].fechaEntradaVehiculo?ticketsPending[i].fechaEntradaVehiculo:"",
                         fechaSalidaVehiculo : ticketsPending[i].fechaSalidaVehiculo?ticketsPending[i].fechaSalidaVehiculo:"",
                         choferID : ticketsPending[i].choferID?ticketsPending[i].choferID:"",
                         choferNombre : ticketsPending[i].choferNombre?ticketsPending[i].choferNombre:"",
                         firma : ticketsPending[i].firma?ticketsPending[i].firma:"",
-                        fechaCreacion : dateFormated(ticketsPending[i].fechaCreacion!),
+                        fechaCreacion : ticketsPending[i].fechaCreacion!,
                         fechaUltimaModificacion : ticketsPending[i].fechaUltimaModificacion?ticketsPending[i].fechaUltimaModificacion:"",
                         fechaEliminacion : ticketsPending[i].fechaEliminacion?ticketsPending[i].fechaEliminacion:"",
                         fechaSincronizacion : date,
-                        creadoPor : ticketsPending[i].creadoPor.toString(),
-                        activoVale : ticketsPending[i].activoVale.toString(),
-                        estadoVale : ticketsPending[i].estadoVale.toString(),
+                        creadoPor : ticketsPending[i].creadoPor?ticketsPending[i].creadoPor.toString():'',
+                        activoVale : ticketsPending[i].activoVale.toString()?ticketsPending[i].activoVale.toString():'',
+                        estadoVale : ticketsPending[i].estadoVale?ticketsPending[i].estadoVale.toString():'',
                         detalleVales: ticketDetails
                     };
-                    console.log(bodyParameters)
+                    console.log('////////////////FINAL BODY////////////////////')
+
+                    let ticketsFormated=JSON.stringify(bodyParameters).replaceAll("[{","[[").replaceAll("},{","],[").replaceAll("}]","]]")
+                    console.log(ticketsFormated)
+                    console.log('////////////////FINAL BODY////////////////////')
+
+                    
+
                     //ready to send
                     const response = await excavacionesDB.post('/setcodyvales',
-                    bodyParameters,
+                    ticketsFormated+'adasd',
                     config
                     )
-                    console.log(JSON.stringify(response.data))
+                    console.log(JSON.stringify(response))
                     //If data was sent successfully, then update local db
                     /*
                     const updateTicketToDBSentence= "UPDATE vales SET EnviadoABaseDeDatosCentral=1 WHERE valeID=?"
@@ -1122,4 +1138,163 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
         )
         */
     }
+}
+
+
+export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
+    let msgToReport=''
+
+    const date = dateFormated();
+
+    const excavacionesDB = axios.create({
+        baseURL: globalSettings.Api.devEndPoint,
+        params:{
+            appUniqueID:deviceId,
+            token:token,
+        }
+     });   
+
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+
+    const response = await excavacionesDB.get<UsuarioResponse>('/codyusuarios',
+    config
+    )
+
+    if (response.data.transaccionID){
+            console.log(JSON.stringify(response.data))
+        let ususariosFromAPI:Usuario[]=response.data[0] as Usuario[]
+        msgToReport=" Items received: " +ususariosFromAPI.length; " - "
+        console.log(JSON.stringify(ususariosFromAPI))
+
+        if (ususariosFromAPI.length>0){
+            for (let i=0; i<ususariosFromAPI.length; i++){
+                console.log(i+' ITEM'+ JSON.stringify(ususariosFromAPI[i]))
+                try {
+                    if  (!ususariosFromAPI[i].fechaSincronizacion) { 
+                        console.log('Insert')
+                        let insertUserSentence= "  INSERT INTO usuarios ("+
+                        "usuarioID, "+
+                        "usuario, "+
+                        "contrasena, "+
+                        "AuthKey, "+
+                        "fechaGeneracionAuthKey, "+
+                        "nombreUsuario, "+
+                        "registradoEnApp, "+
+                        "Tipo_user, "+
+                        "bancoID, "+
+                        "appUniqueID, "+
+                        "fechaCreacion, "+
+                        "fechaUltimaModificacion, "+
+                        "fechaEliminacion, "+
+                        "fechaSincronizacion, "+
+                        "activoUsuario, "+
+                        "estadoUsuario, "+
+                        "creadoPor) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);";
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(insertUserSentence, [
+                                    ususariosFromAPI[i].usuarioID,
+                                    ususariosFromAPI[i].usuario,
+                                    ususariosFromAPI[i].contrasena,
+                                    ususariosFromAPI[i].AuthKey,
+                                    ususariosFromAPI[i].fechaGeneracionAuthKey,
+                                    ususariosFromAPI[i].nombreUsuario,
+                                    ususariosFromAPI[i].registradoEnApp,
+                                    ususariosFromAPI[i].Tipo_user,
+                                    ususariosFromAPI[i].bancoID,
+                                    ususariosFromAPI[i].appUniqueID,
+                                    ususariosFromAPI[i].fechaCreacion,
+                                    ususariosFromAPI[i].fechaUltimaModificacion,
+                                    ususariosFromAPI[i].fechaEliminacion,
+                                    ususariosFromAPI[i].fechaSincronizacion,
+                                    ususariosFromAPI[i].activoUsuario,
+                                    ususariosFromAPI[i].estadoUsuario,
+                                    ususariosFromAPI[i].creadoPor,
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: INSERT SUCCESS, '
+                                    console.log(+ ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: INSERT SUCCESS, ' )
+
+                                },
+                                (error)=>{
+                                    console.log('ERROR '+ ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: INSERT FAIL , reason: '+JSON.stringify(error) )
+                                    msgToReport=msgToReport + ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: INSERT FAIL , reason: '+JSON.stringify(error)
+                                }
+                                );
+                        });
+                    }
+                    else{
+                        let updateUserSentence= "UPDATE usuarios SET "+
+                        "usuario =?, "+
+                        "contrasena=? , "+
+                        "AuthKey =?, "+
+                        "fechaGeneracionAuthKey =?, "+
+                        "nombreUsuario =?, "+
+                        "registradoEnApp =?, "+
+                        "Tipo_user =?, "+
+                        "bancoID =?, "+
+                        "appUniqueID =?, "+
+                        "fechaCreacion =?, "+
+                        "fechaUltimaModificacion =?, "+
+                        "fechaEliminacion =?, "+
+                        "fechaSincronizacion =?, "+
+                        "activoUsuario =?, "+
+                        "estadoUsuario =?, "+
+                        "creadoPor =? "+
+                        "WHERE usuarioID = ?"
+                        
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(updateUserSentence, [
+                                    ususariosFromAPI[i].usuario,
+                                    ususariosFromAPI[i].contrasena,
+                                    ususariosFromAPI[i].AuthKey,
+                                    ususariosFromAPI[i].fechaGeneracionAuthKey,
+                                    ususariosFromAPI[i].nombreUsuario,
+                                    ususariosFromAPI[i].registradoEnApp,
+                                    ususariosFromAPI[i].Tipo_user,
+                                    ususariosFromAPI[i].bancoID,
+                                    ususariosFromAPI[i].appUniqueID,
+                                    ususariosFromAPI[i].fechaCreacion,
+                                    ususariosFromAPI[i].fechaUltimaModificacion,
+                                    ususariosFromAPI[i].fechaEliminacion,
+                                    ususariosFromAPI[i].fechaSincronizacion,
+                                    ususariosFromAPI[i].activoUsuario,
+                                    ususariosFromAPI[i].estadoUsuario,
+                                    ususariosFromAPI[i].creadoPor,
+                                    ususariosFromAPI[i].usuarioID,
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: UPDATE SUCCESS '
+                                },
+                                (error)=>{
+                                    msgToReport=msgToReport + ' - usuarioID: '+ ususariosFromAPI[i].usuarioID +' transaction: UPDATE FAIL , reason: '+JSON.stringify(error)
+                                })
+                                
+                        });
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+
+                
+            } 
+            console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
+            
+                        postSetCodyData(token,
+                            response.data.transaccionID.toString(),
+                            'usuarios',
+                            globalSettings.setCodyDataResult.success.toString(),
+                            msgToReport)
+            
+            
+        }
+        
+    }
+   
+    
+    
+    
 }

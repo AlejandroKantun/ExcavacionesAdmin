@@ -53,7 +53,7 @@ export const getUserLogin = async (userName:string,pass:string) => {
             if ((Buffer.from(pass, 'utf8').toString('base64')==globalSettings.passDefaultCody)&&(res[0].contrasena==globalSettings.passDefault)){
                 loginResult={
                                 authorized:true,
-                                path:'ChangePasswordScreen',
+                                path:'RefreshDataFromDatabase',
                                 userID:res[0].usuarioID.toString(),
                                 zoneID:res[0].bancoID.toString(),
                             }
@@ -63,7 +63,7 @@ export const getUserLogin = async (userName:string,pass:string) => {
             else if (res[0].contrasena===Buffer.from(pass, 'utf8').toString('base64')){
                 loginResult={
                                 authorized:true,
-                                path:'MainDrawerNavigator',
+                                path:'RefreshDataFromDatabase',
                                 userID:res[0].usuarioID.toString(),
                                 zoneID:res[0].bancoID.toString(),
 

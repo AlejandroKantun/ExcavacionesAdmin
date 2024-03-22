@@ -1,5 +1,6 @@
 import React, { createContext, useReducer } from 'react'
 import { authReducer } from './authReducer';
+import { Vale } from '../interfaces/Vale';
 
 //define information that will be stored
 export interface AuthState{
@@ -8,6 +9,8 @@ export interface AuthState{
     userID?:number,
     token?:string,
     zoneID?:number,
+    ticket?: Vale,
+    appUniqueID?:string
 }
 //Initial State
 
@@ -16,7 +19,9 @@ export const authInitialState:AuthState={
     userName:undefined,
     userID:undefined,
     token:undefined,
-    zoneID:undefined
+    zoneID:undefined,
+    ticket:undefined,
+    appUniqueID:undefined
 }
 
 //Usar la interface para decirle a react como luce y que expone el context
@@ -26,9 +31,11 @@ export interface AuthContextProps{
     logOut: () => void;
     changeUserID:(userId:number)=>void,
     changeUserName:(userName:string)=>void,
-    changeToken:(userName:string)=>void,
+    changeToken:(token:string)=>void,
     changeZoneID:(zoneId:number)=>void,
-
+    ChangeTicket:(ticketToLoad:Vale)=>void,
+    removeTicket: () => void,
+    changeUniqueAppID:(uniqueAppID:string)=>void;
 }
 
 //Crear el contexto
@@ -52,10 +59,19 @@ export const AuthProvider = ({children}:any) => {
         dispatch({type:'changeUserName',payload:userName})   
     }
     const changeToken =(token:string)=>{
-        dispatch({type:'changeUserName',payload:token})   
+        dispatch({type:'changeToken',payload:token})   
     }
     const changeZoneID=(zoneId:number)=>{
         dispatch({type:'changeZoneId',payload:zoneId})   
+    }
+    const ChangeTicket=(ticketToLoad:Vale)=>{
+        dispatch({type:'changeTicket',payload:ticketToLoad})   
+    }
+    const changeUniqueAppID=(UniqueAppID:string)=>{
+        dispatch({type:'changeUniqueAppID',payload:UniqueAppID})   
+    }
+    const removeTicket=()=>{
+        dispatch({type:'removeTicket'})   
 
     }
 
@@ -68,7 +84,10 @@ return(
         changeUserID,
         changeUserName,
         changeToken,
-        changeZoneID
+        changeZoneID,
+        ChangeTicket,
+        removeTicket,
+        changeUniqueAppID
     }}>
         {children}
     </AuthContext.Provider>

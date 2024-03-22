@@ -19,5 +19,5 @@ export interface Vehiculo {
     tipoUnidad:                 string;
     EnviadoABaseDeDatosCentral?: number;
     vehiculoID:                 number;
-    numeroTolva:                string|null;
+    numeroTolva:                string;
 }

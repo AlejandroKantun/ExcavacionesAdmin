@@ -10,8 +10,7 @@ import { Cliente } from '../interfaces/cliente';
 import { Destino } from '../interfaces/destino';
 import { Vehiculo } from '../interfaces/vehiculo';
 import { Vale } from '../interfaces/vale';
-import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
-import { Alert } from 'react-native';
+
 
 enum AssignType{
     empresa="Empresa",
@@ -26,20 +25,28 @@ interface Props{
   label:string,
   data: any[],
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
-  getVehicles?: (vehicleId: number) => Promise<void>,
-  vehicleById?: Vehiculo[]
-}
+  getVehicles?: (vehicleId: number) => Promise <Vehiculo[]>,
+  vehicleById?: Vehiculo[],
+  setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number) => void}
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById}:Props ) => {
+export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById,setPlacaNoTolvaNoTriturador}:Props ) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const onSelectVehicle=async(vehicleID:number,)=>{
-    await getVehicles!(vehicleID)
-    await setPropertyOnTicket( "vehiculoID",vehicleID);
-    await setPropertyOnTicket("placa",vehicleById![0]?.placa)
+    await getVehicles!(vehicleID).then(
+      (res)=>{
+        if (res.length>0){
+                console.log('setting '+ JSON.stringify(res[0].placa))
+
+                  setPlacaNoTolvaNoTriturador!(res[0].placa,res[0].numeroTolva,res[0].vehiculoID)
+        }
+        //setPropertyOnTicket( "vehiculoID",vehicleID);
+      }
+    )
+    
   }
   
   return (
@@ -60,11 +67,10 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           search
                                           maxHeight={400}
                                           labelField="nombreEmpresa"
+                                          
                                           valueField="empresaID"
                                           placeholder={!isFocus ? '' : ''}
                                           searchPlaceholder=""
-                                          //value={value.toString()}
-                                          //onFocus={() => setIsFocus(true)}
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Empresa) => <View style={localStyles.renderItemContainer}><CustomText> {item.empresaID} - {item.nombreEmpresa}</CustomText></View>}
                                           onChange={item => {
