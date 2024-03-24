@@ -25,8 +25,8 @@ import { TicketAssignDetail } from '../components/TicketAssignDetail';
 import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
 import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
-import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 import { postTicketsToDB, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveTickets, requestAndSaveVehicles } from '../api/operationsToDB';
+import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
 
 
 
@@ -62,10 +62,6 @@ export const NewTicketScreen = () => {
   //Navigation
   const navigation =useNavigation()
 
-  //test for refreshing
-  const {token,getToken} =useTokenByUserPass();
-
-
   const [placa, setPlaca] = useState('')
   const [noTolva, setNoTolva] = useState('')
   const [paymentSelected, setPaymentSelected] = useState({
@@ -95,9 +91,12 @@ export const NewTicketScreen = () => {
       (res)=>{
         setNextRow(res)
         setFolioFisicoFolioDigitalFechaEntrada(
-          dateFormatedff()+'-'+res.toString(),
-          authState.zoneID?.toString()+'-'+authState?.userID?.toString()+'-'+res,
-          today
+          'FF-'+dateFormatedff()+'-'+res.toString(),
+          authState.empresaID+'|'+authState.zoneID?.toString()+'|'+authState.userID!.toString()+'|'+res.toString(),
+          today,
+          res.toString(),
+          authState.userID!,
+          authState.zoneID!
         )
       }
     );
@@ -137,7 +136,7 @@ export const NewTicketScreen = () => {
                                    // requestAndSaveDestinations(token);
                                    // requestAndSaveClients(token);
                                    // requestAndSaveTickets(token);
-                                   postTicketsToDB(1,token,)
+                                   postTicketsToDB(1,authState.token!,authState.appUniqueID!)
 
                                     }
                                     //resetAllValues();
@@ -157,16 +156,12 @@ export const NewTicketScreen = () => {
                                     //storeUser('Test12');
 
                                     //Alert.alert(dateFormated (date))                               
-                                   //console.log(JSON.stringify(authState.token))
-                          
-                                    requestAndSaveVehicles(authState.token!,authState.appUniqueID!);
-                                    requestAndSaveMaterials(authState.token!,authState.appUniqueID!);
-                                    requestAndSaveDrivers(authState.token!,authState.appUniqueID!);
-                                    requestAndSaveDestinations(authState.token!,authState.appUniqueID!);
-                                    requestAndSaveClients(authState.token!,authState.appUniqueID!);
-                                    requestAndSaveTickets(authState.token!,authState.appUniqueID!);
-
-                                    }
+                                   console.log(JSON.stringify(authState))
+                                   getEmpresaIDwithUserID(authState.userName!).then(
+                                     (res)=>
+                                     {Alert.alert(JSON.stringify(res[0]["empresaID"]))}                           
+                                     )
+                                  }
                                     //resetAllValues();
                                     //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
                                     //setPlacaNoTolvaNoTriturador('TEST','TEST',1)
@@ -184,7 +179,7 @@ export const NewTicketScreen = () => {
           setPlaca={setPlaca}
           noTolva={noTolva}
           setNoTolva={setNoTolva}
-          FolioFisico={dateFormatedff(today).substring(0,dateFormatedff(today).length) +'-'+ nextRow}
+          FolioFisico={ticket.folioFisico}
           setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
         />
           <View>

@@ -18,11 +18,14 @@ export interface changePassResult{
 }
 
 export interface ticketDetail{
+    valeID:string,
     valeMaterialID : string,
     folioDigital : string,
     materialID : string,
     materialNombre : string,
     cantidadm3 : string,
+    EnviadoABaseDeDatosCentral:string,
+    costom3:string
 }
 const db = connectToDatabase();
 
@@ -138,7 +141,7 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
     config
     )
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let vehiclesFromAPI:Vehiculo[]=response.data[0] as Vehiculo[]
         msgToReport=" Items received: " +vehiclesFromAPI.length; " - "
         if (vehiclesFromAPI.length>0){
@@ -276,10 +279,10 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
     const response = await excavacionesDB.get<MaterialResponse>('/codymaterial',
     config
     )
-    //console.log(JSON.stringify(response.data))
+    //
     
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let materialsFromAPI:Material[]=response.data[0] as Material[]
         msgToReport=" Items received: " +materialsFromAPI.length; " - "
         if (materialsFromAPI.length>0){
@@ -404,10 +407,10 @@ export const requestAndSaveDrivers =async (token:string,deviceId?:string)=>{
     const response = await excavacionesDB.get<DriversResponse>('/codychoferes',
     config
     )
-    console.log(JSON.stringify(response.data))
+    
     
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let driversFromAPI:Chofer[]=response.data[0] as Chofer[]
         msgToReport=" Items received: " +driversFromAPI.length; " - "
         if (driversFromAPI.length>0){
@@ -538,10 +541,10 @@ export const requestAndSaveDestinations =async (token:string,deviceId?:string)=>
     const response = await excavacionesDB.get<DestinationsResponse>('/codydestinos',
     config
     )
-    console.log(JSON.stringify(response.data))
+    
     
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let destinationsFromAPI:Destino[]=response.data[0] as Destino[]
         msgToReport=" Items received: " +destinationsFromAPI.length; " - "
         if (destinationsFromAPI.length>0){
@@ -677,10 +680,10 @@ export const requestAndSaveClients =async (token:string,deviceId?:string)=>{
     const response = await excavacionesDB.get<ClientsResponse>('/codyclientes',
     config
     )
-    console.log(JSON.stringify(response.data))
+    
     
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let clientsFromAPI:Cliente[]=response.data[0] as Cliente[]
         msgToReport=" Items received: " +clientsFromAPI.length; " - "
         if (clientsFromAPI.length>0){
@@ -824,10 +827,10 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
     const response = await excavacionesDB.get<valessResponse>('/codyvales',
     config
     )
-    console.log(JSON.stringify(response.data))
+    
     
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let ticketsFromAPI:Vale[]=response.data[0] as Vale[]
         msgToReport=" Items received: " +ticketsFromAPI.length; " - "
         if (ticketsFromAPI.length>0){
@@ -981,14 +984,13 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
 }
 
 export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:string)=>{
-    const selectTicketsPendingSentence=" SELECT * FROM vales WHERE EnviadoABaseDeDatosCentral=0"
+    const selectTicketsPendingSentence=" SELECT * FROM vales WHERE EnviadoABaseDeDatosCentral=0 "
     let ticketsPending:Vale[]=[];
     await (await db).transaction(
         async(tx)=>{
             tx.executeSql(selectTicketsPendingSentence,[],
             (res,ResultSet)=>{
                 ticketsPending =ResultSet.rows.raw() as Vale[];
-                
             },
             (error)=>{
                 console.log(JSON.stringify(error) )
@@ -1033,11 +1035,14 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                                     console.log(ticketsPending[i].valeID+' ' + JSON.stringify(ResultSet.rows.raw()))
                                     itemsFound=true;
                                     ticketDetails.push({
+                                        valeID:ticketsPending[i].valeID.toString(),
                                         valeMaterialID : ticketsMaterialsPending[j].valeMaterialID.toString(),
-                                        folioDigital : ticketsPending[i].folioFisico?ticketsPending[i].folioFisico:'',
+                                        folioDigital : ticketsPending[i].folioDigital?ticketsPending[i].folioDigital:'',
                                         materialID : ticketsMaterialsPending[j].materialID.toString(),
                                         materialNombre : ticketsMaterialsPending[j].materialNombre?ticketsMaterialsPending[j].materialNombre.toString():'',
                                         cantidadm3 : ticketsMaterialsPending[j].cantidadm3.toString(),
+                                        EnviadoABaseDeDatosCentral : ticketsMaterialsPending[j].EnviadoABaseDeDatosCentral.toString(),
+                                        costom3: ticketsMaterialsPending[j].EnviadoABaseDeDatosCentral.toString()
                                     })
                                 }                   
                                 
@@ -1050,17 +1055,20 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                 });
                 
                 if (itemsFound){
-                    console.log('tickets materials before body: ' +JSON.stringify(ticketDetails))
-                    //console.log('FECHA VALE: ' + dateFormated (ticketsPending[i].fechaVale!))
 
                     let bodyParameters = {
-                        transaccionID : '1000',
+                        transaccionID : ticketsPending[i].valeID? ticketsPending[i].valeID.toString():'',
                         valeID :   ticketsPending[i].valeID? ticketsPending[i].valeID.toString():'',
-                        bancoID : ticketsPending[i].bancoID?ticketsPending[i].bancoID.toString():'',
+                        bancoID : ticketsPending[i].bancoID?ticketsPending[i].bancoID.toString():0,
                         empresaID :  ticketsPending[i].empresaID?ticketsPending[i].empresaID.toString():'',
-                        serie: ticketsPending[i].serie? ticketsPending[i].serie.toString():'',
-                        folio : ticketsPending[i].folio?ticketsPending[i].folio.toString():'',
-                        folioDigital : ticketsPending[i].folioDigital? ticketsPending[i].folioDigital.toString():'',
+                        empresaNombre:  ticketsPending[i].empresaNombre? ticketsPending[i].empresaNombre!.toString():'',
+                        Importe:    ticketsPending[i].Importe? ticketsPending[i].Importe!.toString():'',
+                        EnviadoABaseDeDatosCentral: ticketsPending[i].EnviadoABaseDeDatosCentral? ticketsPending[i].EnviadoABaseDeDatosCentral!.toString():'1',
+                        formadepago: ticketsPending[i].formadepago? ticketsPending[i].formadepago!.toString():'',
+                        observacionesEliminar:ticketsPending[i].observacionesEliminar? ticketsPending[i].observacionesEliminar!.toString():'',
+                        serie: ticketsPending[i].serie? ticketsPending[i].serie.toString():'A',
+                        folio : ticketsPending[i].folio?ticketsPending[i].folio:'1',
+                        folioDigital : ticketsPending[i].folioDigital?ticketsPending[i].folioDigital.toString():'2|2|2|2',
                         folioFisico : ticketsPending[i].folioFisico?ticketsPending[i].folioFisico.toString():'',
                         fechaVale : ticketsPending[i].fechaVale!,
                         clienteID : ticketsPending[i].clienteID?ticketsPending[i].clienteID.toString():'',
@@ -1069,7 +1077,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                         destinoNombre : ticketsPending[i].destinoNombre?ticketsPending[i].destinoNombre:"",
                         vehiculoID : ticketsPending[i].vehiculoID?ticketsPending[i].vehiculoID.toString():'',
                         vehiculoNombre : ticketsPending[i].vehiculoNombre?ticketsPending[i].vehiculoNombre:"",
-                        tipoUnidad : ticketsPending[i].tipoUnidad?ticketsPending[i].tipoUnidad.toString():'',
+                        tipoUnidad : ticketsPending[i].tipoUnidad?ticketsPending[i].tipoUnidad.toString():'1',//corregir
                         placa : ticketsPending[i].placa?ticketsPending[i].placa.toString():'',
                         numeroEconomico : ticketsPending[i].numeroEconomico?ticketsPending[i].numeroEconomico.toString():'',
                         numeroValeTriturador : ticketsPending[i].numeroValeTriturador?ticketsPending[i].numeroValeTriturador.toString():'',
@@ -1078,47 +1086,51 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                         fechaSalidaVehiculo : ticketsPending[i].fechaSalidaVehiculo?ticketsPending[i].fechaSalidaVehiculo:"",
                         choferID : ticketsPending[i].choferID?ticketsPending[i].choferID:"",
                         choferNombre : ticketsPending[i].choferNombre?ticketsPending[i].choferNombre:"",
-                        firma : ticketsPending[i].firma?ticketsPending[i].firma:"",
+                        firma :ticketsPending[i].firma?ticketsPending[i].firma:"",
                         fechaCreacion : ticketsPending[i].fechaCreacion!,
                         fechaUltimaModificacion : ticketsPending[i].fechaUltimaModificacion?ticketsPending[i].fechaUltimaModificacion:"",
                         fechaEliminacion : ticketsPending[i].fechaEliminacion?ticketsPending[i].fechaEliminacion:"",
                         fechaSincronizacion : date,
                         creadoPor : ticketsPending[i].creadoPor?ticketsPending[i].creadoPor.toString():'',
-                        activoVale : ticketsPending[i].activoVale.toString()?ticketsPending[i].activoVale.toString():'',
-                        estadoVale : ticketsPending[i].estadoVale?ticketsPending[i].estadoVale.toString():'',
+                        activoVale : ticketsPending[i].activoVale?ticketsPending[i].activoVale:0,
+                        estadoVale : ticketsPending[i].estadoVale?ticketsPending[i].estadoVale:0,
                         detalleVales: ticketDetails
                     };
-                    console.log('////////////////FINAL BODY////////////////////')
 
-                    let ticketsFormated=JSON.stringify(bodyParameters).replaceAll("[{","[[").replaceAll("},{","],[").replaceAll("}]","]]")
-                    console.log(ticketsFormated)
-                    console.log('////////////////FINAL BODY////////////////////')
-
-                    
+                    const finalBody='['+JSON.stringify(bodyParameters)+']';
 
                     //ready to send
+                                         
                     const response = await excavacionesDB.post('/setcodyvales',
-                    ticketsFormated+'adasd',
+                    finalBody,
                     config
-                    )
-                    console.log(JSON.stringify(response))
-                    //If data was sent successfully, then update local db
-                    /*
-                    const updateTicketToDBSentence= "UPDATE vales SET EnviadoABaseDeDatosCentral=1 WHERE valeID=?"
-                    await (await db).transaction(
-                        async(tx)=>{
-                            tx.executeSql(updateTicketToDBSentence,[
-                            ticketsPending[i].valeID.toString()
-                            ],
-                            (res,ResultSet)=>{
-                                console.log(JSON.stringify(ResultSet))
-                            },
-                            (error)=>{
-                                console.log(JSON.stringify(error) )
-                            }
-                            );
-                    });
-                    */
+                    ).then(async (res)=>{
+                        console.log('RESULT of posting'+JSON.stringify(res.data))
+                        /*
+                        const updateTicketToDBSentence= "UPDATE vales SET EnviadoABaseDeDatosCentral=1 WHERE valeID=?"
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(updateTicketToDBSentence,[
+                                ticketsPending[i].valeID.toString()
+                                ],
+                                (res,ResultSet)=>{
+                                    console.log(JSON.stringify(ResultSet))
+                                },
+                                (error)=>{
+                                    console.log(JSON.stringify(error) )
+                                }
+                                );
+                        });
+                        */
+                        
+
+                    }).catch((error)=>{
+                        console.error(JSON.stringify(error))
+                    })
+
+
+                     
+                    
                 }
             } catch (error) {
                 console.error(error)
@@ -1163,7 +1175,7 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
     )
 
     if (response.data.transaccionID){
-            console.log(JSON.stringify(response.data))
+            
         let ususariosFromAPI:Usuario[]=response.data[0] as Usuario[]
         msgToReport=" Items received: " +ususariosFromAPI.length; " - "
         console.log(JSON.stringify(ususariosFromAPI))

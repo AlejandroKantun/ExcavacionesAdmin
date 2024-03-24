@@ -3,11 +3,14 @@ import { dateFormated } from './dateFormated';
 import { connectToDatabase } from './dbStructure';
 import { MaterialQty } from '../hooks/useMaterialQty';
 import { SaveTicketsMaterialsToLocal } from './SaveTicketsMaterialsToLocalDB';
+import { date } from 'yup';
 
 
 const db = connectToDatabase();
 const dateCreation =new Date();
-export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQty[])=>{
+export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQty[],byteCharacters?:any)=>{
+    const today = new Date();
+
     let ticketId=0;
     let insertTicketsSentence = "INSERT INTO vales ("+
     "bancoID, "+
@@ -37,8 +40,9 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
     "importe, "+
     "fechaEntradaVehiculo, "+
     "numeroTolva, "+
-    "fechaSalidaVehiculo "+
-    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    "fechaSalidaVehiculo, "+
+    "folioDigital "+
+    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     
     const sentToCentralDB=0;                
     let countItemsInserted=0;
@@ -50,7 +54,7 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
                 async(tx)=>{
                     tx.executeSql(insertTicketsSentence,[
                         ticket.bancoID, 
-                        ticket.serie, 
+                        'A', 
                         ticket.folio, 
                         ticket.folioFisico, 
                         dateFormated(ticket.fechaVale!), 
@@ -72,11 +76,13 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
                         ticket.clienteID==1?ticket.clienteNombre:"",
                         ticket.destinoID==1?ticket.destinoNombre:"",
                         ticket.vehiculoID==1?ticket.vehiculoNombre:"",
-                        ticket.firma ,
+                        byteCharacters?byteCharacters:'',
                         ticket.Importe,
                         dateFormated(ticket.fechaEntradaVehiculo!),
                         ticket.numeroTolva,
-                        ticket.fechaSalidaVehiculo?dateFormated(ticket.fechaSalidaVehiculo):null
+                        byteCharacters?dateFormated(today):null,
+                        ticket.folioDigital, 
+
                     ],
                     async (res,ResultSet)=>{
                         if (ResultSet.rowsAffected >0 ){

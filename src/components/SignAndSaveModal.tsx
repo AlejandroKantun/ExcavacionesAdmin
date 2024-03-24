@@ -83,11 +83,10 @@ interface Props{
         const image64=signImage.encodeToBase64();
         //console.log(image64)
         const byteCharacters = atob(image64)
-        setPropertyOnTicket("firma", byteCharacters);
         setIsVisible(false);
         setPaths([])
-        console.log(byteCharacters)
-        SaveTicketsToLocalDB(ticket!,materialsQty).then(
+
+        SaveTicketsToLocalDB(ticket!,materialsQty,byteCharacters).then(
           (res)=>{
              if (res>0){
                                     setSuccessModalVisible(true); 

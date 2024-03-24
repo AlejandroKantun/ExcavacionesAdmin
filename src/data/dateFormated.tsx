@@ -8,7 +8,6 @@ export const dateFormated=(date?:Date):string=>{
              a= new Date();
 
     }
-    console.log(typeof(a) + 'a: '+a); 
     var resultDate=''
     resultDate=
     [a.getFullYear(),

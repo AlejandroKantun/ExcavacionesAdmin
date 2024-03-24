@@ -64,11 +64,14 @@ const setPlacaNoTolvaNoTriturador=(placa:string,numerotolva:string,vehiculoID:nu
             vehiculoID:vehiculoID
           })
 }
-const setFolioFisicoFolioDigitalFechaEntrada=(folioFisico:string,folioDigital:string,IncommingDate:Date)=>{
+const setFolioFisicoFolioDigitalFechaEntrada=(folioFisico:string,folioDigital:string,IncommingDate:Date,folio:string,creadoPor:number,bancoID:number)=>{
   setTicket({...ticket, 
             folioFisico:folioFisico,
             folioDigital:folioDigital ,
-            fechaEntradaVehiculo:IncommingDate
+            fechaEntradaVehiculo:IncommingDate,
+            folio:folio,
+            creadoPor:creadoPor,
+            bancoID:bancoID
           })
 }
 

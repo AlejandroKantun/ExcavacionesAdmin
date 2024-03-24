@@ -10,7 +10,8 @@ export interface AuthState{
     token?:string,
     zoneID?:number,
     ticket?: Vale,
-    appUniqueID?:string
+    appUniqueID?:string,
+    empresaID?:number,
 }
 //Initial State
 
@@ -21,7 +22,8 @@ export const authInitialState:AuthState={
     token:undefined,
     zoneID:undefined,
     ticket:undefined,
-    appUniqueID:undefined
+    appUniqueID:undefined,
+    empresaID:undefined
 }
 
 //Usar la interface para decirle a react como luce y que expone el context
@@ -30,6 +32,7 @@ export interface AuthContextProps{
     signIn:()=>void,
     logOut: () => void;
     changeUserID:(userId:number)=>void,
+    changeEmpresaID:(userId:number)=>void,
     changeUserName:(userName:string)=>void,
     changeToken:(token:string)=>void,
     changeZoneID:(zoneId:number)=>void,
@@ -74,7 +77,9 @@ export const AuthProvider = ({children}:any) => {
         dispatch({type:'removeTicket'})   
 
     }
-
+    const changeEmpresaID =(empresaID:number)=>{
+        dispatch({type:'changeEmpresaID',payload:empresaID})   
+    }
 
 return(
     <AuthContext.Provider value={{
@@ -87,7 +92,8 @@ return(
         changeZoneID,
         ChangeTicket,
         removeTicket,
-        changeUniqueAppID
+        changeUniqueAppID,
+        changeEmpresaID
     }}>
         {children}
     </AuthContext.Provider>

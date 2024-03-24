@@ -14,6 +14,8 @@ import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 import { useNetInfo } from "@react-native-community/netinfo";
 import { getUserslogged } from '../data/persistantData';
 import DeviceInfo from 'react-native-device-info';
+import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
+import { Alert } from 'react-native';
 
 global.Buffer = require('buffer').Buffer;
 
@@ -25,7 +27,7 @@ export const LoginScreen = () => {
     const [pass, setPass] = useState('');
     const [isVisible, setIsVisible] = useState(false)
     const {token,getToken} =useTokenByUserPass()
-    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID} = useContext(AuthContext)
+    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID,changeEmpresaID} = useContext(AuthContext)
     const [deviceId, setdeviceId] = useState('')
 
     //Network State
@@ -43,20 +45,30 @@ export const LoginScreen = () => {
                       signIn();
                       changeUserName(user);
                       changeUniqueAppID(deviceId);
-                      getUserslogged().then((usersInDB)=>{
-                          console.log('users in phone' + usersInDB)
-                          if(usersInDB.includes(user)){
-                              //it is not the first time
-                              //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-                              navigation.navigate("RefreshDataFromDatabase" as never)
-
-                          }
-                          else{
-                              //first time, need to change password
-                              navigation.navigate("ChangePasswordScreen" as never)
-
-                          }
-                      })
+                      getEmpresaIDwithUserID(user).then(
+                        (res)=>
+                        {   
+                            changeEmpresaID(Number(res[0]["empresaID"]))
+                            changeUserID(Number(res[0]["usuarioID"]))
+                            changeZoneID(Number(res[0]["bancoID"]))
+                            //Alert.alert(JSON.stringify(res))
+                            getUserslogged().then((usersInDB)=>{
+                                console.log('users in phone' + usersInDB)
+                                if(usersInDB.includes(user)){
+                                    //it is not the first time
+                                    navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                                   // navigation.navigate("RefreshDataFromDatabase" as never)
+      
+                                }
+                                else{
+                                    //first time, need to change password
+                                    navigation.navigate("ChangePasswordScreen" as never)
+      
+                                }
+                            })
+                        }
+                        )
+                      
                   }
                   else{
                       //it means that userPass is not correct
@@ -74,8 +86,17 @@ export const LoginScreen = () => {
                 if(loginResult.path=='MainDrawerNavigator'){
                     signIn();
                     changeUserName(user);
-                    changeUserID(Number(loginResult.userID));
+                    //changeUserID(Number(loginResult.userID));
                     changeZoneID(Number(loginResult.zoneID));
+                    getEmpresaIDwithUserID(user).then(
+                        (res)=>
+                        {
+                            changeEmpresaID(Number(res[0]["empresaID"]))
+                            changeUserID(Number(res[0]["usuarioID"]))
+                            changeZoneID(Number(res[0]["bancoID"]))
+
+                        }
+                        )
                     //navigation.dispatch(StackActions.replace(loginResult.path))
                     navigation.navigate("ChangePasswordScreen" as never)
                     } 

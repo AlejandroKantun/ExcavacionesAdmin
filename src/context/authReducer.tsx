@@ -10,6 +10,7 @@ type AuthAction=
     |{type:'changeTicket',payload:Vale}
     |{type:'removeTicket'}
     |{type:'changeUniqueAppID',payload:string}
+    |{type:'changeEmpresaID', payload:number}
 
 
 
@@ -28,12 +29,19 @@ export const authReducer=(state:AuthState, action:AuthAction): AuthState =>{
                 userID:undefined,
                 userName:undefined,
                 token:undefined,
-                zoneID:undefined
+                zoneID:undefined,
+                ticket:undefined,
+                appUniqueID:undefined
             }
         case'changeUserID':
             return{
                 ...state,
                 userID:action.payload,
+            }
+        case'changeEmpresaID':
+            return{
+                ...state,
+                empresaID:action.payload,
             }
         case'changeUserName':
         return{
