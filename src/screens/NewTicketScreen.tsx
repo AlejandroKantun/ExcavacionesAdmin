@@ -124,24 +124,9 @@ export const NewTicketScreen = () => {
                                 onPress={()=>
                                   
                                   {
-
-                                    
-                                    
-                                  //storeUser('Test3');
-
-                                      
-                                   // requestAndSaveVehicles(token,);
-                                   // requestAndSaveMaterials(token);
-                                   // requestAndSaveDrivers(token);
-                                   // requestAndSaveDestinations(token);
-                                   // requestAndSaveClients(token);
-                                   // requestAndSaveTickets(token);
                                    postTicketsToDB(1,authState.token!,authState.appUniqueID!)
 
                                     }
-                                    //resetAllValues();
-                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-                                    //setPlacaNoTolvaNoTriturador('TEST','TEST',1)
                                   }
 
                                 >
@@ -153,18 +138,15 @@ export const NewTicketScreen = () => {
                                 onPress={()=>
                                   
                                   {
-                                    //storeUser('Test12');
-
-                                    //Alert.alert(dateFormated (date))                               
+                         
                                    console.log(JSON.stringify(authState))
                                    getEmpresaIDwithUserID(authState.userName!).then(
                                      (res)=>
-                                     {Alert.alert(JSON.stringify(res[0]["empresaID"]))}                           
+                                     {
+
+                                      }                           
                                      )
                                   }
-                                    //resetAllValues();
-                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-                                    //setPlacaNoTolvaNoTriturador('TEST','TEST',1)
                                   }
 
                                 >

@@ -57,11 +57,12 @@ const setPropertyOnTicket=(field:keyof Vale,value:any)=>{
     })
 }
 
-const setPlacaNoTolvaNoTriturador=(placa:string,numerotolva:string,vehiculoID:number)=>{
+const setPlacaNoTolvaNoTriturador=(placa:string,numerotolva:string,vehiculoID:number,tipoUnidad:string)=>{
   setTicket({...ticket, 
             placa:placa,
             numeroTolva:numerotolva ,
-            vehiculoID:vehiculoID
+            vehiculoID:vehiculoID,
+            tipoUnidad:tipoUnidad
           })
 }
 const setFolioFisicoFolioDigitalFechaEntrada=(folioFisico:string,folioDigital:string,IncommingDate:Date,folio:string,creadoPor:number,bancoID:number)=>{

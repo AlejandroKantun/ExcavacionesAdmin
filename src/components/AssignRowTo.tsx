@@ -27,7 +27,8 @@ interface Props{
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
   getVehicles?: (vehicleId: number) => Promise <Vehiculo[]>,
   vehicleById?: Vehiculo[],
-  setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number) => void}
+  setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void
+}
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -41,9 +42,8 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
         if (res.length>0){
                 console.log('setting '+ JSON.stringify(res[0].placa))
 
-                  setPlacaNoTolvaNoTriturador!(res[0].placa,res[0].numeroTolva,res[0].vehiculoID)
+                  setPlacaNoTolvaNoTriturador!(res[0].placa,res[0].numeroTolva,res[0].vehiculoID,res[0].tipoUnidad?res[0].tipoUnidad:'1')
         }
-        //setPropertyOnTicket( "vehiculoID",vehicleID);
       }
     )
     

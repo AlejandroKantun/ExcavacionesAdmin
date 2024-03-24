@@ -23,7 +23,7 @@ interface Props{
     noTolva:string,
     setNoTolva: React.Dispatch<React.SetStateAction<string>>,
     FolioFisico:string,
-    setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number) => void
+    setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void
 }
 export const TicketAssignDetail = ({
                                     nextRow,
