@@ -27,13 +27,14 @@ interface Props{
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
   getVehicles?: (vehicleId: number) => Promise <Vehiculo[]>,
   vehicleById?: Vehiculo[],
-  setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void
+  setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void,
+  ticket?:Vale
 }
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById,setPlacaNoTolvaNoTriturador}:Props ) => {
+export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById,setPlacaNoTolvaNoTriturador,ticket}:Props ) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const onSelectVehicle=async(vehicleID:number,)=>{
@@ -64,10 +65,10 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           inputSearchStyle={localStyles.inputSearchStyle}
                                           iconStyle={localStyles.iconStyle}
                                           data={data}
+                                          value={ticket? data.find((element:Empresa)=>{ return element.empresaID===ticket.empresaID}):null}
                                           search
                                           maxHeight={400}
                                           labelField="nombreEmpresa"
-                                          
                                           valueField="empresaID"
                                           placeholder={!isFocus ? '' : ''}
                                           searchPlaceholder=""
@@ -76,10 +77,11 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           onChange={item => {
                                             setPropertyOnTicket("empresaID",item.empresaID);
                                           }}
+                                          
                                           renderLeftIcon={() => (
                                               <Icon style={localStyles.renderLeftIcon} 
                                               name="people-outline" 
-                                              size={30} 
+                                              size={windowWidth*0.055} 
                                               color="rgba(0,0,0,0.5)" />
                                           )}
                                           />
@@ -91,14 +93,13 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           inputSearchStyle={localStyles.inputSearchStyle}
                                           iconStyle={localStyles.iconStyle}
                                           data={data}
+                                          value={ticket? data.find((element:Cliente)=>{ return element.clienteID===ticket.clienteID}):null}
                                           search
                                           maxHeight={400}
                                           labelField="nombreCliente"
                                           valueField="clienteID"
                                           placeholder={!isFocus ? '' : ''}
                                           searchPlaceholder=""
-                                          //value={value.toString()}
-                                          //onFocus={() => setIsFocus(true)}
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Cliente) => <View style={localStyles.renderItemContainer}>
                                                                               <CustomText> {item.clienteID} - {item.nombreCliente} </CustomText>
@@ -109,7 +110,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           renderLeftIcon={() => (
                                               <Icon style={localStyles.renderLeftIcon} 
                                               name="person-outline" 
-                                              size={30} 
+                                              size={windowWidth*0.055} 
                                               color="rgba(0,0,0,0.5)" />
                                           )}
                                           />
@@ -121,10 +122,11 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           inputSearchStyle={localStyles.inputSearchStyle}
                                           iconStyle={localStyles.iconStyle}
                                           data={data}
+                                          value={ticket? data.find((element:Destino)=>{ return element.destinoID===ticket.destinoID}):null}
                                           search
                                           maxHeight={400}
-                                          labelField="direccionDestino"
-                                          valueField="destinoID"
+                                          labelField="nombreDestino"
+                                          valueField="nombreDestino"
                                           placeholder={!isFocus ? '' : ''}
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
@@ -135,7 +137,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           renderLeftIcon={() => (
                                               <Icon style={localStyles.renderLeftIcon} 
                                               name="map-outline" 
-                                              size={30} 
+                                              size={windowWidth*0.055} 
                                               color="rgba(0,0,0,0.5)" />
                                           )}
                                           />
@@ -147,6 +149,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           inputSearchStyle={localStyles.inputSearchStyle}
                                           iconStyle={localStyles.iconStyle}
                                           data={data}
+                                          value={ticket? data.find((element:Vehiculo)=>{ return element.vehiculoID===ticket.vehiculoID}):null}
                                           search
                                           maxHeight={400}
                                           labelField="tipoUnidad"
@@ -168,7 +171,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           renderLeftIcon={() => (
                                               <Icon style={localStyles.renderLeftIcon} 
                                               name="car-outline" 
-                                              size={30} 
+                                              size={windowWidth*0.055} 
                                               color="rgba(0,0,0,0.5)" />
                                           )}
                                           />

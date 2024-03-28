@@ -1,4 +1,4 @@
-import React, { useContext } from 'react'
+import React, { useContext, useEffect } from 'react'
 import { Dimensions, StyleSheet, TextInput, View } from 'react-native'
 import CustomText from './CustomText';
 import { AssignRowTo } from '../components/AssignRowTo';
@@ -18,22 +18,19 @@ interface Props{
     nextRow: number,
     ticket: Vale,
     setPropertyOnTicket: (field: keyof Vale, value: any) => void,
-    placa: string,
-    setPlaca: React.Dispatch<React.SetStateAction<string>>,
-    noTolva:string,
-    setNoTolva: React.Dispatch<React.SetStateAction<string>>,
+    placa: string | undefined,
+    setPlaca: React.Dispatch<React.SetStateAction<string | undefined>>,
+    noTolva:string | null | undefined,
+    setNoTolva: React.Dispatch<React.SetStateAction<string | null | undefined>>,
     FolioFisico:string,
-    setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void
+    setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string, ticket?:Vale) => void,
 }
 export const TicketAssignDetail = ({
-                                    nextRow,
                                     ticket,
                                     setPropertyOnTicket,
                                     placa,
                                     setPlaca,
                                     noTolva,
-                                    setNoTolva,
-                                    FolioFisico,
                                     setPlacaNoTolvaNoTriturador
                                   }:Props) => {
     const {authState} = useContext(AuthContext)
@@ -42,7 +39,9 @@ export const TicketAssignDetail = ({
     const{clients}=useClientsDB()
     const{destinations}=useDestinationsDB()
     const{vehicles:vehiclesById,getVehicles}=useVehiclesByVehicleID()
-
+  
+   
+    
   return (
     <View style={localStyles.companyClientContainer}>
           <View style={localStyles.dateFolioNumberView}>
@@ -52,7 +51,7 @@ export const TicketAssignDetail = ({
                 <TextInput style={localStyles.textInputFolioFisico}
                 maxLength={15}
                 multiline={true}
-                defaultValue={FolioFisico}
+                defaultValue={ticket.folioFisico}
                 //value={ticket.folioFisico}
                 placeholder=  {'aa-mm-dd-#'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
@@ -62,34 +61,48 @@ export const TicketAssignDetail = ({
             </View>      
           </View>
           </View>
-          <AssignRowTo label='Asignado a' assignTo='empresa' data={companies} setPropertyOnTicket={setPropertyOnTicket} />
+            <AssignRowTo 
+                label='Asignado a' 
+                assignTo='empresa' 
+                data={companies} 
+                setPropertyOnTicket={setPropertyOnTicket} 
+                ticket={ticket} />
           {ticket.empresaID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {'Nombre Empresa'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
+                defaultValue={ticket.empresaNombre?ticket.empresaNombre:''}
                 onChangeText={(text)=>{setPropertyOnTicket("empresaNombre",text)}}>
             </TextInput>
             </View>
           :null
           }
-          <AssignRowTo label='Cliente' assignTo='cliente' data={clients} setPropertyOnTicket={setPropertyOnTicket} />
+            <AssignRowTo 
+              label='Cliente' 
+              assignTo='cliente' 
+              data={clients} 
+              setPropertyOnTicket={setPropertyOnTicket} 
+              ticket={ticket}/>
           {ticket.clienteID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {'Nombre Cliente'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
+                defaultValue={ticket.clienteNombre?ticket.clienteNombre:''}
                 onChangeText={(text)=>{setPropertyOnTicket("clienteNombre",text)}}>
             </TextInput>
             </View>
           :null
           }
-          <AssignRowTo label='Destino' assignTo='destino' data={destinations} setPropertyOnTicket={setPropertyOnTicket} />
+          <AssignRowTo label='Destino' assignTo='destino' data={destinations} setPropertyOnTicket={setPropertyOnTicket} ticket={ticket}/>
           {ticket.destinoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {'Nombre destino'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
+                defaultValue={ticket.destinoNombre?ticket.destinoNombre:''}
+
                 onChangeText={(text)=>{setPropertyOnTicket("destinoNombre",text)}}>
             </TextInput>
             </View>
@@ -101,12 +114,14 @@ export const TicketAssignDetail = ({
                       assignTo='unidad' 
                       data={vehicles} 
                       setPropertyOnTicket={setPropertyOnTicket} 
+                      ticket={ticket}
                       getVehicles={getVehicles} vehicleById={vehiclesById}/>
           {ticket.vehiculoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {'Nombre vehiculo'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
+                defaultValue={ticket.vehiculoNombre?ticket.vehiculoNombre:''}
                 onChangeText={(text)=>{setPropertyOnTicket("vehiculoNombre",text)}}>
             </TextInput>
             </View>
@@ -120,11 +135,11 @@ export const TicketAssignDetail = ({
                 placeholder=  {''}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 onChangeText={(text)=>{
-                                        setPropertyOnTicket("placa",text)
                                         setPlaca(text);
+                                        setPropertyOnTicket("placa",text)
                                       }}
-                editable={vehiclesById[0]?.placa?false:true}
-                value={vehiclesById[0]?.placa?vehiclesById[0]?.placa:placa}
+                editable={ticket.vehiculoID==1?true:false}
+                value={ticket.placa?ticket.placa:''}
                 >
               </TextInput>
             </View>
@@ -133,7 +148,9 @@ export const TicketAssignDetail = ({
               <TextInput style={localStyles.textInputPlacaTolvaTriturador}
                 placeholder=  {'S / N'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
-                defaultValue={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.numeroTolva:noTolva}
+                defaultValue={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.numeroTolva.toString():noTolva?.toString()}
+                value={ticket.placa?ticket.numeroTolva?.toString():''}
+
                 maxLength={20}
                 onChangeText={(text)=>{
                   setPropertyOnTicket("numeroTolva",text)

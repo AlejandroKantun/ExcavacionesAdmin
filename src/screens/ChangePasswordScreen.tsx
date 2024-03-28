@@ -11,7 +11,7 @@ import { useEffect } from 'react';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 
 import DeviceInfo from 'react-native-device-info';
-import { changePassResult, ChangePassWordRequest, requestAndSaveUsers } from '../api/operationsToDB';
+import { changePassResult, ChangePassWordRequest, postTicketsToDB, requestAndSaveClients, requestAndSaveCompanies, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveUsers, requestAndSaveVehicles, requestAndSaveZones, requestAndZonesCompanies } from '../api/operationsToDB';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParams } from '../navigation/StackNavigator';
 import { SavePassModal } from '../components/SavePassModal';
@@ -57,18 +57,34 @@ const submitChangeRequest=async(newPassValidated:string)=>{
         Alert.alert('Ha ocurrido un error en el proceso de actualización');
     }
 }
+const refreshAllTables=async (appUniqueID:string)=>{
+    
+    console.log('Recovering Users');
+    await requestAndSaveUsers(authState.token!,appUniqueID!)
+    console.log('Recovering Zones');
+    await requestAndSaveZones(authState.token!,appUniqueID!);
+    console.log('Recovering ZonesCompanies');
+    await requestAndZonesCompanies(authState.token!,appUniqueID!);
+}
 
-   useEffect( () => {
-    getUserByUserName(authState.userName!);
+useEffect( () => {
+    
 
     DeviceInfo.getUniqueId().then((result)=>{
+
         setdeviceId(result)
-        requestAndSaveUsers(authState.token!,result)
+        try {
+            refreshAllTables(result).then(()=>{
+                getUserByUserName(authState.userName!);
+            })            
+    
+        } catch (error) {
+            console.log(JSON.stringify(error))
+        }
     });
-   }, [])
-   
-
-
+    
+    
+   }, [authState.userName])
   return (
     <View style={localStyles.mainCointainer}>
         <HeaderSearchTicket

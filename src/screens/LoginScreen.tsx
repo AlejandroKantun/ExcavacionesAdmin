@@ -9,13 +9,14 @@ import  Icon  from 'react-native-vector-icons/Ionicons';
 import { getUserLogin, loginResult } from '../data/UserLogin';
 import { connectToDatabase } from '../data/dbStructure';
 import { WrongUserDataModal } from '../components/WrongUserDataModal';
-import { AuthContext } from '../context/AuthContext';
+import { AuthContext, authInitialState } from '../context/AuthContext';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 import { useNetInfo } from "@react-native-community/netinfo";
 import { getUserslogged } from '../data/persistantData';
 import DeviceInfo from 'react-native-device-info';
 import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
 import { Alert } from 'react-native';
+import { requestAndSaveCompanies, requestAndSaveZones, requestAndZonesCompanies, requestAndSaveUsers, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveVehicles } from '../api/operationsToDB';
 
 global.Buffer = require('buffer').Buffer;
 
@@ -48,16 +49,31 @@ export const LoginScreen = () => {
                       getEmpresaIDwithUserID(user).then(
                         (res)=>
                         {   
-                            changeEmpresaID(Number(res[0]["empresaID"]))
-                            changeUserID(Number(res[0]["usuarioID"]))
-                            changeZoneID(Number(res[0]["bancoID"]))
+                            
                             //Alert.alert(JSON.stringify(res))
                             getUserslogged().then((usersInDB)=>{
                                 console.log('users in phone' + usersInDB)
-                                if(usersInDB.includes(user)){
+                                if(!usersInDB){
+                                    navigation.navigate("ChangePasswordScreen" as never)
+                                }
+                                else if(usersInDB.includes(user)){
                                     //it is not the first time
-                                    navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-                                   // navigation.navigate("RefreshDataFromDatabase" as never)
+                                    
+                                    //TO REACTIVE NEXT TO LINE, REPLACE QUERY SENTENCE ON getEmpresaWithUserID()
+                                    try {                                    
+                                        changeUserID(Number(res[0]["usuarioID"]))
+                                        changeEmpresaID(Number(res[0]["empresaID"]))
+                                        changeZoneID(Number(res[0]["bancoID"]))
+                                    } catch (error) {
+                                        changeEmpresaID(1);
+                                        changeZoneID(1);
+                                    }
+                                    //changeEmpresaID(Number(res[0]["empresaID"]))
+                                    //changeZoneID(Number(res[0]["bancoID"]))
+
+                                   
+                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                                    navigation.navigate("RefreshDataFromDatabase" as never)
       
                                 }
                                 else{
@@ -152,6 +168,8 @@ export const LoginScreen = () => {
                         Iniciar sesión
                     </CustomText>
             </TouchableOpacity> 
+            
+
         
         <WrongUserDataModal             
                 visible={isVisible}

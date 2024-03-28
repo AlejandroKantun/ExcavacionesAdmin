@@ -1,10 +1,12 @@
 import React from 'react'
-import { Alert, StyleSheet, TouchableOpacity, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, TouchableOpacity, View } from 'react-native'
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { MaterialQty } from '../hooks/useMaterialQty';
 
+const windowWidth = Dimensions.get('window').width;
+const windowHeigth = Dimensions.get('window').height;
 
 interface Props{
     material:MaterialQty,
@@ -38,7 +40,7 @@ export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty}
                     removeMaterialsQty(index);
                 }}
             >
-                    <Icon style={{marginTop:3}} name="remove-outline" size={20} color="#fff" />
+                    <Icon style={{marginTop:3}} name="remove-outline" size={windowHeigth*0.02} color="#fff" />
             </TouchableOpacity>
         </View>
         
@@ -79,8 +81,8 @@ const localStyles = StyleSheet.create({
         opacity:1,
         borderRadius:4,
         marginRight:10,
-        width:30,
-        height:30,
+        width:windowHeigth*0.035,
+        height:windowHeigth*0.035,
         alignItems:'center',
         justifyContent:'center',
         paddingHorizontal:0,

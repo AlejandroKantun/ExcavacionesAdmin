@@ -8,8 +8,6 @@ import { RefreshDataFromDatabase } from '../screens/RefreshDataFromDatabase';
 import { StackActions } from '@react-navigation/routers';
 import { ReloadScreen } from '../screens/ReloadScreen';
 
-//const Stack = createStackNavigator();
-
 export type RootStackParams={
   SplashScreen: undefined,
   LoginScreen:undefined,

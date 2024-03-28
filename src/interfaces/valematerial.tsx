@@ -5,4 +5,5 @@ export interface Valematerial {
     cantidadm3:                 number;
     valeID:                     number;
     materialNombre:             string;
+    costom3:                    number;
 }

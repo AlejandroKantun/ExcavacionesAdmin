@@ -33,17 +33,20 @@ export const HeaderSearchTicket = ({title}:Props) => {
         onPress={()=>{
           navigation.navigate('SearchTicketScreen' as never)
         }}>
-        <Icon  name="search-outline" size={30} color="#fff" />
+        <Icon  name="search-outline" size={windowWidth*0.055} color="#fff" />
         <CustomText style={{color:'#fff'}}>Buscar</CustomText>
       </TouchableOpacity>
-     :title==='Cambiar Contraseña'?
+     :title=='Cambiar Contraseña'?
         null
       :<TouchableOpacity 
         style={localStyles.logOutButton}
         onPress={()=>{
-          navigation.goBack()
+          title =='Editar Vale'
+                  ? navigation.navigate("SearchTicketScreen" as never)
+                  :navigation.goBack()
+
         }}>
-        <Icon  name="arrow-back-outline" size={30} color="#fff" />
+        <Icon  name="arrow-back-outline" size={windowWidth*0.055} color="#fff" />
         <CustomText style={{color:'#fff'}}>Regresar</CustomText>
       </TouchableOpacity>
       }
@@ -52,10 +55,14 @@ export const HeaderSearchTicket = ({title}:Props) => {
         <CustomText style={localStyles.headerText} >
         {title}
         </CustomText>
-     :title==='Cambiar Contraseña'?
+        :title==='Cambiar Contraseña'?
         <CustomText style={localStyles.headerText} >
           Nueva Contraseña 
         </CustomText>
+         :title==='Editar Vale'?
+         <CustomText style={localStyles.headerText} >
+           Editar Vale
+         </CustomText>
         :
         <CustomText style={localStyles.headerText} >
           Buscar Vale  
@@ -70,7 +77,7 @@ export const HeaderSearchTicket = ({title}:Props) => {
         onPress={()=>{
           logOutHandler()
         }}>
-        <Icon  name="log-out-outline" size={30} color="#fff" />
+        <Icon  name="log-out-outline" size={windowWidth*0.06} color="#fff" />
         <CustomText style={{color:'#fff'}}>Salir</CustomText>
         </TouchableOpacity>
       :null
@@ -116,8 +123,8 @@ const localStyles = StyleSheet.create({
         justifyContent:'center', 
         alignItems:'center'},
       headerText:{
-          fontSize:25,
-          marginHorizontal:windowWidth*0.0,
+          fontSize:windowWidth*0.064,
+          marginHorizontal:windowWidth*0.01,
           marginTop:- windowHeight*0.005,
 
           color:globalStyles.colors.white

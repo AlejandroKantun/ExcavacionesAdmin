@@ -3,14 +3,16 @@ import { connectToDatabase } from './dbStructure';
 
 const db = connectToDatabase();
 const dateCreation =new Date();
-export const SaveTicketsMaterialsToLocal = async(cantidadm3:number,valeId:number,materialID:number,countItemsInserted:number,materialNombre?:string)=>{
+export const SaveTicketsMaterialsToLocal = async(cantidadm3:number,valeId:number,materialID:number,countItemsInserted:number,materialNombre?:string,costom3?:number)=>{
     console.log('Insert')
     let insertTicketsMaterialSentence = "INSERT INTO valesmateriales ("+
     "materialNombre, "+
     "cantidadm3, "+
     "valeID, "+
     "materialID, "+
-    "EnviadoABaseDeDatosCentral) VALUES (?,?,?,?,?)"
+    "EnviadoABaseDeDatosCentral,"+
+    "costom3"+
+    " ) VALUES (?,?,?,?,?,?)"
     
     const sentToCentralDB=0;
     await (await db).transaction(
@@ -20,7 +22,8 @@ export const SaveTicketsMaterialsToLocal = async(cantidadm3:number,valeId:number
                 cantidadm3,
                 valeId,
                 materialID,
-                sentToCentralDB
+                sentToCentralDB,
+                costom3
             ],
             (res,ResultSet)=>{
                 if (ResultSet.rowsAffected >0 ){

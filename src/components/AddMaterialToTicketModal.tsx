@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { Button, Modal, StyleSheet, View,Text, TextInput, Dimensions, TouchableOpacity } from 'react-native'
+import { Button, Modal, StyleSheet, View,Text, TextInput, Dimensions, TouchableOpacity, Alert } from 'react-native'
 import { Dropdown } from 'react-native-element-dropdown';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
@@ -10,6 +10,7 @@ import { HeaderTitle } from './HeaderTittle';
 import { useMaterialsByMaterialID } from '../hooks/useMaterialsByMaterialID';
 import { Material } from '../interfaces/material';
 import { number } from 'yup';
+import { WarningModal } from './WarningModal';
 
 const windowWidth = Dimensions.get('window').width;
 const windowheight= Dimensions.get('window').height;
@@ -33,6 +34,8 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
     const{materials:material,getMaterialById}=useMaterialsByMaterialID()
     const [importUpdated, setImportUpdated] = useState(false)
     const [newImport, setNewImport] = useState(0)
+    const [warningModalVisible, setWarningModalVisible] = useState(false)
+    const [alertMessage, setAlertMessage] = useState('')
     useEffect(() => {
         if (material[0]){
         setNewImport(Number(material[0].importe))
@@ -62,127 +65,147 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                         <HeaderTitle title={'Agregar Material'}/>
 
                     </View>
-
+                    <View style={localStyles.interactiveElements}>
                     <View style={localStyles.materialsQuantityContainer}>
+                        <Dropdown
+                                    style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
+                                    placeholderStyle={localStyles.placeholderStyle}
+                                    selectedTextStyle={localStyles.selectedTextStyle}
+                                    inputSearchStyle={localStyles.inputSearchStyle}
+                                    iconStyle={localStyles.iconStyle}
+                                    data={materials}
+                                    search
+                                    maxHeight={400}
+                                    labelField="nombreMaterial"
+                                    valueField="materialID"
+                                    placeholder={!isFocus ? 'Selec Material' : '...'}
+                                    searchPlaceholder="Buscar material"
 
-                    <Dropdown
-                                style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
-                                placeholderStyle={localStyles.placeholderStyle}
-                                selectedTextStyle={localStyles.selectedTextStyle}
-                                inputSearchStyle={localStyles.inputSearchStyle}
-                                iconStyle={localStyles.iconStyle}
-                                data={materials}
-                                search
-                                maxHeight={400}
-                                labelField="nombreMaterial"
-                                valueField="materialID"
-                                placeholder={!isFocus ? 'Selec Material' : '...'}
-                                searchPlaceholder="Buscar material"
+                                    onBlur={() => setIsFocus(false)}
+                                    renderItem={ (item) => 
+                                        <View style={localStyles.renderItemContainer}>
+                                            <CustomText style={{marginVertical:6, fontSize:18}}>
+                                                {item.materialID} - {item.nombreMaterial}
+                                                </CustomText>
+                                        </View>
+                                    }
+                                    onChange={item => {
 
-                                onBlur={() => setIsFocus(false)}
-                                renderItem={ (item) => 
-                                    <View style={localStyles.renderItemContainer}>
-                                        <CustomText style={{marginVertical:6, fontSize:18}}>
-                                            {item.materialID} - {item.nombreMaterial}
-                                            </CustomText>
-                                    </View>
-                                }
-                                onChange={item => {
-
-                                    onChangeItem(item)
-                                    
-                                }}
-                                renderLeftIcon={() => (
-                                    <Icon style={localStyles.renderLeftIcon} 
-                                    name="hammer-outline" 
-                                    size={30} 
-                                    color="rgba(0,0,0,0.5)" />
-                                )}
-                                />
-                    <TextInput 
-                        style={localStyles.textInputTon}
-                        keyboardType='numeric'
-                        placeholder='Cantidad [M3]'
-                        defaultValue={materialM3.toString()}
-                        placeholderTextColor='rgba(0,0,0,0.6)'
-                        
-                        onChangeText={(Text)=>{
-                            if (Number(Text)>0){
-                                setMaterialM3(Number(Text))
-                            }
-                            else    {setMaterialM3(0)}
+                                        onChangeItem(item)
+                                        
+                                    }}
+                                    renderLeftIcon={() => (
+                                        <Icon style={localStyles.renderLeftIcon} 
+                                        name="hammer-outline" 
+                                        size={windowWidth*0.055} 
+                                        color="rgba(0,0,0,0.5)" />
+                                    )}
+                                    />
+                        <TextInput 
+                            style={localStyles.textInputTon}
+                            keyboardType='numeric'
+                            placeholder='Cantidad [M3]'
+                            defaultValue={materialM3.toString()}
+                            placeholderTextColor='rgba(0,0,0,0.6)'
                             
-                        }}
-                        
-                    />
-                     </View>
-                     {value==1?
-                        <View>  
-                            <TextInput style={localStyles.textInputDataMaterial}
-                                placeholder=  {'Material'}  
-                                placeholderTextColor='rgba(0,0,0,0.5)'
-                                maxLength={30}
-                                onChangeText={(text)=>{
-                                    setMaterialName(text);
-                                }}>
-                            </TextInput>
-                            </View>
-                        :null
-                    }
-                    {material[0]?
-                        <View>  
-                            <TextInput style={localStyles.textInputDataMaterial}
-                                placeholder=  {'Importe: '}  
-                                maxLength={30}
-                                placeholderTextColor='rgba(0,0,0,0.5)'
-                                keyboardType='numeric'
-                                defaultValue={newImport.toString()}
-                                onChangeText={(text)=>{
-                                    setImportUpdated(true)
-                                    setNewImport(Number(text))
-                                }}>
-                            </TextInput>
-                            </View>
-                        :null
-                    }
+                            onChangeText={(Text)=>{
+                                if (Number(Text)>0){
+                                    setMaterialM3(Number(Text))
+                                }
+                                else    {setMaterialM3(0)}
+                                
+                            }}
+                            
+                        />
+                        </View>
+                        {value==1?
+                            <View>  
+                                <TextInput style={localStyles.textInputDataMaterial}
+                                    placeholder=  {'Material'}  
+                                    placeholderTextColor='rgba(0,0,0,0.5)'
+                                    maxLength={30}
+                                    onChangeText={(text)=>{
+                                        setMaterialName(text);
+                                    }}>
+                                </TextInput>
+                                </View>
+                            :null
+                        }
+                        {material[0]?
+                            <View>  
+                                <TextInput style={localStyles.textInputDataMaterial}
+                                    placeholder=  {'Importe: '}  
+                                    maxLength={30}
+                                    placeholderTextColor='rgba(0,0,0,0.5)'
+                                    keyboardType='numeric'
+                                    defaultValue={newImport.toString()}
+                                    onChangeText={(text)=>{
+                                        setImportUpdated(true)
+                                        if(typeof(Number(text))=='number'){
+                                            setNewImport(Number(text))
+                                        }
+                                        else{
+                                            setNewImport(0)
+                                        }
+                                    }}>
+                                </TextInput>
+                                </View>
+                            :null
+                        }
+                    </View>
+
+                    
                    
 
                     <View >
                         <View style={[  
                                         localStyles.buttonsContainer,
-                                        {marginTop:value==1?0:windowheight*0.05}
+                                        {paddingVertical:value==1?windowheight*0.02:windowheight*0.02
+                                        ,marginBottom:windowheight*0.3
+                                    }
                                                     ]}>
                             <TouchableOpacity 
                             style={localStyles.btnCancel}
                             onPress={()=>{
                                 setIsVisible(false)
                             }}>
-                            <Icon style={{marginTop:3, paddingRight:10}} name="close-outline" size={30} color="#fff" />
+                            <Icon style={{marginTop:3, paddingRight:10}} name="close-outline" size={windowWidth*0.055} color="#fff" />
                             <CustomText style={{color:'#fff'}} >Cancelar</CustomText>
                         </TouchableOpacity>
                         <TouchableOpacity 
                             style={localStyles.btnSave}
                             onPress={()=>{
+                                let alertMessageAux=''
                                 //VALIDATION
-                              
-                                setIsVisible(false);
-                                getMaterialById(-1); //to reset this variable
-                                for(let i =0; i<materialsQty.length; i++){
-                                    subtotal= subtotal+ (materialsQty[i].quantity*materialsQty[i].newImport)
+                                if((value==1 && materialName.toString.length==0)||(materialM3<1)||(newImport<1)){
+                                    if (value==1 && materialName.toString.length==0){alertMessageAux=alertMessageAux+'\n'+'- Nombre Material (Otro) es requerido'}
+                                    if (materialM3==0){alertMessageAux=alertMessageAux+'\n'+'- Agregar cantidad'}
+                                    if (newImport==0){alertMessageAux=alertMessageAux+'\n'+'- Agregar importe'}
 
-                                }  
-                                subtotal= subtotal+ (materialM3*newImport);
+                                    setAlertMessage(alertMessageAux)
+                                    setWarningModalVisible(true);
+                                }
+                                else{
+                                    setIsVisible(false);
+                                    getMaterialById(-1); //to reset this variable
+                                    for(let i =0; i<materialsQty.length; i++){
+                                        subtotal= subtotal+ (materialsQty[i].quantity*materialsQty[i].newImport)
+
+                                    }  
+                                    subtotal= subtotal+ (materialM3*newImport);
+                                    
+                                    addMaterialsQty({
+                                        ID: lengthData+1,
+                                        materialName: materialName,
+                                        quantity:materialM3,
+                                        materialID: value,
+                                        importUpdated:importUpdated,
+                                        newImport:newImport
+                                        })
+                                }
                                 
-                                addMaterialsQty({
-                                    ID: lengthData+1,
-                                    materialName: materialName,
-                                    quantity:materialM3,
-                                    materialID: value,
-                                    importUpdated:importUpdated,
-                                    newImport:newImport
-                                     })
                             }}>
-                            <Icon style={{marginTop:3, paddingRight:10}} name="add-circle-outline" size={30} color="#fff" />
+                            <Icon style={{marginTop:3, paddingRight:10}} name="add-circle-outline" size={windowWidth*0.055} color="#fff" />
                             <CustomText style={{color:'#fff'}} >Agregar</CustomText>
                         </TouchableOpacity>
                         </View>
@@ -194,6 +217,11 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                 
 
             </View>
+            <WarningModal
+            visible={warningModalVisible}
+            setIsVisible={setWarningModalVisible}
+            textToShow={alertMessage}
+            />
         </Modal>
   )
 }
@@ -208,7 +236,7 @@ const localStyles = StyleSheet.create({
     },
     modalContainer:{
         backgroundColor:'white',
-        height:windowheight*0.4,
+        height:windowheight*0.45,
         width:windowWidth*0.95,
         //justifyContent:'center',
         alignItems:'center',
@@ -220,6 +248,12 @@ const localStyles = StyleSheet.create({
         shadowOpacity:0.25,
         elevation:10,
         
+    },
+    interactiveElements:{
+        width:windowWidth*0.95,
+        height:windowheight*0.25,
+        justifyContent:'center',
+        alignItems:'center'
     },
     headerContainer:{
         flexDirection:'column',
@@ -235,7 +269,8 @@ const localStyles = StyleSheet.create({
     ,
     materialsQuantityContainer:{
         flexDirection:'row',
-        marginHorizontal:windowWidth*0.28
+        width:windowWidth*0.85, 
+        alignItems:'center'
     }
     ,
     dropdown: {
@@ -243,7 +278,6 @@ const localStyles = StyleSheet.create({
         height: 50,
         width:200,
         borderBottomColor: 'gray',
-        borderBottomWidth: 0.5,
       },
       icon: {
         marginRight: 5,
@@ -274,12 +308,15 @@ const localStyles = StyleSheet.create({
         marginHorizontal:windowWidth*0.05
     },    
     textInputTon:{
-      paddingHorizontal:windowWidth*0.07, 
-      marginVertical:20,
+      //paddingHorizontal:windowWidth*0.06, 
+      //width:windowWidth*0.25,
+
+      //marginVertical:20,
+      height:windowheight*0.055,
+      flex:1,
       borderColor:'#ccc',
       borderWidth:1,
-      borderRadius:2, 
-      marginHorizontal:10,
+      borderRadius:4, 
       color:'#000',
       textAlign:'center',
       fontSize:16
@@ -304,19 +341,20 @@ const localStyles = StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
         paddingHorizontal:windowWidth*0.06,
-        paddingVertical:12,
-        borderRadius:4,
-        marginHorizontal:30,
+        paddingVertical:windowheight*0.005,
+        borderRadius:windowheight*0.004,
+        marginHorizontal:windowWidth*0.07,
       },
       textInputDataMaterial:{
         paddingHorizontal:windowWidth*0.1,
         width:windowWidth*0.85, 
-        paddingVertical:windowheight*0.01,
+        height:windowheight*0.055,
+        //paddingVertical:windowheight*0.01,
         marginBottom:windowheight*0.01,
         borderColor:'#ccc',
         borderWidth:1,
         borderRadius:8, 
-        marginHorizontal:10,
+        //marginHorizontal:10,
         color:'#000'},
 });
 

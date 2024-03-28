@@ -10,6 +10,9 @@ import { Cliente, ClientsResponse } from '../interfaces/cliente';
 import { Vale, valessResponse } from '../interfaces/vale';
 import { Valematerial } from '../interfaces/valematerial';
 import { Usuario, UsuarioResponse } from '../interfaces/usuarios';
+import { Empresa, EmpresaResponse } from '../interfaces/empresa';
+import { BancosEmpresasResponse, BancosEmpresas } from '../interfaces/bancosempresas';
+import { Banco, BancoResponse } from '../interfaces/banco';
 
 
 export interface changePassResult{
@@ -72,7 +75,7 @@ export const ChangePassWordRequest =async (userId:string,newPass:string,token:st
                                     ()=>{
                                         changePassResult={
                                         success:true,
-                                        path:'MainDrawerNavigator'
+                                        path:'SplashScreen'
                                         }
                                         resolve(changePassResult);
                                     }
@@ -92,12 +95,12 @@ export const ChangePassWordRequest =async (userId:string,newPass:string,token:st
   
 }
 
-export const postSetCodyData=async (token:string,transactionID:string,table:string,numberState:string,msgResult:string)=>{
+export const postSetCodyData=async (token:string,transactionID:string,table:string,numberState:string,msgResult:string,appUniqueID:string)=>{
     const date = dateFormated();
     const excavacionesDB = axios.create({
         baseURL: globalSettings.Api.devEndPoint,
         params:{
-            appUniqueID:'2',
+            appUniqueID:appUniqueID,
             token:token,
         }
      });
@@ -116,8 +119,11 @@ export const postSetCodyData=async (token:string,transactionID:string,table:stri
     bodyParameters,
     config
     )
+    .then((res)=>{
+        console.log('Notification to setcody: response: ' + JSON.stringify(res.data))
 
-    console.log('Notification to setcody: response: ' + JSON.stringify(response.data))
+    }).catch((error)=>{console.log(JSON.stringify(error))})
+
 }
 
 export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
@@ -147,8 +153,24 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
         if (vehiclesFromAPI.length>0){
             for (let i=0; i<vehiclesFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(vehiclesFromAPI[i]))
+                //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM vehiculos WHERE vehiculoID=?", [vehiclesFromAPI[i].vehiculoID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+                console.log(vehiclesFromAPI[i].vehiculoID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
                 try {
-                    if  (!vehiclesFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertVehicleSentence= "INSERT INTO vehiculos ("+
                         "tipoUnidad, "+
@@ -164,7 +186,8 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
                         "empresaID, "+
                         "creadoPor, "+ 
                         "EnviadoABaseDeDatosCentral, "+
-                        "vehiculoID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?)";
+                        "numeroTolva, "+
+                        "vehiculoID) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)";
                         await (await db).transaction(
                             async(tx)=>{
                                 tx.executeSql(insertVehicleSentence, [
@@ -181,6 +204,7 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
                                     vehiclesFromAPI[i].empresaID,
                                     vehiclesFromAPI[i].creadoPor,
                                     sentToCentralDB,
+                                    vehiclesFromAPI[i].numeroTolva,
                                     vehiclesFromAPI[i].vehiculoID
                                 ],
                                 (res)=>{
@@ -198,19 +222,20 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
                     else{
                         let updateVehicleSentence= "UPDATE vehiculos "+
                             " SET "+
-                    " tipoUnidad = ?,"+
-                    " placa = ?,"+
-                    " capacidad = ?,"+
-                    " numeroEconomico = ?,"+
-                    " codigoQR = ?,"+
-                    " fechaCreacion = ?,"+
-                    " fechaEliminacion =?,"+
-                    " fechaSincronizacion = ?,"+
-                    " activoVehiculo = ?,"+
-                    " estadoVehiculo = ?,"+
-                    " empresaID = ?, "+
-                    " creadoPor = ?" +
-                    " WHERE vehiculoID = ?;";
+                            " tipoUnidad = ?,"+
+                            " placa = ?,"+
+                            " capacidad = ?,"+
+                            " numeroEconomico = ?,"+
+                            " codigoQR = ?,"+
+                            " fechaCreacion = ?,"+
+                            " fechaEliminacion =?,"+
+                            " fechaSincronizacion = ?,"+
+                            " activoVehiculo = ?,"+
+                            " estadoVehiculo = ?,"+
+                            " empresaID = ?, "+
+                            " creadoPor = ?," +
+                            " numeroTolva =?"+
+                            " WHERE vehiculoID = ?;";
                         
                         await (await db).transaction(
                             async(tx)=>{
@@ -227,6 +252,7 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
                                     vehiclesFromAPI[i].estadoVehiculo,
                                     vehiclesFromAPI[i].empresaID,
                                     vehiclesFromAPI[i].creadoPor,
+                                    vehiclesFromAPI[i].numeroTolva,
                                     vehiclesFromAPI[i].vehiculoID
                                 ],
                                 (res)=>{
@@ -250,7 +276,8 @@ export const requestAndSaveVehicles =async (token:string,deviceId?:string)=>{
                             response.data.transaccionID.toString(),
                             'vehiculos',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
         }
     }
    
@@ -288,8 +315,24 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
         if (materialsFromAPI.length>0){
             for (let i=0; i<materialsFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(materialsFromAPI[i]))
+                //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM materiales WHERE materialID=?", [materialsFromAPI[i].materialID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+               console.log(materialsFromAPI[i].materialID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
                 try {
-                    if  (!materialsFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertMatieralSentence="INSERT INTO materiales ("+
                         " nombreMaterial,"+
@@ -301,7 +344,8 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
                         " estadoMaterial,"+
                         " EnviadoABaseDeDatosCentral,"+
                         " creadoPor,"+
-                        "materialID) VALUES  (?,?, ?, ?, ?, ?, ?, ?, ?,?)"
+                        " importe, "+
+                        "materialID) VALUES  (?,?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
                         const sentToCentralDB=1;
                         await (await db).transaction(
                             async(tx)=>{
@@ -315,6 +359,7 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
                                     materialsFromAPI[i].estadoMaterial,
                                     sentToCentralDB,
                                     materialsFromAPI[i].creadoPor,
+                                    materialsFromAPI[i].importe,
                                     materialsFromAPI[i].materialID
                                 ],
                                 (res)=>{
@@ -378,7 +423,8 @@ export const requestAndSaveMaterials =async (token:string,deviceId?:string)=>{
                             response.data.transaccionID.toString(),
                             'materiales',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
         }
     }
    
@@ -416,8 +462,24 @@ export const requestAndSaveDrivers =async (token:string,deviceId?:string)=>{
         if (driversFromAPI.length>0){
             for (let i=0; i<driversFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(driversFromAPI[i]))
+                //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM choferes WHERE choferID=?", [driversFromAPI[i].choferID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+               console.log(driversFromAPI[i].choferID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
                 try {
-                    if  (!driversFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertDriverSentence = "INSERT INTO choferes ( "+
                         "nombreChofer, "+
@@ -511,7 +573,8 @@ export const requestAndSaveDrivers =async (token:string,deviceId?:string)=>{
                             response.data.transaccionID.toString(),
                             'choferes',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
                             
         }
     }
@@ -550,8 +613,24 @@ export const requestAndSaveDestinations =async (token:string,deviceId?:string)=>
         if (destinationsFromAPI.length>0){
             for (let i=0; i<destinationsFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(destinationsFromAPI[i]))
+                //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM destinos WHERE destinoID=?", [destinationsFromAPI[i].destinoID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+               console.log(destinationsFromAPI[i].destinoID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
                 try {
-                    if  (!destinationsFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertDestinationsSentece="INSERT INTO destinos ("+
                         "nombreDestino, "+
@@ -649,7 +728,8 @@ export const requestAndSaveDestinations =async (token:string,deviceId?:string)=>
                             response.data.transaccionID.toString(),
                             'destinos',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
                             
                             
         }
@@ -689,8 +769,24 @@ export const requestAndSaveClients =async (token:string,deviceId?:string)=>{
         if (clientsFromAPI.length>0){
             for (let i=0; i<clientsFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(clientsFromAPI[i]))
+                 //check wether or not exist in db
+                 let isInsertProcess=true;
+                 await (await db).transaction(
+                     async(tx)=>{
+                         await tx.executeSql("SELECT * FROM clientes WHERE clienteID=?", [clientsFromAPI[i].clienteID])
+                         .then(
+                             ([tx,queryResult])=>{
+                                 console.info(JSON.stringify(queryResult))
+                                 if (queryResult.rows.length>0){
+                                     isInsertProcess=false;
+                                 }
+                             }
+                         )
+                                 
+                 });
+                console.log(clientsFromAPI[i].clienteID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
                 try {
-                    if  (!clientsFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertClientsSentence="INSERT INTO clientes ("+
                         "nombreCliente, "+
@@ -795,7 +891,8 @@ export const requestAndSaveClients =async (token:string,deviceId?:string)=>{
                             response.data.transaccionID.toString(),
                             'clientes',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
                        
                             
         }
@@ -972,7 +1069,8 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
                             response.data.transaccionID.toString(),
                             'vales',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
                        
                             
         }
@@ -1042,7 +1140,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                                         materialNombre : ticketsMaterialsPending[j].materialNombre?ticketsMaterialsPending[j].materialNombre.toString():'',
                                         cantidadm3 : ticketsMaterialsPending[j].cantidadm3.toString(),
                                         EnviadoABaseDeDatosCentral : ticketsMaterialsPending[j].EnviadoABaseDeDatosCentral.toString(),
-                                        costom3: ticketsMaterialsPending[j].EnviadoABaseDeDatosCentral.toString()
+                                        costom3: ticketsMaterialsPending[j].costom3.toString()
                                     })
                                 }                   
                                 
@@ -1098,7 +1196,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                     };
 
                     const finalBody='['+JSON.stringify(bodyParameters)+']';
-
+                    console.log('FINAL BODY SENT \n'+finalBody)
                     //ready to send
                                          
                     const response = await excavacionesDB.post('/setcodyvales',
@@ -1106,7 +1204,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                     config
                     ).then(async (res)=>{
                         console.log('RESULT of posting'+JSON.stringify(res.data))
-                        /*
+                        
                         const updateTicketToDBSentence= "UPDATE vales SET EnviadoABaseDeDatosCentral=1 WHERE valeID=?"
                         await (await db).transaction(
                             async(tx)=>{
@@ -1121,7 +1219,7 @@ export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:stri
                                 }
                                 );
                         });
-                        */
+                    
                         
 
                     }).catch((error)=>{
@@ -1175,16 +1273,35 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
     )
 
     if (response.data.transaccionID){
-            
+       
+        
         let ususariosFromAPI:Usuario[]=response.data[0] as Usuario[]
         msgToReport=" Items received: " +ususariosFromAPI.length; " - "
         console.log(JSON.stringify(ususariosFromAPI))
-
+        
         if (ususariosFromAPI.length>0){
             for (let i=0; i<ususariosFromAPI.length; i++){
                 console.log(i+' ITEM'+ JSON.stringify(ususariosFromAPI[i]))
+
+                 //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM usuarios WHERE usuarioID=?", [ususariosFromAPI[i].usuarioID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+                console.log(ususariosFromAPI[i].usuarioID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
+               
                 try {
-                    if  (!ususariosFromAPI[i].fechaSincronizacion) { 
+                    if  (isInsertProcess) { 
                         console.log('Insert')
                         let insertUserSentence= "  INSERT INTO usuarios ("+
                         "usuarioID, "+
@@ -1294,12 +1411,15 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
                 
             } 
             console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
-            
-                        postSetCodyData(token,
+            /*
+            postSetCodyData(token,
                             response.data.transaccionID.toString(),
                             'usuarios',
                             globalSettings.setCodyDataResult.success.toString(),
-                            msgToReport)
+                            msgToReport,
+                            deviceId?deviceId:'2')
+             */
+                        
             
             
         }
@@ -1309,4 +1429,434 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
     
     
     
+}
+
+export const requestAndSaveCompanies =async (token:string,deviceId?:string)=>{
+    let msgToReport=''
+
+    const date = dateFormated();
+
+    const excavacionesDB = axios.create({
+        baseURL: globalSettings.Api.devEndPoint,
+        params:{
+            appUniqueID:deviceId,
+            token:token,
+        }
+     });   
+
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+
+    const response = await excavacionesDB.get<EmpresaResponse>('/codyempresas',
+    
+    config
+    )
+    //.then((res)=>{console.log(JSON.stringify(res.data))}).catch((error)=>{console.log(JSON.stringify(error))})
+    //return 0;
+    console.log('RESPONSE IN EMPRESARESPONS +\n'+JSON.stringify(response.data))
+    
+    if (response.data.transaccionID){
+            
+        let empresasFromAPI:Empresa[]=response.data[0] as Empresa[]
+        msgToReport=" Items received: " +empresasFromAPI.length; " - "
+        if (empresasFromAPI.length>0){
+            for (let i=0; i<empresasFromAPI.length; i++){
+                console.log(i+' ITEM'+ JSON.stringify(empresasFromAPI[i]))
+
+                 //check wether or not exist in db
+                 let isInsertProcess=true;
+                 await (await db).transaction(
+                     async(tx)=>{
+                         await tx.executeSql("SELECT * FROM empresas WHERE empresaID=?", [empresasFromAPI[i].empresaID])
+                         .then(
+                             ([tx,queryResult])=>{
+                                 console.info(JSON.stringify(queryResult))
+                                 if (queryResult.rows.length>0){
+                                     isInsertProcess=false;
+                                 }
+                             }
+                         )
+                                 
+                 });
+                 console.log(empresasFromAPI[i].empresaID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
+                try {
+                    if  (isInsertProcess) { 
+                        console.log('Insert')
+                        let insertCompaniesSentences="INSERT INTO empresas ("+
+                        "nombreEmpresa, "+
+                        "direccionFiscal, "+
+                        "codigoPostal, "+
+                        "contacto, "+
+                        "serieVale, "+
+                        "folioInicialVale, "+
+                        "logoEmpresa, "+
+                        "fechaCreacion, "+
+                        "fechaUltimaModificacion, "+
+                        "fechaEliminacion, "+
+                        "fechaSincronizacion, "+
+                        "activoEmpresa, "+
+                        "estadoEmpresa, "+
+                        "EnviadoABaseDeDatosCentral, "+
+                        "creadoPor, " 
+                        +"empresaID "+
+                        ")VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+                        const sentToCentralDB=1;
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(insertCompaniesSentences,[
+                                    empresasFromAPI[i].nombreEmpresa,
+                                    empresasFromAPI[i].direccionFiscal,
+                                    empresasFromAPI[i].codigoPostal,
+                                    empresasFromAPI[i].contacto,
+                                    empresasFromAPI[i].serieVale,
+                                    empresasFromAPI[i].folioInicialVale,
+                                    empresasFromAPI[i].logoEmpresa,
+                                    empresasFromAPI[i].fechaCreacion,
+                                    empresasFromAPI[i].fechaUltimaModificacion,
+                                    empresasFromAPI[i].fechaEliminacion,
+                                    empresasFromAPI[i].fechaSincronizacion,
+                                    empresasFromAPI[i].activoEmpresa,
+                                    empresasFromAPI[i].estadoEmpresa,
+                                    sentToCentralDB,
+                                    empresasFromAPI[i].creadoPor,
+                                    empresasFromAPI[i].empresaID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - empresaID: '+ empresasFromAPI[i].empresaID.toString() +' transaction: INSERT SUCCESS, '
+                                    console.log(+ ' - empresaID: '+ empresasFromAPI[i].empresaID.toString() +' transaction: INSERT SUCCESS, ' )
+    
+                                },
+                                (error)=>{
+                                    console.log('ERROR '+ ' - empresaID: '+ empresasFromAPI[i].empresaID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error) )
+                                    msgToReport=msgToReport + ' - empresaID: '+ empresasFromAPI[i].empresaID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error)
+                                }
+                                );
+                        });
+                    }
+                    else{
+                        let updateCompaniesSentence="UPDATE empresas SET "+
+                        "nombreEmpresa =?, "+
+                        "direccionFiscal =?, "+
+                        "codigoPostal =?, "+
+                        "contacto =?, "+
+                        "serieVale =?, "+
+                        "folioInicialVale =?, "+
+                        "logoEmpresa =?, "+
+                        "fechaCreacion =?, "+
+                        "fechaUltimaModificacion =?, "+
+                        "fechaEliminacion =?, "+
+                        "fechaSincronizacion =?, "+
+                        "activoEmpresa =?, "+
+                        "estadoEmpresa =?, "+
+                        "EnviadoABaseDeDatosCentral =?, "+
+                        "creadoPor =? " +
+                        "WHERE  empresaID  =?";
+                        
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(updateCompaniesSentence,[
+                                    empresasFromAPI[i].nombreEmpresa,
+                                    empresasFromAPI[i].direccionFiscal,
+                                    empresasFromAPI[i].codigoPostal,
+                                    empresasFromAPI[i].contacto,
+                                    empresasFromAPI[i].serieVale,
+                                    empresasFromAPI[i].folioInicialVale,
+                                    empresasFromAPI[i].logoEmpresa,
+                                    empresasFromAPI[i].fechaCreacion,
+                                    empresasFromAPI[i].fechaUltimaModificacion,
+                                    empresasFromAPI[i].fechaEliminacion,
+                                    empresasFromAPI[i].fechaSincronizacion,
+                                    empresasFromAPI[i].activoEmpresa,
+                                    empresasFromAPI[i].estadoEmpresa,
+                                    sentToCentralDB,
+                                    empresasFromAPI[i].creadoPor,
+                                    empresasFromAPI[i].empresaID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - empresaID: '+ empresasFromAPI[i].empresaID+' transaction: UPDATE SUCCESS '
+    
+                                },
+                                (error)=>{
+                                    msgToReport=msgToReport + ' - empresaID: '+ empresasFromAPI[i].empresaID+' transaction: UPDATE FAIL , reason: '+JSON.stringify(error)
+                                })
+                                
+                        });
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+    
+                
+            } 
+            console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
+            
+             postSetCodyData(token,
+                            response.data.transaccionID.toString(),
+                            'empresas',
+                            globalSettings.setCodyDataResult.success.toString(),
+                            msgToReport,
+                            deviceId?deviceId:'2')
+            
+           
+                                                
+        }
+    }
+
+}
+
+export const requestAndSaveZones =async (token:string,deviceId?:string)=>{
+    let msgToReport=''
+
+    const date = dateFormated();
+
+    const excavacionesDB = axios.create({
+        baseURL: globalSettings.Api.devEndPoint,
+        params:{
+            appUniqueID:deviceId,
+            token:token,
+        }
+     });   
+
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+
+    const response = await excavacionesDB.get<BancoResponse>('/codybancos',
+    config
+    )
+    
+    console.log(JSON.stringify(response.data))
+    
+    if (response.data.transaccionID){
+            
+        let bancosFromAPI:Banco[]=response.data[0] as Banco[]
+        msgToReport=" Items received: " +bancosFromAPI.length; " - "
+        if (bancosFromAPI.length>0){
+            for (let i=0; i<bancosFromAPI.length; i++){
+                console.log(i+' ITEM'+ JSON.stringify(bancosFromAPI[i]))
+                 //check wether or not exist in db
+                 let isInsertProcess=true;
+                 await (await db).transaction(
+                     async(tx)=>{
+                         await tx.executeSql("SELECT * FROM bancos WHERE bancoID=?", [bancosFromAPI[i].bancoID])
+                         .then(
+                             ([tx,queryResult])=>{
+                                 console.info(JSON.stringify(queryResult))
+                                 if (queryResult.rows.length>0){
+                                     isInsertProcess=false;
+                                 }
+                             }
+                         )
+                                 
+                 });
+                console.log(bancosFromAPI[i].bancoID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
+
+                try {
+                    if  (isInsertProcess) { 
+                        console.log('Insert')
+                        let insertCompaniesSentences="INSERT INTO bancos ( "+ 
+                        "nombreBanco, "+ 
+                        "fechaCreacion, "+ 
+                        "fechaUltimaModificacion, "+ 
+                        "fechaEliminacion, "+ 
+                        "creadoPor, "+ 
+                        "activoBanco, "+ 
+                        "estadoBanco,"+ 
+                        "bancoID"+ 
+                        ") VALUES (?,?,?,?,?,?,?,?)";
+                        const sentToCentralDB=1;
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(insertCompaniesSentences,[
+                                    bancosFromAPI[i].nombreBanco,
+                                    bancosFromAPI[i].fechaCreacion,
+                                    bancosFromAPI[i].fechaUltimaModificacion,
+                                    bancosFromAPI[i].fechaEliminacion,
+                                    bancosFromAPI[i].creadoPor,
+                                    bancosFromAPI[i].activoBanco,
+                                    bancosFromAPI[i].estadoBanco,
+                                    bancosFromAPI[i].bancoID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - bancoID: '+ bancosFromAPI[i].bancoID.toString()+' transaction: INSERT SUCCESS, '
+                                    console.log(+ ' - bancoID: '+ bancosFromAPI[i].bancoID.toString()+' transaction: INSERT SUCCESS, ' )
+    
+                                },
+                                (error)=>{
+                                    console.log('ERROR '+ ' - bancoID: '+ bancosFromAPI[i].bancoID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error) )
+                                    msgToReport=msgToReport + ' - bancoID: '+ bancosFromAPI[i].bancoID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error)
+                                }
+                                );
+                        });
+                    }
+                    else{
+                        let updateZonesSentences="UPDATE bancos SET "+ 
+                        "nombreBanco =?, "+ 
+                        "fechaCreacion =?, "+ 
+                        "fechaUltimaModificacion =?, "+ 
+                        "fechaEliminacion =?, "+ 
+                        "creadoPor =?, "+ 
+                        "activoBanco =?, "+ 
+                        "estadoBanco =? "+ 
+                        " WHERE bancoID = ?";
+                        
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(updateZonesSentences,[
+                                    bancosFromAPI[i].nombreBanco,
+                                    bancosFromAPI[i].fechaCreacion,
+                                    bancosFromAPI[i].fechaUltimaModificacion,
+                                    bancosFromAPI[i].fechaEliminacion,
+                                    bancosFromAPI[i].creadoPor,
+                                    bancosFromAPI[i].activoBanco,
+                                    bancosFromAPI[i].estadoBanco,
+                                    bancosFromAPI[i].bancoID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - bancoID: '+ bancosFromAPI[i].bancoID+' transaction: UPDATE SUCCESS '
+    
+                                },
+                                (error)=>{
+                                    msgToReport=msgToReport + ' - bancoID: '+ bancosFromAPI[i].bancoID+' transaction: UPDATE FAIL , reason: '+JSON.stringify(error)
+                                })
+                                
+                        });
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+    
+                
+            } 
+            console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
+            
+            postSetCodyData(token,
+                            response.data.transaccionID.toString(),
+                            'bancos',
+                            globalSettings.setCodyDataResult.success.toString(),
+                            msgToReport,
+                            deviceId?deviceId:'2')
+                                                
+        }
+    }
+
+}
+
+
+export const requestAndZonesCompanies =async (token:string,deviceId?:string)=>{
+    let msgToReport=''
+
+    const date = dateFormated();
+
+    const excavacionesDB = axios.create({
+        baseURL: globalSettings.Api.devEndPoint,
+        params:{
+            appUniqueID:deviceId,
+            token:token,
+        }
+     });   
+
+    const config = {
+        headers: { Authorization: `Bearer ${token}` }
+    };
+
+    const response = await excavacionesDB.get<BancosEmpresasResponse>('/codybancosempresas',
+    config
+    )
+    
+    if (response.data.transaccionID){
+            
+        let bancosEmpresasFromAPI:BancosEmpresas[]=response.data[0] as BancosEmpresas[]
+        msgToReport=" Items received: " +bancosEmpresasFromAPI.length; " - "
+        if (bancosEmpresasFromAPI.length>0){
+            for (let i=0; i<bancosEmpresasFromAPI.length; i++){
+                console.log(i+' ITEM'+ JSON.stringify(bancosEmpresasFromAPI[i]))
+
+                //check wether or not exist in db
+                let isInsertProcess=true;
+                await (await db).transaction(
+                    async(tx)=>{
+                        await tx.executeSql("SELECT * FROM bancosempresas WHERE bancoEmpresaID=?", [bancosEmpresasFromAPI[i].bancoEmpresaID])
+                        .then(
+                            ([tx,queryResult])=>{
+                                console.info(JSON.stringify(queryResult))
+                                if (queryResult.rows.length>0){
+                                    isInsertProcess=false;
+                                }
+                            }
+                        )
+                                
+                });
+               console.log(bancosEmpresasFromAPI[i].bancoEmpresaID+' ID es insertprocess: '+JSON.stringify(isInsertProcess))
+                try {
+                    if  (isInsertProcess) { 
+                        console.log('Insert')
+                        let insertCompaniesSentences="INSERT INTO bancosempresas ("+
+                        "bancoID, "+
+                        "empresaID,"+
+                        "bancoEmpresaID"+
+                        ")VALUES (?,?,?);";
+                        const sentToCentralDB=1;
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(insertCompaniesSentences,[
+                                    bancosEmpresasFromAPI[i].bancoID,
+                                    bancosEmpresasFromAPI[i].empresaID,
+                                    bancosEmpresasFromAPI[i].bancoEmpresaID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID.toString()+' transaction: INSERT SUCCESS, '
+                                    console.log(+ ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID.toString()+' transaction: INSERT SUCCESS, ' )
+    
+                                },
+                                (error)=>{
+                                    console.log('ERROR '+ ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error) )
+                                    msgToReport=msgToReport + ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID.toString() +' transaction: INSERT FAIL , reason: '+JSON.stringify(error)
+                                }
+                                );
+                        });
+                    }
+                    else{
+                        let updateZonesSentences="UPDATE bancosempresas SET "+
+                        "bancoID =?, "+
+                        "empresaID =?"+
+                        "WHERE bancoEmpresaID=?"
+                        
+                        await (await db).transaction(
+                            async(tx)=>{
+                                tx.executeSql(updateZonesSentences,[
+                                    bancosEmpresasFromAPI[i].bancoID,
+                                    bancosEmpresasFromAPI[i].empresaID,
+                                    bancosEmpresasFromAPI[i].bancoEmpresaID
+                                ],
+                                (res)=>{
+                                    msgToReport=msgToReport + ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID+' transaction: UPDATE SUCCESS '
+    
+                                },
+                                (error)=>{
+                                    msgToReport=msgToReport + ' - bancoEmpresaID: '+ bancosEmpresasFromAPI[i].bancoEmpresaID +' transaction: UPDATE FAIL , reason: '+JSON.stringify(error)
+                                })
+                                
+                        });
+                    }
+                } catch (error) {
+                    console.log(error)
+                }
+    
+                
+            } 
+            console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
+            
+            
+            postSetCodyData(token,
+                            response.data.transaccionID.toString(),
+                            'bancosempresas',
+                            globalSettings.setCodyDataResult.success.toString(),
+                            msgToReport,
+                            deviceId?deviceId:'2')
+                                                           
+        }
+    }
+
 }

@@ -100,7 +100,7 @@ export const DeleteTicketModal = ({visible,setIsVisible,ticketByID,reloadItem}:P
                                         )
                                         setIsVisible(true);
                                     }}>
-                                    <Icon style={{marginTop:3, paddingRight:10}} name="trash-outline" size={25} color="#fff" />
+                                    <Icon style={{marginTop:3, paddingRight:10}} name="trash-outline" size={windowHeight*0.028} color="#fff" />
                                     <CustomText style={{color:'#fff'}} >Borrar</CustomText>
                                     </TouchableOpacity>
 
@@ -109,7 +109,7 @@ export const DeleteTicketModal = ({visible,setIsVisible,ticketByID,reloadItem}:P
                                     onPress={()=>{
                                         setIsVisible(false);
                                     }}>
-                                    <Icon style={{marginTop:3, paddingRight:10}} name="arrow-back-circle-outline" size={25} color="#fff" />
+                                    <Icon style={{marginTop:3, paddingRight:10}} name="arrow-back-circle-outline" size={windowHeight*0.028} color="#fff" />
                                     <CustomText style={{color:'#fff'}} >Regresar</CustomText>
                                 </TouchableOpacity>
                             </View>   

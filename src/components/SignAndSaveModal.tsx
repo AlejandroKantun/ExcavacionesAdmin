@@ -18,6 +18,8 @@ import { useNavigation } from "@react-navigation/core";
 import { StackActions } from '@react-navigation/native';
 import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
 import { MaterialQty } from "../hooks/useMaterialQty";
+import { UpdateTicketsOnDB } from '../data/UpdateTicketsOnDB';
+import { WarningModal } from "./WarningModal";
 
 
 const windowWidth = Dimensions.get('window').width;
@@ -29,14 +31,18 @@ interface Props{
     setPropertyOnTicket: (field: keyof Vale, value: any) => void,
     setSuccessModalVisible: (value: React.SetStateAction<boolean>) => void,
     ticket: Vale,
-    materialsQty: MaterialQty[]
+    materialsQty: MaterialQty[],
+    isUpdateProcess?:boolean
 }
 
 
-  export const SignAndSaveModal = ({visible,setIsVisible,setPropertyOnTicket,setSuccessModalVisible,ticket,materialsQty}:Props) => {
+  export const SignAndSaveModal = ({visible,setIsVisible,setPropertyOnTicket,setSuccessModalVisible,ticket,materialsQty,isUpdateProcess}:Props) => {
     const [paths, setPaths] = useState<SkPath[]>([]);
     const canvasRef = useCanvasRef();
     const navigation =useNavigation()
+    const [warningModalVisible, setWarningModalVisible] = useState(false)
+    const [alertMessage, setAlertMessage] = useState('')
+
 
     const onDrawingStart = useCallback((touchInfo: TouchInfo) => {
       setPaths((old) => {
@@ -74,38 +80,78 @@ interface Props{
       
     );
     const onSave=()=>{
-      const signImage = canvasRef.current?.makeImageSnapshot()
-      if (signImage) {
-        var Buffer = require('buffer/').Buffer;
-       
-       
-        
-        const image64=signImage.encodeToBase64();
-        //console.log(image64)
-        const byteCharacters = atob(image64)
-        setIsVisible(false);
-        setPaths([])
+      let alertMessageAux=''
 
-        SaveTicketsToLocalDB(ticket!,materialsQty,byteCharacters).then(
-          (res)=>{
-             if (res>0){
-                                    setSuccessModalVisible(true); 
-                                    setTimeout(() => { 
-                                        setSuccessModalVisible(false);
-                                        navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+      if((ticket.folioFisico.length<1)
+          ||(!ticket.empresaID)
+          ||(!ticket.clienteID)
+          ||(!ticket.destinoID)
+          ||(!ticket.vehiculoID)
+          ||(materialsQty.length<1)
+          ){
+            if(ticket.folioFisico.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Folio Físico'}
+            if(!ticket.empresaID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Empresa'}
+            if(!ticket.clienteID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Cliente'}
+            if(!ticket.destinoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Destino'}
+            if(!ticket.vehiculoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Vehículo'}
+            if(materialsQty.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Material'}
 
-                                    }, 2000);
-                                    
-                                }
-          }
-        )
-       
+            setAlertMessage(alertMessageAux)
+            setWarningModalVisible(true);
+        }
+      else {
+        const signImage = canvasRef.current?.makeImageSnapshot()
+        if (signImage) {
+          var Buffer = require('buffer/').Buffer;
+    
+          const image64=signImage.encodeToBase64();
+          console.log('image BASE 64')
+          //console.log(image64)
+          const byteCharacters = atob(image64)
+          console.log('ATOB IMAGE')
+          //console.log(byteCharacters)
+          setIsVisible(false);
+          setPaths([])
+          
+            if (isUpdateProcess)
+            {
+              UpdateTicketsOnDB(ticket!,materialsQty,image64).then(
+                (res)=>{
+                  if (res>0){
+                                          setSuccessModalVisible(true); 
+                                          setTimeout(() => { 
+                                              setSuccessModalVisible(false);
+                                              navigation.navigate("SearchTicketScreen" as never)  
+                                          }, 2000);
+                                          
+                                      }
+                }
+              )
+            }
+            else{
+              SaveTicketsToLocalDB(ticket!,materialsQty,image64).then(
+              (res)=>{
+                if (res>0){
+                                        setSuccessModalVisible(true); 
+                                        setTimeout(() => { 
+                                            setSuccessModalVisible(false);
+                                            navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+  
+                                        }, 2000);
+                                        
+                                    }
+              }
+            )
+            }   
+         
+        }
+      }
+      
+
 }
-
-    }
     return (
-
-        <Modal
+        <View>
+ <Modal
             animationType='slide'
             visible={visible}
             transparent={true}
@@ -164,7 +210,6 @@ interface Props{
                               style={localStyles.btnSave}
                               onPress={()=>{
                                 onSave();
-                                  
                               }}>
                               <Icon style={{marginTop:3, paddingRight:10}} name="save-outline" size={30} color="#fff" />
                               <CustomText style={{color:'#fff'}} >Guardar</CustomText>
@@ -173,10 +218,14 @@ interface Props{
                     </View>
                       
               </View>
-                    
-    
-            
         </Modal>
+        <WarningModal
+                          visible={warningModalVisible}
+                          setIsVisible={setWarningModalVisible}
+                          textToShow={alertMessage}
+                          />  
+        </View>
+       
       
     );
   };

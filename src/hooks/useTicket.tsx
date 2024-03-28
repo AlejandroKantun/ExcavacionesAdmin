@@ -8,7 +8,7 @@ interface KeyValueVale{
   field:keyof Vale,
   value:any
 }
-export const useTicket = () => {
+export const useTicket = (previousTicket?:Vale) => {
   let ticketToStart:Vale={
     vehiculoNombre:'',
     destinoNombre : '',
@@ -47,7 +47,7 @@ export const useTicket = () => {
     empresaNombre:               ''     
   }
 
- const [ticket,setTicket] = useState<Vale>(ticketToStart)
+ const [ticket,setTicket] = useState<Vale>(previousTicket?previousTicket:ticketToStart)
 
 
 const setPropertyOnTicket=(field:keyof Vale,value:any)=>{

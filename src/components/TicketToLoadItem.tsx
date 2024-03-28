@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View } from 'react-native';
 import { Dimensions, StyleSheet } from 'react-native';
 import { Vale } from '../interfaces/vale';
 import CustomText from './CustomText';
@@ -52,8 +52,13 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                 }
             </View>
 
-                <View style={localStyles.imageContainer}>
-                    
+                <View style={localStyles.signImageContainer}>
+                    {
+                        ticketByID.firma?
+                        <Image  source={{uri: "data:image/png;base64,"+ticketByID.firma } }
+                                                  style={localStyles.signImage}/>
+                        :null
+                    }
                 </View>
                 
                                     
@@ -77,10 +82,11 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                         style={localStyles.btnLoad}
                         onPress={()=>{
                             ChangeTicket(ticketByID);
-                            navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                            navigation.navigate("UpdateTicketScreen" as never)
+
 
                         }}>
-                        <Icon style={{marginTop:3, paddingRight:10}} name="arrow-up-circle-outline" size={25} color="#fff" />
+                        <Icon style={{marginTop:3, paddingRight:10}} name="arrow-up-circle-outline" size={windowHeight*0.028} color="#fff" />
                         <CustomText style={{color:'#fff'}} >Cargar</CustomText>
                     </TouchableOpacity>
                 </View>           
@@ -153,5 +159,17 @@ const localStyles = StyleSheet.create({
         height:windowHeight*0.05,
         borderRadius:4,
         marginHorizontal:windowWidth*0.025,
-    }
+    },
+    signImageContainer:{
+        justifyContent:'center',
+        alignSelf:'center',
+        borderRadius:5,
+        backgroundColor:'rgba(1,1,1,0.15)',
+        height: windowHeight*0.13, 
+        width: windowHeight*0.13,
+        },
+    signImage:{
+          height: windowHeight*0.13, 
+          width: windowHeight*0.13, 
+          resizeMode:'contain'}
 });

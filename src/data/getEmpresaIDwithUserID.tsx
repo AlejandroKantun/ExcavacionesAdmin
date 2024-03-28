@@ -12,6 +12,7 @@ export const getEmpresaIDwithUserID = async (userID:string) => {
     let empresaID=0;
     const selectSentence= "select usuarios.usuarioID,usuarios.bancoID, empresas.empresaID from usuarios INNER JOIN bancosempresas on bancosempresas.bancoID = usuarios.bancoID INNER JOIN empresas on empresas.empresaID =bancosempresas.empresaID "+
     "WHERE usuarios.usuario=?"
+    //const selectSentence= "SELECT usuarioID from usuarios WHERE usuario=?"
     var empresas:empresaInUser[]=[];
 
     const promise =   new Promise(

@@ -57,7 +57,7 @@ export const SearchTicketScreen = () => {
                           <TouchableOpacity 
                             style={localStyles.datePickerBtn}
                             onPress={()=>{setDatePickerModalStartVisible(true)}}>
-                            <Icon style={{marginRight:10}} name="calendar-outline" size={30} color="#000" />
+                            <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
                             <CustomText>
                               {dateMin?
                               dateFormatedDateFiltered(dateMin)
@@ -71,7 +71,7 @@ export const SearchTicketScreen = () => {
                           <TouchableOpacity 
                             style={localStyles.datePickerBtn}
                             onPress={()=>{setDatePickerModalEndVisible(true)}}>
-                            <Icon style={{marginRight:10}} name="calendar-outline" size={30} color="#000" />
+                            <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
                             <CustomText>
                               {dateMax?
                               dateFormatedDateFiltered(dateMax)
@@ -83,7 +83,7 @@ export const SearchTicketScreen = () => {
                       </View>
                       <TextInput
                       style={localStyles.textInputTextToFilter}
-                      placeholder='Buscar Folio, Placa, No Tolva'
+                      placeholder='Buscar por Folio, Placa ó No Tolva'
                       placeholderTextColor='rgba(0,0,0,0.5)'
                       onChangeText={(text)=>{
                         setTextFilter(text)

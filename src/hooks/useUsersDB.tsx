@@ -44,6 +44,7 @@ export const useUsersDB = () => {
               userName
             ]).then(
               ([tx,results]) => {
+                console.log(results.rows.raw())
                 for (let i = 0; i <results.rows.length; i++) {
                   tempArray.push(results.rows.item(i) as Usuario)
                 }

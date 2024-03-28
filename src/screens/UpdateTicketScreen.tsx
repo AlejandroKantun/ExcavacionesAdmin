@@ -1,10 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, Button, StyleProp, Text, Alert } from 'react-native';
+import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, Alert, Image} from 'react-native';
 import { ScrollView } from 'react-native-gesture-handler';
 import CustomText from '../components/CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePickerModal from "react-native-modal-datetime-picker";
-
 import useDate from '../hooks/useDate';
 import globalStyles from '../theme/appTheme';
 import { AddMaterialToTicketModal } from '../components/AddMaterialToTicketModal';
@@ -14,19 +13,21 @@ import { useMaterialQty, MaterialQty } from '../hooks/useMaterialQty';
 import { CustomCheckBox } from '../components/CustomCheckBox';
 import { SaveTicketModal } from '../components/SaveTicketModal';
 import { SignAndSaveModal } from '../components/SignAndSaveModal';
-import { useNavigation } from '@react-navigation/core';
+import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
-import { dateFormated, dateFormatedff } from '../data/dateFormated';
+import { dateFormated } from '../data/dateFormated';
 import { AuthContext } from '../context/AuthContext';
-import { getLastRowTickets } from '../data/getLastRowTickets';
 import { TicketAssignDetail } from '../components/TicketAssignDetail';
 import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
 import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
-import { WarningModal } from '../components/WarningModal';
-
+import { postTicketsToDB, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveTickets, requestAndSaveVehicles, requestAndSaveCompanies } from '../api/operationsToDB';
+import { DrawerScreenProps } from '@react-navigation/drawer';
+import { RootDrawerParams } from '../navigation/MainDrawerNavigator';
+import { UpdateTicketsOnDB } from '../data/UpdateTicketsOnDB';
+import { scale } from '@shopify/react-native-skia';
 
 
 
@@ -35,21 +36,26 @@ const MateriasInTicket:MaterialQty[] = [];
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const NewTicketScreen = () => {
+interface Props extends DrawerScreenProps<RootDrawerParams,'UpdateTicketScreen'>{}
+
+export const UpdateTicketScreen = () => {
   const {authState} = useContext(AuthContext)
   const [nextRow, setNextRow] = useState(0);
   const {date}=useDate();
-
+ 
+ 
   //ticket Data
   const{ticket,
     setPropertyOnTicket,
     loadTicket,
-    setPlacaNoTolvaNoTriturador,
-    setFolioFisicoFolioDigitalFechaEntrada}=useTicket()
+    setPlacaNoTolvaNoTriturador
+    }=useTicket(//authState.ticket
+      )
+
   const {materialsQty,
         addMaterialsQty,
         removeMaterialsQty,
-        subtotal} =useMaterialQty(MateriasInTicket,setPropertyOnTicket)
+        getTicketsMaterialsFromDB} =useMaterialQty(MateriasInTicket,setPropertyOnTicket,authState.ticket?.valeID)
 
   //Modals states 
   const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
@@ -58,19 +64,17 @@ export const NewTicketScreen = () => {
   const [saveModalVisible, setSaveModalVisible] = useState(false)
   const [signModalVisible, setSignModalVisible] = useState(false)
   const [successModalVisible, setSuccessModalVisible] = useState(false)
-  const [warningModalVisible, setWarningModalVisible] = useState(false)
-  const [alertMessage, setAlertMessage] = useState('')
-
 
   //Navigation
   const navigation =useNavigation()
 
-  const [placa, setPlaca] = useState<string | undefined>('')
-  const [noTolva, setNoTolva] = useState<string |null| undefined>('')
+  const [placa, setPlaca] = useState(authState.ticket?.placa)
+  const [noTolva, setNoTolva] = useState(authState.ticket?.numeroTolva)
   const [paymentSelected, setPaymentSelected] = useState({
     cash:false,
     credit:false
   })
+
   const setPaymentType=(paymentSelected:string)=>{
     paymentSelected==='cash'?
     setPaymentSelected({
@@ -84,40 +88,30 @@ export const NewTicketScreen = () => {
     })
     setPropertyOnTicket("formadepago",paymentSelected)
   }
- const resetAllValues=()=>{
-  setPropertyOnTicket("empresaNombre",null)
-  setPropertyOnTicket("empresaID",null);
-
- }
-  useEffect(() => {
-    getLastRowTickets().then(
-      (res)=>{
-        setNextRow(res)
-        setFolioFisicoFolioDigitalFechaEntrada(
-          'FF-'+dateFormatedff()+'-'+res.toString(),
-          authState.empresaID+'|'+authState.zoneID?.toString()+'|'+authState.userID!.toString()+'|'+res.toString(),
-          today,
-          res.toString(),
-          authState.userID!,
-          authState.zoneID!
-        )
-      }
-    );
-    const today= new Date()
-    if (authState.ticket){
-      loadTicket(authState.ticket);
-      console.log('loading before ticket')
-    }
-  }, [])
+ 
+  
   const today = new Date()
+  
+
+  useEffect(() => {
+    if(authState.ticket){
+        if(authState.ticket?.formadepago){setPaymentType(authState.ticket?.formadepago!)}
+       loadTicket(authState.ticket!)
+       getTicketsMaterialsFromDB();
+
+       
+    }
+  }, [authState.ticket])
+  
   return (
     <SafeAreaView style={{flex: 1}}>
       <ScrollView  style={localStyles.mainContainer}>
         
         <HeaderSearchTicket
-          title={'Nuevo Vale'}
+          title={'Editar Vale'}
           
-        />
+        />       
+         
         <TicketAssignDetail
           nextRow={nextRow}
           ticket={ticket}
@@ -128,20 +122,25 @@ export const NewTicketScreen = () => {
           setNoTolva={setNoTolva}
           FolioFisico={ticket.folioFisico}
           setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
+          
         />
           <View>
             <View style={localStyles.headerMaterialsToDispatch}>
-                
-                <TouchableOpacity 
+                {
+                  !ticket.firma?
+                  <TouchableOpacity 
                       style={localStyles.AddMaterialBtntStyle}
                       onPress={()=>
                         {
                           setNewMaterialVisible(true)
                         }
                       }>
-                      <Icon style={{marginTop:3}} name="add-outline" size={windowWidth*0.075} color="#fff" />
+                      <Icon style={{marginTop:3}} name="add-outline" size={windowWidth*0.075}color="#fff" />
                       <CustomText style={{color:'#fff'}} >Material</CustomText>
                 </TouchableOpacity>
+                  :null
+                }
+                
                 <AddMaterialToTicketModal 
                     visible={newMaterialVisible} 
                     setIsVisible={setNewMaterialVisible} 
@@ -194,13 +193,13 @@ export const NewTicketScreen = () => {
                     onValueChange={()=>{setPaymentType('credit')}}
                 />
               </View>
-              <View style={localStyles.PayInfoRow}>
-                <CustomText> Hora de entrada : </CustomText>
+              <View style={{flexDirection:'row',flex:1,justifyContent:'center'}}>
+                <View style={localStyles.dateVehicleContainer}>
+                <CustomText> Hora de entrada:</CustomText>
                 <TouchableOpacity 
                   style={localStyles.datePickerBtn}
                   disabled={true}
                   onPress={()=>{setDatePickerModalStartVisible(true)}}>
-                  <Icon style={{marginRight:10}} name="time-outline" size={windowWidth*0.055} color="#000" />
                   <CustomText>
                     {(ticket.fechaEntradaVehiculo && ticket.fechaEntradaVehiculo.toString().length==19)?
                     ticket.fechaEntradaVehiculo 
@@ -208,7 +207,29 @@ export const NewTicketScreen = () => {
                     dateFormated(ticket.fechaEntradaVehiculo).substring(0,dateFormated(ticket.fechaEntradaVehiculo).length-3)
                     :'Selecciona'}</CustomText>
                 </TouchableOpacity>
-              </View>              
+              </View>
+              {ticket.fechaSalidaVehiculo?
+                
+                <View style={localStyles.dateVehicleContainer}>
+                <CustomText > Hora de salida:{''} </CustomText>
+                <TouchableOpacity 
+                  style={localStyles.datePickerBtn}
+                  disabled={true}
+                  >
+                  <CustomText > 
+                  {(ticket.fechaSalidaVehiculo && ticket.fechaSalidaVehiculo.toString().length==19)?
+                  ticket.fechaSalidaVehiculo 
+                  :(ticket.fechaSalidaVehiculo)?
+                  dateFormated(ticket.fechaSalidaVehiculo).substring(0,dateFormated(ticket.fechaSalidaVehiculo).length-3)
+                  :'Selecciona'}</CustomText>
+                </TouchableOpacity>
+              </View>
+              :null
+              }
+              </View>
+              
+              
+              
               <View style={localStyles.PayInfoRow}>
                 <CustomText> Nombre de despachador: </CustomText>
                 <View>
@@ -225,61 +246,55 @@ export const NewTicketScreen = () => {
                         >
                         </TextInput>
               </View>
-              <View style={localStyles.BtnPayRow}>
-              <TouchableOpacity 
-                      style={localStyles.btnSave}
-                      onPress={()=>{
-                      let alertMessageAux=''
+              {
+                !ticket.fechaSalidaVehiculo?
+                <View style={localStyles.BtnPayRow}>
 
-                        //setSaveModalVisible(true)
-                      if((ticket.folioFisico.length<1)
-                        ||(!ticket.empresaID)
-                        ||(!ticket.clienteID)
-                        ||(!ticket.destinoID)
-                        ||(!ticket.vehiculoID)
-                        ||(materialsQty.length<1)
-
-                        ){
-                          if(ticket.folioFisico.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Folio Físico'}
-                          if(!ticket.empresaID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Empresa'}
-                          if(!ticket.clienteID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Cliente'}
-                          if(!ticket.destinoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Destino'}
-                          if(!ticket.vehiculoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Vehículo'}
-                          if(materialsQty.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Material'}
-
-                          setAlertMessage(alertMessageAux)
-                          setWarningModalVisible(true);
-                      }
-                      else{
-                        SaveTicketsToLocalDB(ticket!,materialsQty).then(
-                          (res)=>{
-                             if (res>0){
-                                                    setSuccessModalVisible(true); 
-                                                    setTimeout(() => { 
-                                                        setSuccessModalVisible(false);
-                                                        navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-
-                                                    }, 2000);
-                                                    
-                                                }
-                          }
-                        )
-                      }
-
-                        
-
-                        }}>
-                      <Icon style={{marginTop:3, paddingRight:10}} name="save-outline" size={windowWidth*0.07} color="#fff" />
-                      <CustomText style={{color:'#fff'}} >Guardar</CustomText>
-                </TouchableOpacity>
                 <TouchableOpacity 
-                      style={localStyles.btnSave}
-                      onPress={()=>{setSignModalVisible(true)}}>
-                      <Icon style={{marginTop:3,  paddingRight:10}} name="thumbs-up-outline" size={windowWidth*0.065} color="#fff" />
-                      <CustomText style={{color:'#fff'}} >Guardar {'\n'}Firmar</CustomText>
-                </TouchableOpacity>
-              </View>
+                        style={localStyles.btnSave}
+                        onPress={()=>{
+                          UpdateTicketsOnDB(ticket!,materialsQty).then(
+                            (res)=>{
+                              if (res>0){
+                                                      setSuccessModalVisible(true); 
+                                                      setTimeout(() => { 
+                                                          setSuccessModalVisible(false);
+                                                          navigation.navigate("SearchTicketScreen" as never)
+                                                      }, 2000);
+                                                      
+                                                  }
+                            }
+                          )
+
+                          }}>
+                        <Icon style={{marginTop:3, paddingRight:10}} name="save-outline" size={30} color="#fff" />
+                        <CustomText style={{color:'#fff'}} >Actualizar</CustomText>
+                  </TouchableOpacity>
+                  <TouchableOpacity 
+                        style={localStyles.btnSave}
+                        onPress={()=>{setSignModalVisible(true)}}>
+                        <Icon style={{marginTop:3,  paddingRight:10}} name="thumbs-up-outline" size={30} color="#fff" />
+                        <CustomText style={{color:'#fff'}} >Guardar {'\n'}Firmar</CustomText>
+                  </TouchableOpacity>
+                </View>
+                :null
+              }
+                                    
               <View/>
+              {
+                ticket.firma?
+                  <View 
+                      style={localStyles.signContainer}>
+                    <View style={localStyles.signImageContainer}>
+                                  <Image  source={{uri: "data:image/png;base64,"+ticket.firma } }
+                                                  style={localStyles.signImage}/>
+                  </View>                  
+                  <CustomText>Firma</CustomText>
+                </View>
+                :null
+              }
+              
+              
             </View> 
             <SaveTicketModal setIsVisible={setSaveModalVisible} visible={saveModalVisible} ticket={ticket} MaterialsInTicket={materialsQty}/>       
             <SignAndSaveModal 
@@ -288,7 +303,8 @@ export const NewTicketScreen = () => {
                     setSuccessModalVisible={setSuccessModalVisible} 
                     setIsVisible={setSignModalVisible} 
                     visible={signModalVisible} 
-                    setPropertyOnTicket={setPropertyOnTicket}/>
+                    setPropertyOnTicket={setPropertyOnTicket}
+                    isUpdateProcess={true}/>
             <View>
               <DateTimePickerModal
                 mode="time"
@@ -313,16 +329,12 @@ export const NewTicketScreen = () => {
                 onHide={()=>{setDatePickerModalEndVisible(false)}}
               />
             </View>
-          
+           
             <ProcessSuccessModal
                 visible={successModalVisible}
                 setIsVisible={setSuccessModalVisible}
             />
-            <WarningModal
-            visible={warningModalVisible}
-            setIsVisible={setWarningModalVisible}
-            textToShow={alertMessage}
-            />
+
     </ScrollView>
     </SafeAreaView>
     
@@ -391,10 +403,8 @@ const localStyles = StyleSheet.create({
       flexDirection:'row',
       justifyContent:'center',
       alignItems:'center',
-      width:windowWidth*0.35,
-      height:windowHeight*0.065,
-      //paddingHorizontal:25,
-      //paddingVertical:10,
+      paddingHorizontal:25,
+      paddingVertical:10,
       borderRadius:4,
     },
     datePickerBtn:{
@@ -421,5 +431,27 @@ const localStyles = StyleSheet.create({
       borderColor:'#ccc',
       borderWidth:1,
       borderRadius:4, 
-      color:'#000'}
+      color:'#000'},
+      dateVehicleContainer:{
+        flexDirection:'column',
+        justifyContent:'center',
+        alignItems:'center',
+        marginTop:windowHeight*0.02
+      },
+      signContainer:{justifyContent:'center',
+        alignItems:'center',
+        paddingTop:windowHeight*0.01},
+      signImageContainer:{
+        justifyContent:'center',
+        alignSelf:'center',
+        borderColor:'black',
+        borderRadius:5,
+        backgroundColor:globalStyles.colors.shadowBtn,
+        height: windowHeight*0.25, 
+        width: windowHeight*0.25,
+        },
+      signImage:{
+          height: windowHeight*0.25, 
+          width: windowHeight*0.25, 
+          resizeMode:'contain'}
 });

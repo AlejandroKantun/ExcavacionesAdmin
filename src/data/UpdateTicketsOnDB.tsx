@@ -8,42 +8,31 @@ import { date } from 'yup';
 
 const db = connectToDatabase();
 const dateCreation =new Date();
-export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQty[],byteCharacters?:any)=>{
+export const UpdateTicketsOnDB = async(ticket:Vale,ticketsMaterials:MaterialQty[],byteCharacters?:any)=>{
     const today = new Date();
 
     let ticketId=0;
-    let insertTicketsSentence = "INSERT INTO vales ("+
-    "bancoID, "+
-    "serie, "+
-    "folio, "+
-    "folioFisico, "+
-    "fechaVale, "+
-    "tipoUnidad, "+
-    "placa, "+
-    "numeroEconomico, "+
-    "numeroValeTriturador, "+
-    "observaciones, "+
-    "fechaCreacion, "+
-    "activoVale, "+
-    "estadoVale, "+
-    "clienteID, "+
-    "destinoID, "+
-    "vehiculoID, "+
-    "empresaID, "+
-    "creadoPor, "+
-    "EnviadoABaseDeDatosCentral, "+
-    "empresaNombre, "+
-    "clienteNombre, "+
-    "destinoNombre, "+
-    "vehiculoNombre, "+
-    "firma, "+
-    "importe, "+
-    "fechaEntradaVehiculo, "+
-    "numeroTolva, "+
-    "fechaSalidaVehiculo, "+
-    "folioDigital, "+
-    "formadepago "+
-    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    let updateTicketSentence = "UPDATE vales SET "+
+    "bancoID=?, "+
+    "tipoUnidad=?, "+
+    "placa=?, "+
+    "numeroEconomico=?, "+
+    "numeroValeTriturador=?, "+
+    "observaciones=?, "+
+    "clienteID=?, "+
+    "destinoID=?, "+
+    "vehiculoID=?, "+
+    "empresaID=?, "+
+    "EnviadoABaseDeDatosCentral=?, "+
+    "empresaNombre=?, "+
+    "clienteNombre=?, "+
+    "destinoNombre=?, "+
+    "vehiculoNombre=?, "+
+    "firma=?, "+
+    "importe=?, "+
+    "numeroTolva=?, "+
+    "fechaSalidaVehiculo=? "+
+    " WHERE valeID=?"
     
     const sentToCentralDB=0;                
     let countItemsInserted=0;
@@ -53,25 +42,17 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
 
             await (await db).transaction(
                 async(tx)=>{
-                    tx.executeSql(insertTicketsSentence,[
+                    tx.executeSql(updateTicketSentence,[
                         ticket.bancoID, 
-                        'A', 
-                        ticket.folio, 
-                        ticket.folioFisico, 
-                        dateFormated(ticket.fechaVale!), 
                         ticket.tipoUnidad, 
                         ticket.placa, 
                         ticket.numeroEconomico, 
                         ticket.numeroValeTriturador, 
                         ticket.observaciones, 
-                        dateFormated(dateCreation), 
-                        1, 
-                        1, 
                         ticket.clienteID, 
                         ticket.destinoID, 
                         ticket.vehiculoID, 
                         ticket.empresaID, 
-                        ticket.creadoPor, 
                         sentToCentralDB,
                         ticket.empresaID==1?ticket.empresaNombre:"",
                         ticket.clienteID==1?ticket.clienteNombre:"",
@@ -79,33 +60,48 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
                         ticket.vehiculoID==1?ticket.vehiculoNombre:"",
                         byteCharacters?byteCharacters:'',
                         ticket.Importe,
-                        dateFormated(ticket.fechaEntradaVehiculo!),
                         ticket.numeroTolva,
                         byteCharacters?dateFormated(today):null,
-                        ticket.folioDigital, 
-                        ticket.formadepago
+                        ticket.valeID, 
                     ],
                     async (res,ResultSet)=>{
                         if (ResultSet.rowsAffected >0 ){
-                            console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT SUCCESS, ' )
+                            console.log(' - valeID: '+  ticket.valeID +' transaction: UPDATE SUCCESS, ' )
                             console.log(JSON.stringify(ResultSet))
                             
+                            const deleteUpdateSentence ="UPDATE valesmateriales SET valeID=-1 WHERE valeID=?";
+                            
+                            await (await db).transaction(
+                                async(tx)=>{
+                                    tx.executeSql(deleteUpdateSentence,[ticket.valeID],
+                                    (res,ResultSet)=>{
+                                        if (ResultSet.rowsAffected >0 ){
+                                            console.log(' - valeID: '+  ticket.valeID+' with rows of valesmateriales '+ ResultSet.rowsAffected  +' transaction: deleting SUCCESS, ' )
+                                        }
+                                        
+                                    },
+                                    (error)=>{
+                                       console.log(' - valeID: '+  ticket.valeID+'ERROR '+  JSON.stringify(error) )
+                                    }
+                                    );
+                            });
+
                             for (let i=0;i<ticketsMaterials.length;i++){
                                 const result= await SaveTicketsMaterialsToLocal(
                                     ticketsMaterials[i].quantity,
-                                    ResultSet.insertId,
+                                    ticket.valeID,
                                     ticketsMaterials[i].materialID,
                                     countItemsInserted,
                                     ticketsMaterials[i].materialName,
                                     ticketsMaterials[i].newImport)
                             }
                             console.log('items inserted in materialticket '+ countItemsInserted )
-                            resolve(ResultSet.insertId)
+                            resolve(ticket.valeID)
                         }
                         
                     },
                     (error)=>{
-                       console.log(' - valeID: '+  ticket.valeID +' transaction: INSERT FAIL Reason:' + JSON.stringify(error) )
+                       console.log(' - valeID: '+  ticket.valeID +' transaction: UPDATE FAIL Reason:' + JSON.stringify(error) )
                     }
                     );
             });
@@ -113,7 +109,7 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
         });
     await promise.then((res)=>{
         ticketId=res as number;
-        console.log('FINAL ticketID inserted: '+ JSON.stringify(ticketId))
+        console.log('FINAL ticketID updated: '+ JSON.stringify(ticketId))
         return ticketId;
     })
     

@@ -100,11 +100,13 @@ const localStyles = StyleSheet.create({
         paddingVertical:8,
         paddingHorizontal:25,
         backgroundColor:globalStyles.mainButtonColor.color,
-        textAlign:'center'
+        textAlign:'center',
+        marginTop:-windowWidth*0.02
+
     },
     closeButtonText:{
         fontSize:20, 
         color:globalStyles.mainButtonColor.text, 
-        textAlign:'center'
+        textAlign:'center',
     },
 });

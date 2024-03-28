@@ -1,3 +1,8 @@
+export interface EmpresaResponse {
+    "0":           Empresa[];
+    transaccionID: number;
+}
+
 export interface Empresa {
     creadoPor:                  number;
     estadoEmpresa:              number;

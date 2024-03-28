@@ -1,3 +1,7 @@
+export interface BancoResponse {
+    "0":           Banco[];
+    transaccionID: number;
+}
 export interface Banco {
     activoBanco:             number;
     creadoPor:               number;

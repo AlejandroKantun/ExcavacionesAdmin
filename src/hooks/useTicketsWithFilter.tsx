@@ -54,7 +54,6 @@ export const useTicketsWithFilter = () => {
     if (fechaMax){ finalSentence= finalSentence+ " AND fechaCreacion < date('"+fechaMax+"')"}
     if (folioFisico){ finalSentence= finalSentence+ " AND (folioFisico like '%"+folioFisico+"%' OR placa like '%"+folioFisico+"%'  OR numeroTolva like '%"+folioFisico+"%')"}
     finalSentence= finalSentence + " ORDER BY vales.valeid DESC",
-    console.log(finalSentence)
     setTicketsIsloading(true)
 
      try {

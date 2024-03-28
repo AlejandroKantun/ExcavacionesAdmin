@@ -4,8 +4,19 @@ import { MainMenuScreen } from '../screens/MainMenuScreen';
 import { NewTicketScreen } from '../screens/NewTicketScreen';
 import { SketchCanvasWithInteraction } from '../screens/SignAndSaveScreen';
 import { SearchTicketScreen } from '../screens/SearchTicketScreen';
+import { UpdateTicketScreen } from '../screens/UpdateTicketScreen';
+import { Vale } from '../interfaces/Vale';
 
-const Drawer = createDrawerNavigator();
+export type RootDrawerParams={
+  NewTicketScreen:undefined,
+  SearchTicketScreen:undefined,
+  UpdateTicketScreen:{
+    ticket:Vale
+  }
+}
+
+const Drawer = createDrawerNavigator<RootDrawerParams>();
+
 
 export const MainDrawerNavigator = () => {
     const dimensions = useWindowDimensions();
@@ -23,8 +34,8 @@ export const MainDrawerNavigator = () => {
        */}
 
       <Drawer.Screen name="NewTicketScreen" component={NewTicketScreen}  options={{headerShown: false}}/>
-      <Drawer.Screen name="SketchCanvasWithInteraction" component={SketchCanvasWithInteraction} />
       <Drawer.Screen name="SearchTicketScreen" component={SearchTicketScreen} options={{headerShown: false}} />
+      <Drawer.Screen name="UpdateTicketScreen" component={UpdateTicketScreen} options={{headerShown: false}} />
 
       {/* Screens */}
     </Drawer.Navigator>

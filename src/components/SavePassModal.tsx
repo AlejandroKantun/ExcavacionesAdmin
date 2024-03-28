@@ -48,10 +48,7 @@ export const SavePassModal = ({visible,setIsVisible}:Props) => {
                             setIsVisible(false);
                         }}>
                            
-                        <Icon 
-                            name="close-circle-outline" 
-                            size={30} 
-                            color={globalStyles.colors.danger} />
+                        
                     </TouchableOpacity>
                     </View> 
                     <View style={{alignItems:'center',marginTop:20}}>
