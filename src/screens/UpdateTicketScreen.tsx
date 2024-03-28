@@ -159,6 +159,7 @@ export const UpdateTicketScreen = () => {
                     keyExtractor={(item) => item.ID.toString()}
                     renderItem={({item,index})=> 
                     <MaterialQuantityFlatListItem 
+                        ticket={ticket}
                         material={item} 
                         index={index} 
                         removeMaterialsQty={()=>removeMaterialsQty(index)}/>
@@ -171,6 +172,7 @@ export const UpdateTicketScreen = () => {
               <View style={localStyles.PayInfoRow}>
                 <CustomText > Importe ($): </CustomText>
                 <TextInput 
+                  editable={ticket.firma?false:true}
                   style={localStyles.AmountTextInput}
                   placeholder={''}
                   placeholderTextColor='rgba(0,0,0,0.5)'
@@ -182,12 +184,14 @@ export const UpdateTicketScreen = () => {
               <View style={[localStyles.PayInfoRow, ]}>
                 <CustomText> Forma de pago :</CustomText>
                 <CustomCheckBox
+                    ticket={ticket}
                     label='Efectivo '
                     value={paymentSelected.cash}
                     onValueChange={()=>{setPaymentType('cash')}}
                     
                 />
                 <CustomCheckBox
+                    ticket={ticket}
                     label='Crédito'
                     value={paymentSelected.credit}
                     onValueChange={()=>{setPaymentType('credit')}}
@@ -238,6 +242,7 @@ export const UpdateTicketScreen = () => {
               </View>
               <View style={localStyles.PayInfoRow}>
                       <TextInput style={localStyles.textInpuComments}
+                        editable={ticket.firma?false:true}
                         multiline={true}
                         value={ticket.observaciones}
                         placeholder=  {'Observaciones'}

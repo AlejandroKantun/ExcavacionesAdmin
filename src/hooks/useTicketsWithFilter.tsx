@@ -7,9 +7,12 @@ import { Alert } from 'react-native';
 const db = connectToDatabase();
 
 export const useTicketsWithFilter = () => { 
+    const today = new Date()
+    var tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate()+1);
     const [ticketsIsloading, setTicketsIsloading] = useState(true)
-    const [dateMin, setDateMinInt] = useState<Date>()
-    const [dateMax, setDateMaxInt] = useState<Date>()
+    const [dateMin, setDateMinInt] = useState<Date|undefined>(today)
+    const [dateMax, setDateMaxInt] = useState<Date|undefined>(tomorrow)
     const [textFilter, setTextFilterInt] = useState('')
 
     const [tickets,setTickets] = useState<Vale[]>(

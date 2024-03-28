@@ -28,7 +28,7 @@ interface Props{
   getVehicles?: (vehicleId: number) => Promise <Vehiculo[]>,
   vehicleById?: Vehiculo[],
   setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void,
-  ticket?:Vale
+  ticket?:Vale,
 }
 
 const windowWidth = Dimensions.get('window').width;
@@ -59,6 +59,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
 
                AssignType[assignTo]==='Empresa'? 
                         <Dropdown
+                                          disable={ticket?.firma?true:false}
                                           style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                           placeholderStyle={localStyles.placeholderStyle}
                                           selectedTextStyle={localStyles.selectedTextStyle}
@@ -87,6 +88,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           />
                 :AssignType[assignTo]==='Cliente'?
                 <Dropdown
+                                          disable={ticket?.firma?true:false}
                                           style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                           placeholderStyle={localStyles.placeholderStyle}
                                           selectedTextStyle={localStyles.selectedTextStyle}
@@ -116,6 +118,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           />
                 :AssignType[assignTo]==='Destino'?
                 <Dropdown
+                                          disable={ticket?.firma?true:false}
                                           style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                           placeholderStyle={localStyles.placeholderStyle}
                                           selectedTextStyle={localStyles.selectedTextStyle}
@@ -143,6 +146,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           />
                 :
                 <Dropdown
+                                          disable={ticket?.firma?true:false}
                                           style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                           placeholderStyle={localStyles.placeholderStyle}
                                           selectedTextStyle={localStyles.selectedTextStyle}

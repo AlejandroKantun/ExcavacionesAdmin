@@ -112,9 +112,11 @@ interface Props{
           //console.log(byteCharacters)
           setIsVisible(false);
           setPaths([])
-          
-            if (isUpdateProcess)
+          console.log('isupdateprocess: ' + isUpdateProcess)
+
+            if (isUpdateProcess==true)
             {
+              console.log('UPDATE PROCESS')
               UpdateTicketsOnDB(ticket!,materialsQty,image64).then(
                 (res)=>{
                   if (res>0){

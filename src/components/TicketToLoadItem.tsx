@@ -29,24 +29,24 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
         <View style={localStyles.ticketToLoadContainer}>
             <View style={localStyles.ticketItemsContainer}>
             <View style={localStyles.itemsColumns}>
-                <CustomText>
+                <CustomText style={localStyles.customTextStyle}>
                 Folio Físico: {JSON.stringify(ticketByID?ticketByID.folioFisico:null)}
                 </CustomText>
-                <CustomText>
+                <CustomText style={localStyles.customTextStyle}>
                 Placas :{JSON.stringify(ticketByID?ticketByID.placa:null)}
                 </CustomText>
-                <CustomText>
+                <CustomText style={localStyles.customTextStyle}>
                 Numero Tolva: {ticketByID.numeroTolva?ticketByID.numeroTolva:'No disponible'}
                 </CustomText>
-                <CustomText>
+                <CustomText style={localStyles.customTextStyle}>
                 fecha vale: {JSON.stringify(ticketByID?ticketByID.fechaVale:null)}
                 </CustomText>
                 {
                     !ticketByID?.firma?
-                    <CustomText>
+                    <CustomText style={localStyles.customTextStyle}>
                         Estado: Pendiente por firmar
                     </CustomText>
-                    :<CustomText>
+                    :<CustomText style={localStyles.customTextStyle}>
                         Estado: Firmado
                     </CustomText>
                 }
@@ -121,7 +121,7 @@ const localStyles = StyleSheet.create({
     itemsColumns:{
         flexDirection:'column',
         marginHorizontal:windowWidth*0.02,
-        marginVertical:windowHeight*0.01
+        marginVertical:windowHeight*0.01,
         
     },
     imageContainer:{
@@ -171,5 +171,6 @@ const localStyles = StyleSheet.create({
     signImage:{
           height: windowHeight*0.13, 
           width: windowHeight*0.13, 
-          resizeMode:'contain'}
+          resizeMode:'contain'},
+    customTextStyle:{fontSize:windowHeight*0.019}
 });

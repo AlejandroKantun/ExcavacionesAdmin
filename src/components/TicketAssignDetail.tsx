@@ -49,6 +49,7 @@ export const TicketAssignDetail = ({
                 <View style={localStyles.companyClientItemContainer}> 
                 <CustomText  >   Folio Fisico:</CustomText>
                 <TextInput style={localStyles.textInputFolioFisico}
+                
                 maxLength={15}
                 multiline={true}
                 defaultValue={ticket.folioFisico}
@@ -56,6 +57,7 @@ export const TicketAssignDetail = ({
                 placeholder=  {'aa-mm-dd-#'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 onChangeText={(text)=>{setPropertyOnTicket("folioFisico",text)}}
+                editable={ticket.firma?false:true}
                 >
                 </TextInput>
             </View>      
@@ -70,6 +72,7 @@ export const TicketAssignDetail = ({
           {ticket.empresaID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
+                editable={ticket.firma?false:true}
                 placeholder=  {'Nombre Empresa'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 defaultValue={ticket.empresaNombre?ticket.empresaNombre:''}
@@ -88,6 +91,7 @@ export const TicketAssignDetail = ({
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
                 placeholder=  {'Nombre Cliente'}  
+                editable={ticket.firma?false:true}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 defaultValue={ticket.clienteNombre?ticket.clienteNombre:''}
                 onChangeText={(text)=>{setPropertyOnTicket("clienteNombre",text)}}>
@@ -102,7 +106,7 @@ export const TicketAssignDetail = ({
                 placeholder=  {'Nombre destino'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 defaultValue={ticket.destinoNombre?ticket.destinoNombre:''}
-
+                editable={ticket.firma?false:true}
                 onChangeText={(text)=>{setPropertyOnTicket("destinoNombre",text)}}>
             </TextInput>
             </View>
@@ -119,6 +123,7 @@ export const TicketAssignDetail = ({
           {ticket.vehiculoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}
+                editable={ticket.firma?false:true}
                 placeholder=  {'Nombre vehiculo'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 defaultValue={ticket.vehiculoNombre?ticket.vehiculoNombre:''}
@@ -138,7 +143,10 @@ export const TicketAssignDetail = ({
                                         setPlaca(text);
                                         setPropertyOnTicket("placa",text)
                                       }}
-                editable={ticket.vehiculoID==1?true:false}
+                editable={
+                          ticket.firma? false
+                          :ticket.vehiculoID==1?true
+                          :false}
                 value={ticket.placa?ticket.placa:''}
                 >
               </TextInput>
@@ -150,7 +158,7 @@ export const TicketAssignDetail = ({
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 defaultValue={vehiclesById[0]?.numeroTolva?vehiclesById[0]?.numeroTolva.toString():noTolva?.toString()}
                 value={ticket.placa?ticket.numeroTolva?.toString():''}
-
+                editable={ticket.firma?false:true}
                 maxLength={20}
                 onChangeText={(text)=>{
                   setPropertyOnTicket("numeroTolva",text)
@@ -165,6 +173,7 @@ export const TicketAssignDetail = ({
                 placeholder=  {'S / N'}
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 maxLength={20}  
+                editable={ticket.firma?false:true}
                 defaultValue={ticket.placa?ticket.numeroValeTriturador:''}
                 onChangeText={(text)=>{
                   setPropertyOnTicket("numeroValeTriturador",text)

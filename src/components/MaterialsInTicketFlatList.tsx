@@ -1,19 +1,22 @@
 import React from 'react'
 import { FlatList, View } from 'react-native'
 import { MaterialQty } from '../hooks/useMaterialQty';
+import { Vale } from '../interfaces/vale';
 import { MaterialQuantityFlatListItem } from './MaterialQuantityFlatListItem';
 
 interface Props{
     data: ArrayLike<MaterialQty> | null | undefined,
-    removeMaterialsQty: (index: number) => void
+    removeMaterialsQty: (index: number) => void,
+    ticket?:Vale
 }
-export const MaterialsInTicketFlatList = ({data,removeMaterialsQty}:Props) => {
+export const MaterialsInTicketFlatList = ({data,removeMaterialsQty,ticket}:Props) => {
   return (
     <View>
         <FlatList
                     data={data}
                     renderItem={({item,index})=> 
-                    <MaterialQuantityFlatListItem 
+                    <MaterialQuantityFlatListItem
+                        ticket={ticket}
                         material={item} 
                         index={index} 
                         removeMaterialsQty={()=>removeMaterialsQty(index)}/>

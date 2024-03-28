@@ -6,14 +6,48 @@ import { AuthContext } from '../context/AuthContext';
 import globalStyles from '../theme/appTheme';
 import {useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
-import { useNetInfo, useNetInfoInstance } from '@react-native-community/netinfo';
+import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
 
 
 export const RefreshDataFromDatabase = () => {
     const {authState} = useContext(AuthContext)
     const navigation = useNavigation();
-    const {netInfo, refresh} = useNetInfoInstance();
-    const { type, isConnected } = useNetInfo();
+    const netInfo = useNetInfo();
+
+
+    const { isConnected } = useNetInfo();
+    useEffect(() => {
+      if (isConnected === null) {
+        console.log('refreshing...')
+        NetInfo.refresh();
+      }
+      else{
+        console.log('is CONNECTED: ' + JSON.stringify(netInfo.details))
+
+        if (netInfo.isConnected){     
+            console.log('is CONNECTED')
+
+            try {
+                refreshAllTables().then(()=>{
+                    navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                });
+            } catch (error) {
+                console.log('FAIL refresh')
+
+                    navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+
+            }
+            
+        }
+        else{
+            console.log('direct to main')
+
+            navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+        }
+      }
+    }, [isConnected]);
+
+    console.log('isConnected ', isConnected);
 
     const refreshAllTables=async()=>{
             console.log('Posting tickets');
@@ -40,34 +74,7 @@ export const RefreshDataFromDatabase = () => {
     }
 
   
-    useEffect(() => {
-        refresh();
-        
-        console.log('is CONNECTED: ' + JSON.stringify(netInfo.isConnected)+ JSON.stringify(netInfo.type))
-
-            if (netInfo.isConnected){     
-                console.log('is CONNECTED')
-
-                try {
-                    refreshAllTables().then(()=>{
-                        navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-                    });
-                } catch (error) {
-                    console.log('FAIL refresh')
-
-                        navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-
-                }
-                
-            }
-            else{
-                console.log('direct to main')
-
-                navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-            }
-        
-        
-    },[authState.userName])
+   
   return (
     <View style={{justifyContent:'center', alignItems:'center', flex:1}}>
 

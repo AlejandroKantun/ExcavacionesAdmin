@@ -1,26 +1,23 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useEffect, useState } from 'react'
-import { View, StyleSheet, TextInput, Text, Modal, Button,TouchableOpacity} from 'react-native';
+import { View, StyleSheet, TextInput,TouchableOpacity, Dimensions} from 'react-native';
 import CustomText from '../components/CustomText'
 import globalStyles from '../theme/appTheme';
-import { StackActions } from '@react-navigation/native';
-import { HeaderTitle } from '../components/HeaderTittle';
-import  Icon  from 'react-native-vector-icons/Ionicons';
 import { getUserLogin, loginResult } from '../data/UserLogin';
 import { connectToDatabase } from '../data/dbStructure';
 import { WrongUserDataModal } from '../components/WrongUserDataModal';
-import { AuthContext, authInitialState } from '../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
 import { useNetInfo } from "@react-native-community/netinfo";
 import { getUserslogged } from '../data/persistantData';
 import DeviceInfo from 'react-native-device-info';
 import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
-import { Alert } from 'react-native';
-import { requestAndSaveCompanies, requestAndSaveZones, requestAndZonesCompanies, requestAndSaveUsers, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveVehicles } from '../api/operationsToDB';
 
 global.Buffer = require('buffer').Buffer;
 
 const db = connectToDatabase();
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
 
 export const LoginScreen = () => {
     const navigation = useNavigation();
@@ -193,20 +190,22 @@ const localStyles= StyleSheet.create({
         textAlign:'center'
     },
     inputText:{
-        height: 45,
+        height: windowHeight*0.055,
+        width:windowWidth*0.5,
         margin: 6,
         borderWidth: 2,
         padding: 10,
-        paddingHorizontal:50,
+        //paddingHorizontal:50,
         color:'black',
         borderRadius:8,
         borderColor:'rgba(0,0,0,0.5)',
         textAlign:'center'
     },
     loginButton:{
-        borderRadius:15,
-        paddingVertical:8,
-        paddingHorizontal:25,
+        borderRadius:10,
+        paddingVertical:windowHeight*0.009,
+        height: windowHeight*0.055,
+        width:windowWidth*0.42,
         backgroundColor:globalStyles.mainButtonColor.color,
         textAlign:'center'
     },

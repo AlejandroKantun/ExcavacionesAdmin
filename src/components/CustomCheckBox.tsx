@@ -4,18 +4,20 @@ import { StyleSheet, View } from 'react-native'
 import CheckBox from '@react-native-community/checkbox'
 import globalStyles from '../theme/appTheme';
 import CustomText from './CustomText';
+import { Vale } from '../interfaces/Vale';
 
 interface Props{
-    label?:string
-    value?: boolean
-    onValueChange: (value: boolean) => void
+    label?:string,
+    value?: boolean,
+    onValueChange: (value: boolean) => void,
+    ticket?:Vale
 }
 
-export const CustomCheckBox = ({value,onValueChange,label}:Props) => {
+export const CustomCheckBox = ({value,onValueChange,label,ticket}:Props) => {
   return (
     <View style={localStyles.mainContainer}>
         <CheckBox
-            disabled={false}
+            disabled={ticket?.firma?true:false}
             tintColors=
                 {{true: globalStyles.colors.primary, 
                 false:'rgba(0,0,0,0.5)'}}

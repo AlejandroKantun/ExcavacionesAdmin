@@ -4,6 +4,7 @@ import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { MaterialQty } from '../hooks/useMaterialQty';
+import { Vale } from '../interfaces/vale';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeigth = Dimensions.get('window').height;
@@ -11,10 +12,11 @@ const windowHeigth = Dimensions.get('window').height;
 interface Props{
     material:MaterialQty,
     index:number,
-    removeMaterialsQty: (index: number) => void
+    removeMaterialsQty: (index: number) => void,
+    ticket?:Vale
 }
 
-export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty}:Props) => {
+export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty,ticket}:Props) => {
   return (
     <View style={localStyles.mainContainer}>
         <View
@@ -33,18 +35,22 @@ export const MaterialQuantityFlatListItem = ({material,index,removeMaterialsQty}
             </CustomText> 
         </View>
        
-        <View style={{marginLeft:'auto'}}>
-            <TouchableOpacity 
-                style={localStyles.btnDelete}
-                onPress={()=>{
-                    removeMaterialsQty(index);
-                }}
-            >
-                    <Icon style={{marginTop:3}} name="remove-outline" size={windowHeigth*0.02} color="#fff" />
-            </TouchableOpacity>
+            {   !ticket?.firma?
+                <View style={{marginLeft:'auto'}}>
+                <TouchableOpacity 
+                    style={localStyles.btnDelete}
+                    onPress={()=>{
+                        removeMaterialsQty(index);
+                    }}
+                >
+                        <Icon style={{marginTop:3}} name="remove-outline" size={windowHeigth*0.02} color="#fff" />
+                </TouchableOpacity>
+                </View>
+                :null
+            }
+            
         </View>
         
-    </View>
   )
 }
 
@@ -63,16 +69,16 @@ const localStyles = StyleSheet.create({
         alignItems:'center'
     },
     dataText:{
-        fontSize:18,
+        fontSize:windowHeigth*0.017,
         fontWeight:'400'
     },
     subDataText:{
-        fontSize:14,
+        fontSize:windowHeigth*0.017,
         fontWeight:'400',
         
     },
     subTotal:{
-        fontSize:14,
+        fontSize:windowHeigth*0.017,
         fontWeight:'600',
         
     },

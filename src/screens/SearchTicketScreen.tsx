@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, View, Dimensions, TouchableOpacity, Image, FlatList, SafeAreaView, ScrollView } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
@@ -41,7 +41,6 @@ export const SearchTicketScreen = () => {
       setDateMax,
       setTextFilter,
       reloadItem}=useTicketsWithFilter();
-
     
   return (
     <SafeAreaView style={{flex: 1}}>
