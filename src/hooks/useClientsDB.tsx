@@ -14,7 +14,7 @@ const getClients=async ()=>{
      try {
    
         (await db).transaction((tx) => {
-          tx.executeSql("SELECT * FROM clientes", []).then(
+          tx.executeSql("SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1", []).then(
             ([tx,results]) => {
               for (let i = 0; i <results.rows.length; i++) {
                 tempArray.push(results.rows.item(i) as Cliente)

@@ -14,7 +14,7 @@ const getDestinations=async ()=>{
      try {
    
         (await db).transaction((tx) => {
-          tx.executeSql("SELECT * FROM destinos", []).then(
+          tx.executeSql("SELECT * FROM destinos WHERE estadoDestino=1 AND activoDestino=1", []).then(
             ([tx,results]) => {
               for (let i = 0; i <results.rows.length; i++) {
                 tempArray.push(results.rows.item(i) as Destino)

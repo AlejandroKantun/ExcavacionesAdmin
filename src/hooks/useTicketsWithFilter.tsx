@@ -1,18 +1,20 @@
 import React, { useEffect, useState } from 'react'
 import { Vale } from '../interfaces/vale';
 import { connectToDatabase } from '../data/dbStructure';
-import { dateFormatedDateFiltered } from '../data/dateFormated';
+import { dateFormated, dateFormatedDateFiltered } from '../data/dateFormated';
 import { Alert } from 'react-native';
 
 const db = connectToDatabase();
 
 export const useTicketsWithFilter = () => { 
     const today = new Date()
+    today.setHours(0,0,0,0);
+
     var tomorrow = new Date(today);
-        tomorrow.setDate(today.getDate()+1);
+        tomorrow.setHours(23,59,59,997)
     const [ticketsIsloading, setTicketsIsloading] = useState(true)
-    const [dateMin, setDateMinInt] = useState<Date|undefined>(today)
-    const [dateMax, setDateMaxInt] = useState<Date|undefined>(tomorrow)
+    const [dateMin, setDateMinInt] = useState<Date|undefined>()
+    const [dateMax, setDateMaxInt] = useState<Date|undefined>()
     const [textFilter, setTextFilterInt] = useState('')
 
     const [tickets,setTickets] = useState<Vale[]>(
@@ -25,8 +27,9 @@ export const useTicketsWithFilter = () => {
     }, [dateMax,dateMin,textFilter])
 
     const reloadItem=()=>{
+                console.log('DATE FORMATE  \n' +dateFormatedDateFiltered(dateMin) + dateFormatedDateFiltered(dateMax))
                 getTickets(dateFormatedDateFiltered(dateMin),
-                                            dateFormatedDateFiltered(dateMax),
+                           dateFormatedDateFiltered(dateMax),
                                             textFilter)
     }
     
@@ -53,10 +56,11 @@ export const useTicketsWithFilter = () => {
 
    const getTickets=async (fechaMin:String|undefined,fechaMax:String|undefined, folioFisico:String|undefined)=>{
     let finalSentence="SELECT * FROM Vales WHERE 1=1 AND estadoVale=1 "
-    if (fechaMin){ finalSentence= finalSentence+ " AND fechaCreacion > date('"+fechaMin+"')"}
-    if (fechaMax){ finalSentence= finalSentence+ " AND fechaCreacion < date('"+fechaMax+"')"}
+    if (fechaMin){ finalSentence= finalSentence+ " AND fechaCreacion >='"+fechaMin+"'"}
+    if (fechaMax){ finalSentence= finalSentence+ " AND fechaCreacion < '"+fechaMax+"'"}
     if (folioFisico){ finalSentence= finalSentence+ " AND (folioFisico like '%"+folioFisico+"%' OR placa like '%"+folioFisico+"%'  OR numeroTolva like '%"+folioFisico+"%')"}
     finalSentence= finalSentence + " ORDER BY vales.valeid DESC",
+    console.log('final sentence \n' + finalSentence)
     setTicketsIsloading(true)
 
      try {
@@ -73,7 +77,10 @@ export const useTicketsWithFilter = () => {
                     setTickets(tempArray);
                     setTicketsIsloading(false)
                     }
-                else{setTickets([])}
+                else{
+                    setTickets([])
+                    setTicketsIsloading(false)
+                    }
                 }
                 
           );

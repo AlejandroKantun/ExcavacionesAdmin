@@ -67,7 +67,9 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                     </View>
                     <View style={localStyles.interactiveElements}>
                     <View style={localStyles.materialsQuantityContainer}>
-                        <Dropdown
+                        <View style={{ alignItems:'center'}}>
+                            <CustomText style={localStyles.label}>Selecciona Material:</CustomText>
+                            <Dropdown
                                     style={[localStyles.dropdown, isFocus && { borderColor: 'blue' }]}
                                     placeholderStyle={localStyles.placeholderStyle}
                                     selectedTextStyle={localStyles.selectedTextStyle}
@@ -78,7 +80,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     maxHeight={400}
                                     labelField="nombreMaterial"
                                     valueField="materialID"
-                                    placeholder={!isFocus ? 'Selec Material' : '...'}
+                                    placeholder={!isFocus ? ' Materiales' : '...'}
                                     searchPlaceholder="Buscar material"
 
                                     onBlur={() => setIsFocus(false)}
@@ -101,25 +103,28 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                         color="rgba(0,0,0,0.5)" />
                                     )}
                                     />
-                        <TextInput 
+                        </View>
+                        <View style={{flex:1, alignItems:'center'}}>
+                            <CustomText style={localStyles.label}>Cantidad [m3]:</CustomText>
+                            <TextInput 
                             style={localStyles.textInputTon}
                             keyboardType='numeric'
-                            placeholder='Cantidad [M3]'
                             defaultValue={materialM3.toString()}
                             placeholderTextColor='rgba(0,0,0,0.6)'
-                            
+                            placeholder='Cantidad'
                             onChangeText={(Text)=>{
                                 if (Number(Text)>0){
                                     setMaterialM3(Number(Text))
                                 }
                                 else    {setMaterialM3(0)}
                                 
-                            }}
-                            
-                        />
+                            }}/>
+                        </View>
+                        
                         </View>
                         {value==1?
-                            <View>  
+                            <View> 
+                                <CustomText style={localStyles.label}>Material Nombre (Otro):</CustomText>
                                 <TextInput style={localStyles.textInputDataMaterial}
                                     placeholder=  {'Material'}  
                                     placeholderTextColor='rgba(0,0,0,0.5)'
@@ -132,7 +137,8 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             :null
                         }
                         {material[0]?
-                            <View>  
+                            <View>
+                                <CustomText style={localStyles.label}>Precio por metro cúbico:</CustomText>  
                                 <TextInput style={localStyles.textInputDataMaterial}
                                     placeholder=  {'Importe: '}  
                                     maxLength={30}
@@ -187,6 +193,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                 }
                                 else{
                                     setIsVisible(false);
+                                    setMaterialM3(0);
                                     getMaterialById(-1); //to reset this variable
                                     for(let i =0; i<materialsQty.length; i++){
                                         subtotal= subtotal+ (materialsQty[i].quantity*materialsQty[i].newImport)
@@ -274,7 +281,7 @@ const localStyles = StyleSheet.create({
     }
     ,
     dropdown: {
-        margin: 16,
+        marginHorizontal: 16,
         height: 50,
         width:200,
         borderBottomColor: 'gray',
@@ -308,18 +315,14 @@ const localStyles = StyleSheet.create({
         marginHorizontal:windowWidth*0.05
     },    
     textInputTon:{
-      //paddingHorizontal:windowWidth*0.06, 
-      //width:windowWidth*0.25,
-
-      //marginVertical:20,
       height:windowheight*0.055,
-      flex:1,
+      width:windowWidth*0.31,
       borderColor:'#ccc',
       borderWidth:1,
       borderRadius:4, 
       color:'#000',
       textAlign:'center',
-      fontSize:16
+      fontSize:windowheight*0.017
     },
     buttonsContainer:{
         flexDirection:'row',
@@ -349,12 +352,14 @@ const localStyles = StyleSheet.create({
         paddingHorizontal:windowWidth*0.1,
         width:windowWidth*0.85, 
         height:windowheight*0.055,
-        //paddingVertical:windowheight*0.01,
         marginBottom:windowheight*0.01,
         borderColor:'#ccc',
         borderWidth:1,
         borderRadius:8, 
-        //marginHorizontal:10,
         color:'#000'},
+        label:{
+            fontSize:windowheight*0.017,
+            marginBottom:windowheight*0.003,
+        }
 });
 

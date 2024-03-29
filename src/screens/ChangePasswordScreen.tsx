@@ -19,6 +19,7 @@ import { AuthContext } from '../context/AuthContext';
 import { useUsersDB } from '../hooks/useUsersDB';
 import { storeUser } from '../data/persistantData';
 import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
+import CheckBox from '@react-native-community/checkbox';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -29,11 +30,11 @@ interface Props extends StackScreenProps<RootStackParams,'ChangePasswordScreen'>
 export const ChangePasswordScreen = ({route}:Props) => {
     const {authState,changeZoneID,changeUserID}=useContext(AuthContext)
    const navigation =useNavigation()
-   const {token,getToken} =useTokenByUserPass();
    const [deviceId, setdeviceId] = useState('')
-   const ChangePassParams= route.params;
     const [isVisible, setIsVisible] = useState(false)
     const {users,getUserByUserName}=useUsersDB()
+    const [showPass, setShowPass] = useState(false)
+    const [showConfirmPass, setShowConfirmPass] = useState(false)
 
 const submitChangeRequest=async(newPassValidated:string)=>{
     const  changeResult:changePassResult = await ChangePassWordRequest(
@@ -107,30 +108,64 @@ useEffect( () => {
                                 <TextInput
                                     placeholder="Ingrese nueva contraseña"
                                     placeholderTextColor='rgba(0,0,0,0.5)'
-                                    style={localStyles.textInputDataHeader}
+                                    style={localStyles.inputText}
                                     onChangeText={handleChange('password')}
                                     onBlur={handleBlur('password')}
                                     autoCorrect={false}
-                                    secureTextEntry
+                                    secureTextEntry={showPass?false:true}
+
                                 />
                                 {errors.password &&
                                     <Text style={{ fontSize: 13, color: 'red' }}>{errors.password}</Text>
                                 }
+                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                    <CheckBox
+                                        disabled={false}
+                                        value={showPass}
+                                        tintColors=
+                                            {{true: globalStyles.colors.primary, 
+                                            false:'rgba(0,0,0,0.5)'}}
+                                        tintColor='rgba(0,0,0,0.5)'
+                                        onCheckColor={globalStyles.colors.primary}
+                                        onValueChange={(newValue) => {setShowPass(newValue)}//onValueChange(newValue)
+                                        }
+                                        />
+                                    <CustomText style={localStyles.labalShowPass}>
+                                        Mostrar contraseña
+                                    </CustomText>
+                                </View>
                             </View>
                            
                             <View style={localStyles.textInputcontainer}>                  
                                 <TextInput
+                                    maxLength={20}
                                     placeholder="Repita nueva contraseña"
                                     placeholderTextColor='rgba(0,0,0,0.5)'
-                                    style={localStyles.textInputDataHeader}
+                                    style={localStyles.inputText}
                                     onChangeText={handleChange('confirmPassword')}
                                     onBlur={handleBlur('confirmPassword')}
                                     autoCorrect={false}
-                                    secureTextEntry
-                                />
+                                    secureTextEntry={showConfirmPass?false:true}
+                                    />
                                 {errors.confirmPassword &&
                                     <Text style={{ fontSize: 13, color: 'red' }}>{errors.confirmPassword}</Text>
                                 }
+                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                    <CheckBox
+                                        disabled={false}
+                                        value={showConfirmPass}
+                                        tintColors=
+                                            {{true: globalStyles.colors.primary, 
+                                            false:'rgba(0,0,0,0.5)'}}
+                                        tintColor='rgba(0,0,0,0.5)'
+                                        onCheckColor={globalStyles.colors.primary}
+                                        onValueChange={(newValue) => {setShowConfirmPass(newValue)}//onValueChange(newValue)
+                                        }
+                                        />
+                                    <CustomText style={localStyles.labalShowPass}>
+                                        Mostrar contraseña
+                                    </CustomText>
+                                </View>
                             </View>
                         
                         <View style={localStyles.buttonsContainer}>
@@ -205,6 +240,7 @@ const localStyles = StyleSheet.create({
     textInputcontainer:{
         flexDirection:'column',
         paddingVertical:windowHeight*0.02,
+        alignItems:'center'
     },
     textInputDataHeader:{
         flexWrap:'wrap',
@@ -221,4 +257,20 @@ const localStyles = StyleSheet.create({
         backgroundColor:globalStyles.colors.danger,
         textAlign:'center'
     },
+    inputText:{
+        height: windowHeight*0.055,
+        width:windowWidth*0.65,
+        margin: 6,
+        borderBottomColor:'black',
+        borderBottomWidth:1,
+        paddingTop: 6,
+        paddingBottom: 12,
+        color:'black',
+        borderRadius:8,
+        textAlign:'center',
+        fontSize:16,
+    },
+    labalShowPass:{
+        fontSize:windowHeight*0.016
+    }
 });

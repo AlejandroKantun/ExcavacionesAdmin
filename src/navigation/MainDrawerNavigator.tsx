@@ -1,8 +1,6 @@
 import { useWindowDimensions } from 'react-native';
 import { createDrawerNavigator } from '@react-navigation/drawer';
-import { MainMenuScreen } from '../screens/MainMenuScreen';
 import { NewTicketScreen } from '../screens/NewTicketScreen';
-import { SketchCanvasWithInteraction } from '../screens/SignAndSaveScreen';
 import { SearchTicketScreen } from '../screens/SearchTicketScreen';
 import { UpdateTicketScreen } from '../screens/UpdateTicketScreen';
 import { Vale } from '../interfaces/Vale';
@@ -11,7 +9,8 @@ export type RootDrawerParams={
   NewTicketScreen:undefined,
   SearchTicketScreen:undefined,
   UpdateTicketScreen:{
-    ticket:Vale
+    ticket:Vale,
+    reloadItem: () => void
   }
 }
 

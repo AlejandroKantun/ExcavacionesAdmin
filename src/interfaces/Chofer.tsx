@@ -5,8 +5,8 @@ export interface DriversResponse {
 
 export interface Chofer {
     vehiculoID:                 number;
-    estadoChofer:               number;
-    activoChofer:               number;
+    estadoChofer:               number|string;
+    activoChofer:               number|string;
     EnviadoABaseDeDatosCentral?: number;
     fechaSincronizacion:        Date|null;
     fechaEliminacion:           Date|null;

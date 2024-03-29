@@ -5,8 +5,8 @@ export interface ClientsResponse {
 
 export interface Cliente {
     creadoPor:                  number;
-    estadoCliente:              number;
-    activoCliente:              number;
+    estadoCliente:              number|string;
+    activoCliente:              number|string;
     empresaID:                  number;
     fechaSincronizacion:        Date|null;
     fechaEliminacion:           Date|null;

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { StyleSheet, View, Dimensions, TouchableOpacity, Image, FlatList, SafeAreaView, ScrollView } from 'react-native'
+import { StyleSheet, View, Dimensions, TouchableOpacity, Image, FlatList, SafeAreaView, ScrollView, ActivityIndicator } from 'react-native'
 import Icon from 'react-native-vector-icons/Ionicons';
 import globalStyles from '../theme/appTheme';
 import { MaterialQty } from '../hooks/useMaterialQty';
 import CustomText from '../components/CustomText';
-import { useNavigation } from '@react-navigation/core';
+import { useFocusEffect, useNavigation } from '@react-navigation/core';
 import { openDatabase } from 'react-native-sqlite-storage';
 import { TicketToLoadItem } from '../components/TicketToLoadItem';
 import { TextInput } from 'react-native';
@@ -40,8 +40,18 @@ export const SearchTicketScreen = () => {
       dateMax, 
       setDateMax,
       setTextFilter,
-      reloadItem}=useTicketsWithFilter();
-    
+      reloadItem,
+      ticketsIsloading}=useTicketsWithFilter();
+    useFocusEffect(
+        React.useCallback(() => {
+          var todayMin= new Date();
+          todayMin.setHours(0,0,0,0);
+          setDateMin(todayMin)
+          var todayMax=new Date();
+          todayMax.setHours(23,59,59,997);
+          setDateMax(todayMax)
+        }, [])
+      );
   return (
     <SafeAreaView style={{flex: 1}}>
       <View
@@ -59,7 +69,7 @@ export const SearchTicketScreen = () => {
                             <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
                             <CustomText>
                               {dateMin?
-                              dateFormatedDateFiltered(dateMin)
+                              dateFormatedDateFiltered(dateMin)?.substring(0,10)
                               :'Selecciona'}</CustomText>
                           </TouchableOpacity>
                       </View>
@@ -73,7 +83,7 @@ export const SearchTicketScreen = () => {
                             <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
                             <CustomText>
                               {dateMax?
-                              dateFormatedDateFiltered(dateMax)
+                              dateFormatedDateFiltered(dateMax)?.substring(0,10)
                               :'Selecciona'}</CustomText>
                           </TouchableOpacity>
                       </View>
@@ -90,32 +100,48 @@ export const SearchTicketScreen = () => {
                       }>
                         
                       </TextInput>
-                    
-                     <View>
-                      <View >
-                      
-                          <FlatList 
-                                      ItemSeparatorComponent={ItemSeparatorTickets}
-                                      data={tickets}
-                                      horizontal={false}
-                                      keyExtractor={(item) => item.valeID.toString()}
-                                      renderItem={({item,index})=> 
-                                      <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
-                                      }
-                                      ListFooterComponent={(<View style={{height:windowHeight*0.27}}> 
+                    {
+                      ticketsIsloading?
+                      <View>
+                        <ActivityIndicator
+                        animating={true}
+                        size={windowHeight*0.05}
+                        color={globalStyles.colors.primary}
+                        ></ActivityIndicator>
+                      </View>
+                      :<View>
+                        <View >
+                            {tickets.length>0?
+                              <FlatList 
+                                          ItemSeparatorComponent={ItemSeparatorTickets}
+                                          data={tickets}
+                                          horizontal={false}
+                                          keyExtractor={(item) => item.valeID.toString()}
+                                          renderItem={({item,index})=> 
+                                          <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
+                                          }
+                                          ListFooterComponent={(<View style={{height:windowHeight*0.27}}> 
 
-                                      </View>)}
-                          ></FlatList>
+                                          </View>)}
+                              ></FlatList>
+                              :<View>
+                                <CustomText style={localStyles.noDataFoundLabel}>No se encontraron vales</CustomText>
+                              </View>
+                            }
+                            
 
-                        
-                    </View>
-                    </View>
+                          
+                        </View>
+                      </View>
+                    }
+                     
 
                     <View>
               <DateTimePickerModal
                   mode="date"
                   isVisible={datePickerModalStartVisible}
                   onConfirm={(datePicked)=>{
+                    datePicked.setHours(0,0,0,0)
                     setDateMin(datePicked)
 
                   }}
@@ -132,7 +158,7 @@ export const SearchTicketScreen = () => {
                   mode="date"
                   isVisible={datePickerModalEndVisible}
                   onConfirm={(datePicked)=>{
-
+                    datePicked.setHours(23,59,59,997)
                     setDateMax(datePicked)
                     setDatePickerModalEndVisible(false)
                   }}
@@ -266,7 +292,10 @@ const localStyles = StyleSheet.create({
         paddingVertical:12,
         borderRadius:4,
         marginHorizontal:30,
-  
+      },
+      noDataFoundLabel:{
+        fontSize:windowHeight*0.022,
+        color:globalStyles.colors.textLoginPlaceHolder
       }
 });
 

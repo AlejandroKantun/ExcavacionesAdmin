@@ -10,7 +10,7 @@ const globalStyles = {
         primary:"#0366d6",
         primaryRGB:'3,102,214',
         white:"#fefefe",
-        textLoginPlaceHolder:"#1572e8",
+        textLoginPlaceHolder:"#495057",
         danger:'#f25961',
         sucess:'#5cb85c',
         shadowBtn:'#ededed',

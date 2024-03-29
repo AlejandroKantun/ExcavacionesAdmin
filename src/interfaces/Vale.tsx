@@ -10,8 +10,8 @@ export interface Vale {
     destinoID:                  number;
     clienteID:                  number;
     fechaEntradaVehiculo:       Date|null;
-    estadoVale:                 number;
-    activoVale:                 number;
+    estadoVale:                 number|string;
+    activoVale:                 number|string;
     fechaEliminacion:           Date|null;
     fechaSincronizacion:        Date|null;
     fechaUltimaModificacion:    Date|null;

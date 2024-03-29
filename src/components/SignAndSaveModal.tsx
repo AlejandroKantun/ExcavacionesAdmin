@@ -32,11 +32,11 @@ interface Props{
     setSuccessModalVisible: (value: React.SetStateAction<boolean>) => void,
     ticket: Vale,
     materialsQty: MaterialQty[],
-    isUpdateProcess?:boolean
+    isUpdateProcess?:boolean,
 }
 
 
-  export const SignAndSaveModal = ({visible,setIsVisible,setPropertyOnTicket,setSuccessModalVisible,ticket,materialsQty,isUpdateProcess}:Props) => {
+  export const SignAndSaveModal = ({visible,setIsVisible,setSuccessModalVisible,ticket,materialsQty,isUpdateProcess}:Props) => {
     const [paths, setPaths] = useState<SkPath[]>([]);
     const canvasRef = useCanvasRef();
     const navigation =useNavigation()

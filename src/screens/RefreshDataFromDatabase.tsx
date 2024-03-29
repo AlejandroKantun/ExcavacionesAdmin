@@ -77,7 +77,6 @@ export const RefreshDataFromDatabase = () => {
    
   return (
     <View style={{justifyContent:'center', alignItems:'center', flex:1}}>
-
         <CustomText style={{fontSize:25}}> Sincronizando datos</CustomText>
         <ActivityIndicator size={40} color={globalStyles.colors.primary} ></ActivityIndicator>  
     </View>

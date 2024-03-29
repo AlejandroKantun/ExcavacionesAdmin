@@ -12,8 +12,8 @@ export interface Material {
     fechaEliminacion:        Date|null;
     fechaSincronizacion:     Date|null;
     creadoPor:               number | null;
-    activoMaterial:          boolean;
-    estadoMaterial:          boolean;
+    activoMaterial:          boolean|number|string;
+    estadoMaterial:          boolean|number|string;
     EnviadoABaseDeDatosCentral?: number,
     importe:                 number|null
 }

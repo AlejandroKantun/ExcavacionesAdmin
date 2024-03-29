@@ -3,11 +3,11 @@ export interface BancoResponse {
     transaccionID: number;
 }
 export interface Banco {
-    activoBanco:             number;
+    activoBanco:             number|string;
     creadoPor:               number;
     fechaEliminacion:        Date|null;
     nombreBanco:             string;
-    estadoBanco:             number;
+    estadoBanco:             number|string;
     fechaUltimaModificacion: Date;
     fechaCreacion:           Date;
     bancoID:                 number;

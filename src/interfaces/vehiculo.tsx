@@ -4,12 +4,12 @@ export interface VehiculoResponse {
 }
 
 export interface Vehiculo {
-    estadoVehiculo:             number;
+    estadoVehiculo:             number|string;
     empresaID:                  number;
     fechaSincronizacion:        Date|null;
     numeroEconomico:            string;
     fechaEliminacion:           Date|string;
-    activoVehiculo:             number|boolean; 
+    activoVehiculo:             number|string|boolean; 
     fechaCreacion:              Date;
     placa:                      string;
     codigoQR:                   string|null;

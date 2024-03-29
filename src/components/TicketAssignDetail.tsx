@@ -137,7 +137,7 @@ export const TicketAssignDetail = ({
             <View style={localStyles.columnVehicleContainer}>
             <CustomText  >Placas :</CustomText>
               <TextInput style={localStyles.textInputPlacaTolvaTriturador}
-                placeholder=  {''}  
+                placeholder=  {'N/A'}  
                 placeholderTextColor='rgba(0,0,0,0.5)'
                 onChangeText={(text)=>{
                                         setPlaca(text);

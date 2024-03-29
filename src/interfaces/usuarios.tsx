@@ -20,8 +20,8 @@ export interface Usuario {
     fechaEliminacion:        Date|null;
     fechaSincronizacion:     Date|null;
     creadoPor:               Date|null;
-    activoUsuario:           boolean;
-    estadoUsuario:           boolean;
+    activoUsuario:           boolean|number|string;
+    estadoUsuario:           boolean|number|string;
     grant_type:              string;
     client_id:               string;
     client_secret:           string;

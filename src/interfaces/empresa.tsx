@@ -5,8 +5,8 @@ export interface EmpresaResponse {
 
 export interface Empresa {
     creadoPor:                  number;
-    estadoEmpresa:              number;
-    activoEmpresa:              number;
+    estadoEmpresa:              number|string;
+    activoEmpresa:              number|string;
     fechaCreacion:              Date;
     direccionFiscal:            Date|null;
     logoEmpresa:                Blob|null;

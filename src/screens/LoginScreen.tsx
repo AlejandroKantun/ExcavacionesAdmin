@@ -12,6 +12,9 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { getUserslogged } from '../data/persistantData';
 import DeviceInfo from 'react-native-device-info';
 import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
+import { CustomCheckBox } from '../components/CustomCheckBox';
+import CheckBox from '@react-native-community/checkbox';
+import { Image } from 'react-native';
 
 global.Buffer = require('buffer').Buffer;
 
@@ -27,11 +30,13 @@ export const LoginScreen = () => {
     const {token,getToken} =useTokenByUserPass()
     const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID,changeEmpresaID} = useContext(AuthContext)
     const [deviceId, setdeviceId] = useState('')
+    const [showPass, setShowPass] = useState(false)
 
     //Network State
     const { type, isConnected } = useNetInfo();
 
     const loginHandler=async ()=>{
+        console.log(isConnected)
         if (isConnected){
             //If there is connection to internet
 
@@ -47,7 +52,6 @@ export const LoginScreen = () => {
                         (res)=>
                         {   
                             
-                            //Alert.alert(JSON.stringify(res))
                             getUserslogged().then((usersInDB)=>{
                                 console.log('users in phone' + usersInDB)
                                 if(!usersInDB){
@@ -56,7 +60,6 @@ export const LoginScreen = () => {
                                 else if(usersInDB.includes(user)){
                                     //it is not the first time
                                     
-                                    //TO REACTIVE NEXT TO LINE, REPLACE QUERY SENTENCE ON getEmpresaWithUserID()
                                     try {                                    
                                         changeUserID(Number(res[0]["usuarioID"]))
                                         changeEmpresaID(Number(res[0]["empresaID"]))
@@ -65,11 +68,7 @@ export const LoginScreen = () => {
                                         changeEmpresaID(1);
                                         changeZoneID(1);
                                     }
-                                    //changeEmpresaID(Number(res[0]["empresaID"]))
-                                    //changeZoneID(Number(res[0]["bancoID"]))
 
-                                   
-                                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
                                     navigation.navigate("RefreshDataFromDatabase" as never)
       
                                 }
@@ -92,7 +91,6 @@ export const LoginScreen = () => {
         }else{
             //If there is no connection to internet
             const loginResult:loginResult = await getUserLogin(user,pass);
-
             if (!loginResult.authorized )
             setIsVisible(true)
             else if(loginResult.authorized ) {
@@ -110,7 +108,6 @@ export const LoginScreen = () => {
 
                         }
                         )
-                    //navigation.dispatch(StackActions.replace(loginResult.path))
                     navigation.navigate("ChangePasswordScreen" as never)
                     } 
                 else{
@@ -136,7 +133,8 @@ export const LoginScreen = () => {
             <CustomText style={localStyles.tittleText}>
                 Sistema {'\n' }Administrativo
             </CustomText>
-            <View style={{paddingBottom:10}}>
+            
+            <View style={localStyles.inputsContainer}>
                 <TextInput
                     style={localStyles.inputText}
                     placeholder= '  Usuario  '
@@ -147,13 +145,29 @@ export const LoginScreen = () => {
                 />
             <TextInput
                     style={localStyles.inputText}
-                    placeholder= 'Contraseña'
+                    placeholder= '  Contraseña'
                     placeholderTextColor={globalStyles.colors.textLoginPlaceHolder}
                     autoCorrect={false}
-                    secureTextEntry
+                    secureTextEntry={showPass?false:true}
                     onChangeText={(Text)=>setPass(Text)}
 
                 />
+                <View style={{flexDirection:'row',alignItems:'center'}}>
+                    <CheckBox
+                        disabled={false}
+                        value={showPass}
+                        tintColors=
+                            {{true: globalStyles.colors.primary, 
+                            false:'rgba(0,0,0,0.5)'}}
+                        tintColor='rgba(0,0,0,0.5)'
+                        onCheckColor={globalStyles.colors.primary}
+                        onValueChange={(newValue) => {setShowPass(newValue)}//onValueChange(newValue)
+                        }
+                        />
+                    <CustomText>
+                        Mostrar contraseña
+                    </CustomText>
+                </View>
             </View>
 
             <TouchableOpacity style={localStyles.loginButton}
@@ -162,7 +176,7 @@ export const LoginScreen = () => {
             }}
                 >
                     <CustomText style={localStyles.loginButtonText}>
-                        Iniciar sesión
+                        Ingresar ahora
                     </CustomText>
             </TouchableOpacity> 
             
@@ -183,34 +197,42 @@ const localStyles= StyleSheet.create({
         justifyContent:'center',
         alignItems:'center',
     },
-    inputsContainer:{
+    imageLogin:{
+        height: windowHeight*0.3, 
+        width: windowHeight*0.3, 
+        resizeMode:'contain',
+        borderRadius:25
     },
+    inputsContainer:{marginBottom:windowWidth*0.08},
     tittleText:{
         fontSize:35, 
-        textAlign:'center'
+        textAlign:'center',
+        marginBottom:windowWidth*0.05
     },
     inputText:{
         height: windowHeight*0.055,
-        width:windowWidth*0.5,
+        width:windowWidth*0.55,
         margin: 6,
-        borderWidth: 2,
-        padding: 10,
-        //paddingHorizontal:50,
+        borderBottomColor:'black',
+        borderBottomWidth:1,
+        paddingTop: 6,
+        paddingBottom: 12,
         color:'black',
         borderRadius:8,
-        borderColor:'rgba(0,0,0,0.5)',
-        textAlign:'center'
+        textAlign:'center',
+        fontSize:16,
     },
     loginButton:{
-        borderRadius:10,
-        paddingVertical:windowHeight*0.009,
-        height: windowHeight*0.055,
-        width:windowWidth*0.42,
+        borderRadius:60,
+        paddingVertical:15,
+        height: windowHeight*0.065,
+        width:windowWidth*0.40,
         backgroundColor:globalStyles.mainButtonColor.color,
-        textAlign:'center'
+        textAlign:'center',
+        justifyContent:'center'
     },
     loginButtonText:{
-        fontSize:20, 
+        fontSize:14, 
         color:globalStyles.mainButtonColor.text, 
         textAlign:'center'
     },

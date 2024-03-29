@@ -56,7 +56,7 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                     {
                         ticketByID.firma?
                         <Image  source={{uri: "data:image/png;base64,"+ticketByID.firma } }
-                                                  style={localStyles.signImage}/>
+                                style={localStyles.signImage}/>
                         :null
                     }
                 </View>
@@ -112,16 +112,19 @@ const localStyles = StyleSheet.create({
         height:windowHeight*0.21,
         backgroundColor:'rgba('+globalStyles.colors.primaryRGB+',0.1)',
         borderRadius:4,
+        
     },
     ticketItemsContainer:{
         flexDirection:'row',
         height:windowHeight*0.15,
+        justifyContent:'center',
 
     },
     itemsColumns:{
         flexDirection:'column',
-        marginHorizontal:windowWidth*0.02,
+        marginRight:windowWidth*0.008,
         marginVertical:windowHeight*0.01,
+
         
     },
     imageContainer:{
@@ -131,7 +134,9 @@ const localStyles = StyleSheet.create({
             height:windowHeight*0.13,
             marginRight:windowWidth*0.02,
             marginVertical:windowHeight*0.01,
-            borderRadius:4
+            borderRadius:4,
+            justifyContent:'center',
+            alignItems:'center'
          },
     btnContainer:{
         flexDirection:'row',

@@ -13,21 +13,17 @@ import { useMaterialQty, MaterialQty } from '../hooks/useMaterialQty';
 import { CustomCheckBox } from '../components/CustomCheckBox';
 import { SaveTicketModal } from '../components/SaveTicketModal';
 import { SignAndSaveModal } from '../components/SignAndSaveModal';
-import { useFocusEffect, useNavigation } from '@react-navigation/core';
-import { StackActions } from '@react-navigation/native';
+import { useNavigation } from '@react-navigation/core';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useTicket } from '../hooks/useTicket';
 import { dateFormated } from '../data/dateFormated';
 import { AuthContext } from '../context/AuthContext';
 import { TicketAssignDetail } from '../components/TicketAssignDetail';
 import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
-import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
 import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
-import { postTicketsToDB, requestAndSaveClients, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveTickets, requestAndSaveVehicles, requestAndSaveCompanies } from '../api/operationsToDB';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RootDrawerParams } from '../navigation/MainDrawerNavigator';
 import { UpdateTicketsOnDB } from '../data/UpdateTicketsOnDB';
-import { scale } from '@shopify/react-native-skia';
 
 
 
@@ -38,12 +34,12 @@ const windowHeight = Dimensions.get('window').height;
 
 interface Props extends DrawerScreenProps<RootDrawerParams,'UpdateTicketScreen'>{}
 
-export const UpdateTicketScreen = () => {
+export const UpdateTicketScreen = ({route}:Props) => {
   const {authState} = useContext(AuthContext)
   const [nextRow, setNextRow] = useState(0);
   const {date}=useDate();
  
- 
+  
   //ticket Data
   const{ticket,
     setPropertyOnTicket,

@@ -90,6 +90,7 @@ export const NewTicketScreen = () => {
 
  }
   useEffect(() => {
+    console.log(JSON.stringify(authState))
     getLastRowTickets().then(
       (res)=>{
         setNextRow(res)
