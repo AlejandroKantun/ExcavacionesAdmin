@@ -86,8 +86,8 @@ const createTables = async (query?:keyof typeof QuerySentences) =>
         
 
     /* Create tables */
-export const createDatabaseStructure = () => {
-    createTables().then(
+export const createDatabaseStructure = async() => {
+    await createTables().then(
             ()=>storeDBCreated()
     );
 }

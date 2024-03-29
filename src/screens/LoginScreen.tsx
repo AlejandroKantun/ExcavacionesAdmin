@@ -91,31 +91,35 @@ export const LoginScreen = () => {
         }else{
             //If there is no connection to internet
             const loginResult:loginResult = await getUserLogin(user,pass);
+            console.info(JSON.stringify(loginResult))
+
             if (!loginResult.authorized )
             setIsVisible(true)
             else if(loginResult.authorized ) {
-                if(loginResult.path=='MainDrawerNavigator'){
+                if(loginResult.path=='RefreshDataFromDatabase'){
                     signIn();
                     changeUserName(user);
-                    //changeUserID(Number(loginResult.userID));
-                    changeZoneID(Number(loginResult.zoneID));
                     getEmpresaIDwithUserID(user).then(
                         (res)=>
                         {
                             changeEmpresaID(Number(res[0]["empresaID"]))
                             changeUserID(Number(res[0]["usuarioID"]))
                             changeZoneID(Number(res[0]["bancoID"]))
-
+                            navigation.navigate("RefreshDataFromDatabase" as never)
                         }
+
+
                         )
-                    navigation.navigate("ChangePasswordScreen" as never)
                     } 
                 else{
+                    
                     navigation.navigate(loginResult.path as never,{
                         userId:loginResult.userID,
                         userName:user,
                         pass:pass,
                     } as never)
+                    
+                    
                     }
             }
         }

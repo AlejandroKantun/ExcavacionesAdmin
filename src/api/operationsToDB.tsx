@@ -1326,7 +1326,7 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
                                 tx.executeSql(insertUserSentence, [
                                     ususariosFromAPI[i].usuarioID,
                                     ususariosFromAPI[i].usuario,
-                                    ususariosFromAPI[i].contrasena,
+                                    ususariosFromAPI[i].password,
                                     ususariosFromAPI[i].AuthKey,
                                     ususariosFromAPI[i].fechaGeneracionAuthKey,
                                     ususariosFromAPI[i].nombreUsuario,
@@ -1378,7 +1378,7 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
                             async(tx)=>{
                                 tx.executeSql(updateUserSentence, [
                                     ususariosFromAPI[i].usuario,
-                                    ususariosFromAPI[i].contrasena,
+                                    ususariosFromAPI[i].password,
                                     ususariosFromAPI[i].AuthKey,
                                     ususariosFromAPI[i].fechaGeneracionAuthKey,
                                     ususariosFromAPI[i].nombreUsuario,
@@ -1411,16 +1411,13 @@ export const requestAndSaveUsers =async (token:string,deviceId?:string)=>{
                 
             } 
             console.log('Summary of transaction: ' + msgToReport + "transaction No: "  +JSON.stringify(response.data.transaccionID)) ;
-            /*
+            
             postSetCodyData(token,
                             response.data.transaccionID.toString(),
                             'usuarios',
                             globalSettings.setCodyDataResult.success.toString(),
                             msgToReport,
-                            deviceId?deviceId:'2')
-             */
-                        
-            
+                            deviceId?deviceId:'2')                    
             
         }
         
@@ -1858,5 +1855,25 @@ export const requestAndZonesCompanies =async (token:string,deviceId?:string)=>{
                                                            
         }
     }
+
+}
+
+export const requestResetDeviceID=async (appUniqueID:string)=>{
+    const date = dateFormated();
+    const excavacionesDB = axios.create({
+        baseURL: globalSettings.Api.devEndPoint,
+        params:{
+            appUniqueID:appUniqueID,
+        }
+     });
+     
+    
+    
+    const response = await excavacionesDB.post('/codyreset'
+    )
+    .then((res)=>{
+        console.info('Notification to setcodyReset: ' + JSON.stringify(res.data))
+
+    }).catch((error)=>{console.log(JSON.stringify(error))})
 
 }

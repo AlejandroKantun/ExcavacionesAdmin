@@ -6,6 +6,8 @@ import EncryptedStorage from 'react-native-encrypted-storage';
 import { useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
 import { createDatabaseStructure } from '../data/dbStructure';
+import { requestResetDeviceID } from '../api/operationsToDB';
+import DeviceInfo from 'react-native-device-info';
 
 const userSession='UserSession'
 const dbCreatedSession ='dbCreatedSession';
@@ -33,7 +35,7 @@ export const SplashScreen = () => {
         }
     }
 
-    async function getIsDBCreated (){
+    async function getIsDBCreated (appUniqueID:string){
         await EncryptedStorage.getItem(dbCreatedSession).then(
         result=>{
           if(result !=null){
@@ -42,19 +44,25 @@ export const SplashScreen = () => {
               }
           }
           else{
-            createDatabaseStructure();
+            createDatabaseStructure().then(()=>{
+                requestResetDeviceID(appUniqueID)
+            })
            }
         }
        );
  }
     
     useEffect(() => {
-        getIsDBCreated() 
-        validateSession();
-        setTimeout(() => {
-        setAnimating(false);
-       
-        }, 5000);
+        DeviceInfo.getUniqueId().then((result)=>{
+            getIsDBCreated(result) 
+                    validateSession();
+                    setTimeout(() => {
+                    setAnimating(false);
+                
+                    }, 5000);
+        });
+
+        
     }, []);
     return (
     <View

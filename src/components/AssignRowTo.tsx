@@ -71,7 +71,8 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           maxHeight={400}
                                           labelField="nombreEmpresa"
                                           valueField="empresaID"
-                                          placeholder={!isFocus ? '' : ''}
+                                          placeholder={!isFocus ? 'Selecciona' : ''}
+                                        
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Empresa) => <View style={localStyles.renderItemContainer}><CustomText> {item.empresaID} - {item.nombreEmpresa}</CustomText></View>}
@@ -100,7 +101,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           maxHeight={400}
                                           labelField="nombreCliente"
                                           valueField="clienteID"
-                                          placeholder={!isFocus ? '' : ''}
+                                          placeholder={!isFocus ? 'Selecciona' : ''}
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Cliente) => <View style={localStyles.renderItemContainer}>
@@ -130,7 +131,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           maxHeight={400}
                                           labelField="nombreDestino"
                                           valueField="nombreDestino"
-                                          placeholder={!isFocus ? '' : ''}
+                                          placeholder={!isFocus ? 'Selecciona' : ''}
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Destino) => <View style={localStyles.renderItemContainer} ><CustomText > {item.nombreDestino} - {item.direccionDestino}</CustomText></View>}
@@ -158,7 +159,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           maxHeight={400}
                                           labelField="tipoUnidad"
                                           valueField="vehiculoID"
-                                          placeholder={!isFocus ? '' : ''}
+                                          placeholder={!isFocus ? 'Selecciona' : ''}
                                           searchPlaceholder=""
                                           onBlur={() => setIsFocus(false)}
                                           renderItem={ (item:Vehiculo) =>
