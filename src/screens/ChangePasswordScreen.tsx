@@ -37,11 +37,14 @@ export const ChangePasswordScreen = ({route}:Props) => {
     const [showConfirmPass, setShowConfirmPass] = useState(false)
 
 const submitChangeRequest=async(newPassValidated:string)=>{
+              
+
     const  changeResult:changePassResult = await ChangePassWordRequest(
             users[0].usuarioID.toString(),
             newPassValidated,
             authState.token!,
             deviceId);
+       
     if (changeResult.success){
         setIsVisible(true);
         //storing user for next login
@@ -87,12 +90,14 @@ useEffect( () => {
     
    }, [authState.userName])
   return (
-    <View style={localStyles.mainCointainer}>
-        <HeaderSearchTicket
+      <View style={localStyles.totalContainer}>
+          <HeaderSearchTicket
         title={'Cambiar Contraseña'}
         />
+        <View style={localStyles.mainCointainer}>
+        
         <View style={localStyles.itemsContainer}>
-            
+                
                 <Formik
                         initialValues={{ password:'' , confirmPassword:''}}
                         validationSchema={changePasswordSchema}
@@ -104,7 +109,9 @@ useEffect( () => {
                         {({ handleChange, handleBlur, handleSubmit, values,errors, }) => (
                             
                         <View style={{flexDirection:'column'}}>
-                            <View style={localStyles.textInputcontainer}>                  
+                            
+                            <View style={localStyles.textInputcontainer}>
+                                            
                                 <TextInput
                                     placeholder="Ingrese nueva contraseña"
                                     placeholderTextColor='rgba(0,0,0,0.5)'
@@ -202,29 +209,37 @@ useEffect( () => {
         <SavePassModal visible={isVisible} setIsVisible={setIsVisible}/>
         
     </View>
+      </View>
+    
     
   )
 }
 
 const localStyles = StyleSheet.create({
+    totalContainer:{
+        flex:1
+    },
     mainCointainer:{
-        flex:1,
-        //justifyContent:'center',
+        justifyContent:'center',
         alignContent:'center',
+        flex:1,
     },
 
     itemsContainer:{
         alignItems:'center',
         justifyContent:'center',
-        height:windowHeight*0.8,
-        borderRadius:15,
+        borderRadius:30,
+        borderWidth:1,
+        borderColor:globalStyles.colors.borderColor,
+        paddingVertical:windowHeight*0.05,
+        width:windowWidth*0.95,
+        alignSelf:'center'
     },
     submitReplaceButton:{
         borderRadius:15,
         paddingVertical:windowHeight*0.012,
         paddingHorizontal:windowWidth*0.08,
         marginHorizontal:windowWidth*0.03,
-        marginBottom:windowHeight*0,
         backgroundColor:globalStyles.mainButtonColor.color,
         textAlign:'center'
     },

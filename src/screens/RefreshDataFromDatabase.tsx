@@ -7,7 +7,7 @@ import globalStyles from '../theme/appTheme';
 import {useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
-
+import BackgroundFetch from "react-native-background-fetch";
 
 export const RefreshDataFromDatabase = () => {
     const {authState} = useContext(AuthContext)
@@ -16,6 +16,31 @@ export const RefreshDataFromDatabase = () => {
 
 
     const { isConnected } = useNetInfo();
+
+    const initBackgroundFetch = async () => {
+      console.log('[BackgroundFetch] starting... ', );        
+
+      const status:number = await BackgroundFetch.configure({minimumFetchInterval: 20}, 
+      async (taskId:string) => {
+        console.log('[BackgroundFetch] taskId', taskId);        
+        recurrentTaskTorefreshItems();
+
+      }, (taskId:string) => {
+        // Oh No!  Our task took too long to complete and the OS has signalled
+        // that this task must be finished immediately.
+        console.log('[Fetch] TIMEOUT taskId:', taskId);
+        BackgroundFetch.finish(taskId);
+      });
+      
+    }
+
+    useEffect(() => {  
+      initBackgroundFetch().then(()=>{
+        BackgroundFetch.start();
+      });
+     
+    }, )
+    
     useEffect(() => {
       if (isConnected === null) {
         console.log('refreshing...')
@@ -33,9 +58,7 @@ export const RefreshDataFromDatabase = () => {
                 });
             } catch (error) {
                 console.log('FAIL refresh')
-
                     navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
-
             }
             
         }
@@ -47,7 +70,15 @@ export const RefreshDataFromDatabase = () => {
       }
     }, [isConnected]);
 
-    console.log('isConnected ', isConnected);
+
+    const recurrentTaskTorefreshItems=async()=>{
+      try {
+        console.log('Posting tickets in refreshing mode');
+        await postTicketsToDB(authState.empresaID!,authState.token!,authState.appUniqueID!)
+      } catch (error) {
+          console.log('Fail refresh')
+      }
+    }
 
     const refreshAllTables=async()=>{
             console.log('Posting tickets');
@@ -79,6 +110,8 @@ export const RefreshDataFromDatabase = () => {
     <View style={{justifyContent:'center', alignItems:'center', flex:1}}>
         <CustomText style={{fontSize:25}}> Sincronizando datos</CustomText>
         <ActivityIndicator size={40} color={globalStyles.colors.primary} ></ActivityIndicator>  
+       
+        
     </View>
   )
 }

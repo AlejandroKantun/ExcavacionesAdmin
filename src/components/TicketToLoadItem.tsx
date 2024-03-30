@@ -9,6 +9,7 @@ import { DeleteTicketModal } from './DeleteTicketModal';
 import { AuthContext } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
+import { dateFormated } from '../data/dateFormated';
 
 interface Props{
     ticketByID: Vale,
@@ -39,7 +40,7 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                 Numero Tolva: {ticketByID.numeroTolva?ticketByID.numeroTolva:'No disponible'}
                 </CustomText>
                 <CustomText style={localStyles.customTextStyle}>
-                fecha vale: {JSON.stringify(ticketByID?ticketByID.fechaVale:null)}
+                Fecha vale:  {ticketByID.fechaVale?ticketByID.fechaVale:null}
                 </CustomText>
                 {
                     !ticketByID?.firma?
@@ -64,7 +65,7 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                                     
                     
         </View>
-            <View style={localStyles.btnContainer}>
+        <View style={localStyles.btnContainer}>
                     {
                         !ticketByID?.firma?
                         <TouchableOpacity 
@@ -86,11 +87,32 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
 
 
                         }}>
-                        <Icon style={{marginTop:3, paddingRight:10}} name="arrow-up-circle-outline" size={windowHeight*0.028} color="#fff" />
-                        <CustomText style={{color:'#fff'}} >Cargar</CustomText>
+                        <Icon style={{marginTop:3, paddingRight:10}} 
+                        name={ticketByID?.firma?'eye-outline':'pencil-outline'}
+                        size={windowHeight*0.028} color="#fff" />
+                        <CustomText style={{color:'#fff'}} >
+                            {!ticketByID?.firma?'Editar':'Ver'}
+                        </CustomText>
                     </TouchableOpacity>
-                </View>           
+                </View>
+                <View style={localStyles.isLoadContainer}>
+                    <CustomText>
+                        Enviado:
+                    </CustomText>
+                    <Icon 
+                        style={{marginTop:3, paddingRight:10}} 
+                        name={ticketByID.EnviadoABaseDeDatosCentral?
+                            "cloud-done-outline"
+                            :"close-circle-outline"} 
+                        size={windowHeight*0.03} 
+                        color={
+                                ticketByID.EnviadoABaseDeDatosCentral?
+                                globalStyles.colors.primary
+                                :globalStyles.colors.dangerShadow} />
+ 
+                </View>     
         </View>
+          
         <DeleteTicketModal
          setIsVisible={setIsVisible}
          visible={visible}   
@@ -109,7 +131,7 @@ const localStyles = StyleSheet.create({
     },
     ticketToLoadContainer:{
         width:windowWidth*0.9,
-        height:windowHeight*0.21,
+        height:windowHeight*0.227,
         backgroundColor:'rgba('+globalStyles.colors.primaryRGB+',0.1)',
         borderRadius:4,
         
@@ -177,5 +199,15 @@ const localStyles = StyleSheet.create({
           height: windowHeight*0.13, 
           width: windowHeight*0.13, 
           resizeMode:'contain'},
-    customTextStyle:{fontSize:windowHeight*0.019}
+    customTextStyle:{
+        fontSize:windowHeight*0.019
+    },
+    isLoadContainer:{
+        flexDirection:'row',
+        alignSelf:'flex-end',
+        alignItems:'center',
+        justifyContent:'center',
+        marginRight:windowWidth*0.02,
+        marginTop:windowHeight*0.045
+    }
 });

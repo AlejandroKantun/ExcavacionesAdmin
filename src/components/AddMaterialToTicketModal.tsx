@@ -109,9 +109,8 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             <TextInput 
                             style={localStyles.textInputTon}
                             keyboardType='numeric'
-                            defaultValue={materialM3.toString()}
                             placeholderTextColor='rgba(0,0,0,0.6)'
-                            placeholder='Cantidad'
+                            placeholder='m3'
                             onChangeText={(Text)=>{
                                 if (Number(Text)>0){
                                     setMaterialM3(Number(Text))
@@ -144,7 +143,6 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     maxLength={30}
                                     placeholderTextColor='rgba(0,0,0,0.5)'
                                     keyboardType='numeric'
-                                    defaultValue={newImport.toString()}
                                     onChangeText={(text)=>{
                                         setImportUpdated(true)
                                         if(typeof(Number(text))=='number'){
@@ -173,7 +171,9 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             <TouchableOpacity 
                             style={localStyles.btnCancel}
                             onPress={()=>{
-                                setIsVisible(false)
+                                setMaterialM3(0);
+                                setIsVisible(false);
+                                setNewImport(0)
                             }}>
                             <Icon style={{marginTop:3, paddingRight:10}} name="close-outline" size={windowWidth*0.055} color="#fff" />
                             <CustomText style={{color:'#fff'}} >Cancelar</CustomText>

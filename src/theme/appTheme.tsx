@@ -16,6 +16,7 @@ const globalStyles = {
         shadowBtn:'#ededed',
         ambar:'#ffbf00',
         dangerShadow:'rgba(242, 89, 97,0.5)',
+        borderColor:'rgb(216, 216, 216)'
     },
     fontSizes:{
         body:14,

@@ -133,7 +133,7 @@ export const LoginScreen = () => {
     
   return (
     <View style={localStyles.mainContainer}>
-        <View style={localStyles.mainContainer}>
+        <View style={localStyles.itemsContainer}>
             <CustomText style={localStyles.tittleText}>
                 Sistema {'\n' }Administrativo
             </CustomText>
@@ -200,6 +200,15 @@ const localStyles= StyleSheet.create({
         flex:1,
         justifyContent:'center',
         alignItems:'center',
+    },
+    itemsContainer:{
+        justifyContent:'center',
+        alignItems:'center',
+        paddingVertical:windowHeight*0.125,
+        paddingHorizontal:windowWidth*0.15,
+        borderRadius:30,
+        borderWidth:1,
+        borderColor:globalStyles.colors.borderColor
     },
     imageLogin:{
         height: windowHeight*0.3, 
