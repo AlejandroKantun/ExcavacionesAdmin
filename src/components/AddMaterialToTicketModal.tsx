@@ -143,6 +143,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                     maxLength={30}
                                     placeholderTextColor='rgba(0,0,0,0.5)'
                                     keyboardType='numeric'
+                                    value={newImport.toString()}
                                     onChangeText={(text)=>{
                                         setImportUpdated(true)
                                         if(typeof(Number(text))=='number'){
