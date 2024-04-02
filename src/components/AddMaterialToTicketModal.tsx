@@ -184,8 +184,8 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                             onPress={()=>{
                                 let alertMessageAux=''
                                 //VALIDATION
-                                if((value==1 && materialName.toString.length==0)||(materialM3<1)||(newImport<1)){
-                                    if (value==1 && materialName.toString.length==0){alertMessageAux=alertMessageAux+'\n'+'- Nombre Material (Otro) es requerido'}
+                                if((value==1 && materialName.length===0)||(materialM3<1)||(newImport<1)){
+                                    if (value==1 && materialName.length===0){alertMessageAux=alertMessageAux+'\n'+'- Nombre Material (Otro) es requerido'}
                                     if (materialM3==0){alertMessageAux=alertMessageAux+'\n'+'- Agregar cantidad'}
                                     if (newImport==0){alertMessageAux=alertMessageAux+'\n'+'- Agregar importe'}
 

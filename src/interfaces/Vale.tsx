@@ -1,3 +1,4 @@
+import { number } from 'yup';
 
 export interface valessResponse {
     "0":           Vale[];
@@ -32,7 +33,7 @@ export interface Vale {
     numeroValeTriturador:       string;
     placa:                      string;
     choferNombre:               string|null;
-    choferID:                   string|null;
+    choferID:                   number|null;
     observaciones:              string;
     vehiculoID:                 number;
     folioDigital:               string;

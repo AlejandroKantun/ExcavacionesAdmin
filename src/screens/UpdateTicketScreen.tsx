@@ -24,6 +24,8 @@ import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
 import { DrawerScreenProps } from '@react-navigation/drawer';
 import { RootDrawerParams } from '../navigation/MainDrawerNavigator';
 import { UpdateTicketsOnDB } from '../data/UpdateTicketsOnDB';
+import { AddChofer } from '../components/AddChofer';
+import { useDriversDB } from '../hooks/useDriversDB';
 
 
 
@@ -47,6 +49,8 @@ export const UpdateTicketScreen = ({route}:Props) => {
     setPlacaNoTolvaNoTriturador
     }=useTicket(//authState.ticket
       )
+    const{drivers,getDriversWithVehicleID}=useDriversDB()
+
 
   const {materialsQty,
         addMaterialsQty,
@@ -118,6 +122,8 @@ export const UpdateTicketScreen = ({route}:Props) => {
           setNoTolva={setNoTolva}
           FolioFisico={ticket.folioFisico}
           setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
+          getDriversWithVehicleID={getDriversWithVehicleID}
+
           
         />
           <View>
@@ -236,6 +242,12 @@ export const UpdateTicketScreen = ({route}:Props) => {
                   <CustomText> {authState.userName} </CustomText>
                 </View>
               </View>
+              <AddChofer
+              data={drivers}
+              label={'Chofer'}
+              setPropertyOnTicket={setPropertyOnTicket}
+              ticket={ticket}
+              />
               <View style={localStyles.PayInfoRow}>
                       <TextInput style={localStyles.textInpuComments}
                         editable={ticket.firma?false:true}

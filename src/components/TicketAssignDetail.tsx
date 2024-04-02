@@ -1,5 +1,5 @@
 import React, { useContext, useEffect } from 'react'
-import { Dimensions, StyleSheet, TextInput, View } from 'react-native'
+import { Alert, Dimensions, StyleSheet, TextInput, View } from 'react-native'
 import CustomText from './CustomText';
 import { AssignRowTo } from '../components/AssignRowTo';
 import globalStyles from '../theme/appTheme';
@@ -10,6 +10,9 @@ import { useVehiclesDB } from '../hooks/useVehicles';
 import { useClientsDB } from '../hooks/useClientsDB';
 import { useDestinationsDB } from '../hooks/useDestinations';
 import { useVehiclesByVehicleID } from '../hooks/useVehiclesByVehicleID';
+import { useFocusEffect } from '@react-navigation/core';
+import { Destino } from '../interfaces/destino';
+import { Empresa } from '../interfaces/empresa';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -23,6 +26,7 @@ interface Props{
     noTolva:string | null | undefined,
     setNoTolva: React.Dispatch<React.SetStateAction<string | null | undefined>>,
     FolioFisico:string,
+    getDriversWithVehicleID: (vehicleID?: number | undefined) => Promise<void>,
     setPlacaNoTolvaNoTriturador: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string, ticket?:Vale) => void,
 }
 export const TicketAssignDetail = ({
@@ -31,15 +35,52 @@ export const TicketAssignDetail = ({
                                     placa,
                                     setPlaca,
                                     noTolva,
-                                    setPlacaNoTolvaNoTriturador
+                                    setPlacaNoTolvaNoTriturador,
+                                    getDriversWithVehicleID
                                   }:Props) => {
     const {authState} = useContext(AuthContext)
-    const{companies}=useCompaniesDB()
-    const{vehicles}=useVehiclesDB()
-    const{clients}=useClientsDB()
-    const{destinations}=useDestinationsDB()
-    const{vehicles:vehiclesById,getVehicles}=useVehiclesByVehicleID()
+    const{companies,getCompanies}=useCompaniesDB()
+    const{vehicles,getVehiclesWithEmpresaID}=useVehiclesDB()
+    const{clients,getClientsWithEmpresaID}=useClientsDB()
+    const{destinations,getDestinationsWithClientID}=useDestinationsDB()
+    const{vehicles:vehiclesById,getVehicles,}=useVehiclesByVehicleID()
   
+   
+    useFocusEffect(
+      React.useCallback(() => {
+        getCompanies().then(()=>{
+         
+        })
+            
+      }, [])
+
+      
+    );
+    useEffect(() => {
+      if (ticket.empresaID){getClientsWithEmpresaID(ticket.empresaID);
+        getVehiclesWithEmpresaID(ticket.empresaID);}
+    }, [companies])
+    
+    
+
+    useEffect(() => {
+          if (ticket.clienteID){getDestinationsWithClientID(ticket.clienteID)}
+
+    }, [clients])
+
+    useEffect(() => {
+          if (ticket.vehiculoID){getDriversWithVehicleID(ticket.vehiculoID)}
+    }, [vehicles])
+
+    useEffect(() => {
+      console.log(JSON.stringify(destinations.find((element:Destino)=>{ return element.destinoID===ticket.destinoID})))
+      if (!destinations.find((element:Destino)=>{ return element.destinoID===ticket.destinoID})){
+        getClientsWithEmpresaID(ticket.empresaID);
+
+            }
+            
+    }, [destinations])
+    
    
     
   return (
@@ -67,7 +108,9 @@ export const TicketAssignDetail = ({
                 label='Asignado a' 
                 assignTo='empresa' 
                 data={companies} 
-                setPropertyOnTicket={setPropertyOnTicket} 
+                setPropertyOnTicket={setPropertyOnTicket}
+                getVehiclesWithEmpresaID={getVehiclesWithEmpresaID} 
+                getClientsWithEmpresaID={getClientsWithEmpresaID}
                 ticket={ticket} />
           {ticket.empresaID==1?
           <View>  
@@ -85,7 +128,8 @@ export const TicketAssignDetail = ({
               label='Cliente' 
               assignTo='cliente' 
               data={clients} 
-              setPropertyOnTicket={setPropertyOnTicket} 
+              setPropertyOnTicket={setPropertyOnTicket}
+              getDestinationsWithClientID={getDestinationsWithClientID} 
               ticket={ticket}/>
           {ticket.clienteID==1?
           <View>  
@@ -119,7 +163,8 @@ export const TicketAssignDetail = ({
                       data={vehicles} 
                       setPropertyOnTicket={setPropertyOnTicket} 
                       ticket={ticket}
-                      getVehicles={getVehicles} vehicleById={vehiclesById}/>
+                      getVehicles={getVehicles} 
+                      getDriversWithVehicleID={getDriversWithVehicleID}/>
           {ticket.vehiculoID==1?
           <View>  
             <TextInput style={localStyles.textInputDataHeader}

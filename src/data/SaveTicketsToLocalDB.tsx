@@ -42,8 +42,11 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
     "numeroTolva, "+
     "fechaSalidaVehiculo, "+
     "folioDigital, "+
-    "formadepago "+
-    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    "formadepago, "+
+    "choferID, "+
+    "choferNombre "+
+
+    " )VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"
     
     const sentToCentralDB=0;                
     let countItemsInserted=0;
@@ -83,7 +86,9 @@ export const SaveTicketsToLocalDB = async(ticket:Vale,ticketsMaterials:MaterialQ
                         ticket.numeroTolva,
                         byteCharacters?dateFormated(today):null,
                         ticket.folioDigital, 
-                        ticket.formadepago
+                        ticket.formadepago,
+                        ticket.choferID,
+                        ticket.choferNombre
                     ],
                     async (res,ResultSet)=>{
                         if (ResultSet.rowsAffected >0 ){

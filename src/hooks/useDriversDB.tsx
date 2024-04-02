@@ -32,12 +32,41 @@ const getDrivers=async ()=>{
     
 }
 
+const getDriversWithVehicleID=async (vehicleID?:number)=>{
+  let tempArray :Chofer[]=[] ;
+
+  try {
+let selectSentence="SELECT * FROM choferes WHERE estadoChofer=1 AND activoChofer=1 AND choferID=1"
+if (vehicleID){
+      selectSentence = " SELECT * FROM choferes WHERE estadoChofer=1 AND activoChofer=1 AND vehiculoID= "+vehicleID.toString() + " OR choferID=1";
+}
+     (await db).transaction((tx) => {
+       tx.executeSql(selectSentence, []).then(
+         ([tx,results]) => {
+           for (let i = 0; i <results.rows.length; i++) {
+             tempArray.push(results.rows.item(i) as Chofer)
+           }
+           setDrivers(tempArray);
+ 
+         }
+       );
+     });
+   } catch (error) {
+     console.error(error)
+     throw Error("Failed to get data from database")
+   }
+ 
+ 
+}
+
+
  useEffect(() => {
-    getDrivers();
+  getDriversWithVehicleID();
  }, [])
  
   return {
     drivers,
-    getDrivers
+    getDrivers,
+    getDriversWithVehicleID
   }
 }

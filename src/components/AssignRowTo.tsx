@@ -26,15 +26,30 @@ interface Props{
   data: any[],
   setPropertyOnTicket: (field: keyof Vale, value: any) => void,
   getVehicles?: (vehicleId: number) => Promise <Vehiculo[]>,
-  vehicleById?: Vehiculo[],
   setPlacaNoTolvaNoTriturador?: (placa: string, numerotolva: string,vehiculoID:number,tipoUnidad:string) => void,
   ticket?:Vale,
+  getClientsWithEmpresaID?: (empresaID?: number | undefined) => Promise<void>,
+  getDestinationsWithClientID?: (clienteID: number) => Promise<void>,
+  getVehiclesWithEmpresaID?: (empresaID: number) => Promise<void>,
+  getDriversWithVehicleID?: (vehicleID?: number | undefined) => Promise<void>
 }
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
-export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles,vehicleById,setPlacaNoTolvaNoTriturador,ticket}:Props ) => {
+export const AssignRowTo = ({
+    assignTo,
+    label,
+    data,
+    setPropertyOnTicket,
+    getVehicles,
+    setPlacaNoTolvaNoTriturador,
+    ticket,
+    getClientsWithEmpresaID,
+    getDestinationsWithClientID,
+    getVehiclesWithEmpresaID,
+    getDriversWithVehicleID
+  }:Props ) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const onSelectVehicle=async(vehicleID:number,)=>{
@@ -78,6 +93,8 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           renderItem={ (item:Empresa) => <View style={localStyles.renderItemContainer}><CustomText> {item.empresaID} - {item.nombreEmpresa}</CustomText></View>}
                                           onChange={item => {
                                             setPropertyOnTicket("empresaID",item.empresaID);
+                                            if(getClientsWithEmpresaID){ getClientsWithEmpresaID(item.empresaID)}
+                                            if(getVehiclesWithEmpresaID){ getVehiclesWithEmpresaID(item.empresaID)}
                                           }}
                                           
                                           renderLeftIcon={() => (
@@ -109,6 +126,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                                                          </View> }
                                           onChange={item => {
                                               setPropertyOnTicket("clienteID",item.clienteID);
+                                              if(getDestinationsWithClientID){getDestinationsWithClientID(item.clienteID)}
                                           }}
                                           renderLeftIcon={() => (
                                               <Icon style={localStyles.renderLeftIcon} 
@@ -169,6 +187,7 @@ export const AssignRowTo = ({assignTo,label,data,setPropertyOnTicket,getVehicles
                                           onChange={item => {
                                             const setting =async ()=>{
                                                     onSelectVehicle(item.vehiculoID);   
+                                                    if(getDriversWithVehicleID){getDriversWithVehicleID(item.vehiculoID)}
                                             } 
                                             setting()
 

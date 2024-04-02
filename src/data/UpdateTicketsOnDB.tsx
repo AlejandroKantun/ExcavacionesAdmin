@@ -31,7 +31,10 @@ export const UpdateTicketsOnDB = async(ticket:Vale,ticketsMaterials:MaterialQty[
     "firma=?, "+
     "importe=?, "+
     "numeroTolva=?, "+
-    "fechaSalidaVehiculo=? "+
+    "fechaSalidaVehiculo=?, "+
+    "choferID=?, "+
+    "choferNombre=? "+
+
     " WHERE valeID=?"
     
     const sentToCentralDB=0;                
@@ -62,6 +65,8 @@ export const UpdateTicketsOnDB = async(ticket:Vale,ticketsMaterials:MaterialQty[
                         ticket.Importe,
                         ticket.numeroTolva,
                         byteCharacters?dateFormated(today):null,
+                        ticket.choferID,
+                        ticket.choferNombre,
                         ticket.valeID, 
                     ],
                     async (res,ResultSet)=>{

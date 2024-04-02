@@ -26,6 +26,8 @@ import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 import { SaveTicketsToLocalDB } from '../data/SaveTicketsToLocalDB';
 import { ProcessSuccessModal } from '../components/ProcessSuccessModal';
 import { WarningModal } from '../components/WarningModal';
+import { AddChofer } from '../components/AddChofer';
+import { useDriversDB } from '../hooks/useDriversDB';
 
 
 
@@ -50,6 +52,7 @@ export const NewTicketScreen = () => {
         addMaterialsQty,
         removeMaterialsQty,
         subtotal} =useMaterialQty(MateriasInTicket,setPropertyOnTicket)
+  const{drivers,getDriversWithVehicleID}=useDriversDB()
 
   //Modals states 
   const [datePickerModalStartVisible, setDatePickerModalStartVisible] = useState(false)
@@ -129,6 +132,7 @@ export const NewTicketScreen = () => {
           setNoTolva={setNoTolva}
           FolioFisico={ticket.folioFisico}
           setPlacaNoTolvaNoTriturador={setPlacaNoTolvaNoTriturador}
+          getDriversWithVehicleID={getDriversWithVehicleID}
         />
           <View>
             <View style={localStyles.headerMaterialsToDispatch}>
@@ -216,6 +220,12 @@ export const NewTicketScreen = () => {
                   <CustomText> {authState.userName} </CustomText>
                 </View>
               </View>
+              <AddChofer
+              data={drivers}
+              label={'Chofer'}
+              setPropertyOnTicket={setPropertyOnTicket}
+              ticket={ticket}
+              />
               <View style={localStyles.PayInfoRow}>
                       <TextInput style={localStyles.textInpuComments}
                         multiline={true}
@@ -394,8 +404,6 @@ const localStyles = StyleSheet.create({
       alignItems:'center',
       width:windowWidth*0.35,
       height:windowHeight*0.065,
-      //paddingHorizontal:25,
-      //paddingVertical:10,
       borderRadius:4,
     },
     datePickerBtn:{
@@ -404,7 +412,6 @@ const localStyles = StyleSheet.create({
       borderRadius:2,
       paddingVertical:6,
       paddingHorizontal:10, 
-      //backgroundColor:globalStyles.colors.shadowBtn
     },
     AmountTextInput:{
       paddingHorizontal:35, 

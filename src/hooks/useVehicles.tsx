@@ -1,6 +1,7 @@
 import {useEffect, useState } from 'react'
 import { connectToDatabase } from '../data/dbStructure';
 import { Vehiculo } from '../interfaces/vehiculo';
+import { number } from 'yup';
 
 const db = connectToDatabase();
 
@@ -32,12 +33,40 @@ const getVehicles=async ()=>{
     
 }
 
+const getVehiclesWithEmpresaID=async (empresaID?:number)=>{
+  let tempArray :Vehiculo[]=[] ;
+
+  try {
+    let selectSentence="SELECT * FROM vehiculos WHERE estadoVehiculo=1 AND activoVehiculo=1 AND vehiculoID=1"
+    if (empresaID){
+          selectSentence = "SELECT * FROM vehiculos WHERE estadoVehiculo=1 AND activoVehiculo=1 AND empresaID = "+empresaID.toString();
+    }
+     (await db).transaction((tx) => {
+       tx.executeSql(selectSentence, []).then(
+         ([tx,results]) => {
+           for (let i = 0; i <results.rows.length; i++) {
+             tempArray.push(results.rows.item(i) as Vehiculo)
+           }
+           setVehicles(tempArray);
+ 
+         }
+       );
+     });
+   } catch (error) {
+     console.error(error)
+     throw Error("Failed to get data from database")
+   }
+ 
+ 
+}
+
  useEffect(() => {
-    getVehicles();
+  getVehiclesWithEmpresaID();
  }, [])
  
   return {
     vehicles,
-    getVehicles
+    getVehicles,
+    getVehiclesWithEmpresaID
   }
 }

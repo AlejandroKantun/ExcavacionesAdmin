@@ -9,9 +9,10 @@ export const useCompaniesDB = () => {
  const [companies, setCompanies] = useState<Empresa[]>(
      []
  )
- let tempArray :Empresa[]=[] ;
 
 const getCompanies=async ()=>{
+  let tempArray :Empresa[]=[] ;
+
      try {
    
         (await db).transaction((tx) => {
@@ -34,7 +35,7 @@ const getCompanies=async ()=>{
 }
 
  useEffect(() => {
-  getCompanies();
+  //getCompanies();
  }, [])
  
   return {

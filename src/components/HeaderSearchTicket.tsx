@@ -50,24 +50,38 @@ export const HeaderSearchTicket = ({title}:Props) => {
         <CustomText style={{color:'#fff'}}>Regresar</CustomText>
       </TouchableOpacity>
       }
-     {
+        {
         title=='Nuevo Vale'?
-        <CustomText style={localStyles.headerText} >
-        {title}
-        </CustomText>
+        <View style={localStyles.headerTextContainer}>
+          <CustomText style={localStyles.headerText} >
+          {title}
+          </CustomText>
+        </View>
+
+        
         :title==='Cambiar Contraseña'?
-        <CustomText style={localStyles.headerText} >
+        <View style={localStyles.headerTextNewPassContainer}>
+          <CustomText style={localStyles.headerTextNewPass} >
           Nueva Contraseña 
         </CustomText>
+        </View>
+        
          :title==='Editar Vale'?
-         <CustomText style={localStyles.headerText} >
-           Editar Vale
-         </CustomText>
+         <View style={localStyles.headerTextContainer}>
+           <CustomText style={localStyles.headerText} >
+            Editar Vale
+          </CustomText>
+        </View>
+         
         :
-        <CustomText style={localStyles.headerText} >
-          Buscar Vale  
-        </CustomText>
-      }
+        <View style={localStyles.headerTextContainer}>
+            <CustomText style={localStyles.headerText} >
+            Buscar Vale  
+          </CustomText>
+        </View>
+        
+        }
+     
 
       {
 
@@ -77,7 +91,7 @@ export const HeaderSearchTicket = ({title}:Props) => {
         onPress={()=>{
           logOutHandler()
         }}>
-        <Icon  name="log-out-outline" size={windowWidth*0.06} color="#fff" />
+        <Icon  name="log-out-outline" size={windowWidth*0.055} color="#fff" />
         <CustomText style={{color:'#fff'}}>Salir</CustomText>
         </TouchableOpacity>
       :null
@@ -99,7 +113,7 @@ const localStyles = StyleSheet.create({
         backgroundColor:globalStyles.colors.primary,
         flexDirection:'row',
         justifyContent:'center',
-        
+    
       },
       SearchTicketButton:{
         flex:1,
@@ -108,7 +122,7 @@ const localStyles = StyleSheet.create({
         alignSelf:'baseline',
         borderRadius:2,
         paddingVertical:6,
-        paddingHorizontal:windowWidth*0.03,
+        //paddingHorizontal:windowWidth*0.03,
         backgroundColor:globalStyles.colors.primary
       },
       logOutButton:{
@@ -116,15 +130,32 @@ const localStyles = StyleSheet.create({
         alignItems:'center',
         alignSelf:'baseline',
         borderRadius:2,
-        paddingHorizontal:windowWidth*0.11, 
         backgroundColor:globalStyles.colors.primary,
       },
       HeaderTitleText:{
         justifyContent:'center', 
-        alignItems:'center'},
+        alignItems:'center',
+        },
+        headerTextContainer:{
+          width:windowWidth*0.33,
+          justifyContent:'center',
+          alignItems:'center',
+          marginHorizontal:windowWidth*0.084,
+        },
+      headerTextNewPassContainer:{
+        width:windowWidth*0.6,
+        justifyContent:'center',
+        alignItems:'center',
+        marginHorizontal:windowWidth*0.084,
+      },
       headerText:{
-          fontSize:windowWidth*0.064,
-          marginHorizontal:windowWidth*0.01,
+          fontSize:windowWidth*0.061,
+          marginTop:- windowHeight*0.005,
+
+          color:globalStyles.colors.white
+        },
+      headerTextNewPass:{
+          fontSize:windowWidth*0.061,
           marginTop:- windowHeight*0.005,
 
           color:globalStyles.colors.white

@@ -1,6 +1,7 @@
 import {useEffect, useState } from 'react'
 import { connectToDatabase } from '../data/dbStructure';
 import { Cliente } from '../interfaces/cliente';
+import { number } from 'yup';
 
 const db = connectToDatabase();
 
@@ -32,12 +33,41 @@ const getClients=async ()=>{
     
 }
 
+const getClientsWithEmpresaID=async (empresaID?:number)=>{
+  let tempArray :Cliente[]=[] ;
+
+  try {
+    let selectSentence="SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 AND clienteID=1"
+    if (empresaID){
+          selectSentence = "SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 AND empresaID = "+empresaID.toString();
+    }
+
+     (await db).transaction((tx) => {
+       tx.executeSql(selectSentence, []).then(
+         ([tx,results]) => {
+           for (let i = 0; i <results.rows.length; i++) {
+             tempArray.push(results.rows.item(i) as Cliente)
+           }
+           setClients(tempArray);
+ 
+         }
+       );
+     });
+   } catch (error) {
+     console.error(error)
+     throw Error("Failed to get data from database")
+   }
+ 
+ 
+}
  useEffect(() => {
-    getClients();
+    //getClients();
+    getClientsWithEmpresaID();
  }, [])
  
   return {
     clients,
-    getClients
+    getClients,
+    getClientsWithEmpresaID
   }
 }

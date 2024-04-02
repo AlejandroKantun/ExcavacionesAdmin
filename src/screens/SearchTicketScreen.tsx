@@ -90,16 +90,26 @@ export const SearchTicketScreen = () => {
                       
                       </View>
                       </View>
-                      <TextInput
-                      style={localStyles.textInputTextToFilter}
-                      placeholder='Buscar por Folio, Placa ó No Tolva'
-                      placeholderTextColor='rgba(0,0,0,0.5)'
-                      onChangeText={(text)=>{
-                        setTextFilter(text)
-                      }
-                      }>
+                      <View style={localStyles.searchInputContainer}>
+                        <TouchableOpacity
+                        onPress={()=>{reloadItem()}}>
+                          <Icon style={{marginRight:windowWidth*0.001}} name="search-outline" size={windowHeight*0.025 }  color={globalStyles.colors.textLoginPlaceHolder} />
+
+                        </TouchableOpacity>
+
+                        <TextInput
+                          style={localStyles.textInputTextToFilter}
+                          placeholder='Buscar por Folio, Placa ó No Tolva'
+                          placeholderTextColor='rgba(0,0,0,0.5)'
+                          onChangeText={(text)=>{
+                            setTextFilter(text)
+                          }
+                          }>
+                          
+                        </TextInput>
+                      </View>
                         
-                      </TextInput>
+                     
                     {
                       ticketsIsloading?
                       <View>
@@ -112,7 +122,11 @@ export const SearchTicketScreen = () => {
                       :<View>
                         <View >
                             {tickets.length>0?
-                              <FlatList 
+                              <FlatList   ListHeaderComponent={ 
+                                            <View style={localStyles.headerContainer}>
+                                              <CustomText>Total: {tickets.length.toString()}</CustomText>
+                                            </View>
+                                           }
                                           ItemSeparatorComponent={ItemSeparatorTickets}
                                           data={tickets}
                                           horizontal={false}
@@ -207,22 +221,26 @@ const localStyles = StyleSheet.create({
       backgroundColor:globalStyles.colors.shadowBtn
     },
     textInputTextToFilter:{
-      width:windowWidth*0.9,
+      //width:windowWidth*0.9,
+      flex:1,
       height:windowHeight*0.055,
-      //marginTop:windowHeight*0.02,
-      marginBottom:windowHeight*0.02,
       borderColor:'#ccc',
       borderWidth:1,
       borderRadius:8, 
       marginHorizontal:5,
       color:'#000'},
 
-
-
     searchTab:{
         flexDirection:'row'
     }
     ,
+    searchInputContainer:{
+      flexDirection:'row',
+      justifyContent:'center',
+      alignItems:'center',
+      width:windowWidth*0.9,
+      marginBottom:windowHeight*0.005
+    },
     dropdown: {
         margin: 16,
         height: 50,
@@ -296,6 +314,12 @@ const localStyles = StyleSheet.create({
       noDataFoundLabel:{
         fontSize:windowHeight*0.022,
         color:globalStyles.colors.textLoginPlaceHolder
+      },
+      headerContainer:{
+        flexDirection:'row',
+        justifyContent:'flex-end',
+        paddingRight:windowWidth*0.028,
+        width:windowWidth*0.9
       }
 });
 

@@ -1082,7 +1082,7 @@ export const requestAndSaveTickets =async (token:string,deviceId?:string)=>{
 }
 
 export const postTicketsToDB= async(empresaID:number,token:string,deviceId?:string)=>{
-    const selectTicketsPendingSentence=" SELECT * FROM vales WHERE EnviadoABaseDeDatosCentral=0 "
+    const selectTicketsPendingSentence="SELECT * FROM vales WHERE EnviadoABaseDeDatosCentral=0 and fechaSalidaVehiculo IS NOT NULL"
     let ticketsPending:Vale[]=[];
     await (await db).transaction(
         async(tx)=>{
