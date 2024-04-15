@@ -1,79 +1,67 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+<img src="https://alejandrokantun.github.io/ExcavImages/MaquinaExcavadora.jpeg" width="500">
 
-# Getting Started
+# Mobile App for Android - iOS
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+<table>
+<tr>
+<td>
+  This App is a Ticket system for materials that are extracted and shipped by some companies.
+  Main features are:
+  - Online and offline login
+  - Create, Update and Delete tickets with materials, price and volumen
+  - Save and Sign material with touchable canva
+  - Autosync (if network is available) of tickets
+  - View previous tickets
+  - Search tickets by date range, No of Tolva (vehicle reference), Placa(Vehicle reference) 
+</td>
+</tr>
+</table>
 
-## Step 1: Start the Metro Server
+## Tech
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+Some technical features are:
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- React Native - Typescrpt
+- Use of hooks and customs hooks
+- Use of Context to manage data through all screens
+- Use of local database with sqlite
+- Use of async storage
+- Use of API to data transaction
+- Use of scheduled jobs to sync data with a server
+- Use of Scrowllable list and Flatlist.
+- Use of Textinputs and validation with Formik and Yup
+- Recognition of operating systems for UI element design
+- Use of community package such as checboxes, dropdown button, verifyin network connection and so on.
 
-```bash
-# using npm
-npm start
+## Demos
 
-# OR using Yarn
-yarn start
-```
+### First login and changing Password
 
-## Step 2: Start your Application
+[![](https://alejandrokantun.github.io/ExcavImages/ChangePassword.gif)](https://alejandrokantun.github.io/ExcavImages/ChangePassword.mp4)
 
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
+### Create ticket
 
-### For Android
+[Click to play](https://alejandrokantun.github.io/ExcavImages/CreateTicket.mp4)
 
-```bash
-# using npm
-npm run android
+### Filter tickets by date
 
-# OR using Yarn
-yarn android
-```
+[![](https://alejandrokantun.github.io/ExcavImages/FilterTicketsByDate.gif)](https://alejandrokantun.github.io/ExcavImages/FilterTicketsByDate.mp4)
 
-### For iOS
+### Search and delete ticket
 
-```bash
-# using npm
-npm run ios
+[![](https://alejandrokantun.github.io/ExcavImages/SearchAndDeleteTicket.gif)](https://alejandrokantun.github.io/ExcavImages/SearchAndDeleteTicket.mp4)
 
-# OR using Yarn
-yarn ios
-```
+### Screenshots
 
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
+<img src="https://alejandrokantun.github.io/ExcavImages/ScreenShoot1.png" width="400">
+<img src="https://alejandrokantun.github.io/ExcavImages/ScreenShoot2.png" width="400">
+<img src="https://alejandrokantun.github.io/ExcavImages/ScreenShoot3.png" width="400">
+<img src="https://alejandrokantun.github.io/ExcavImages/ScreenShoot4.png" width="400">
+<img src="https://alejandrokantun.github.io/ExcavImages/ScreenShoot5.png" width="400">
 
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
+### Status of the app
 
-## Step 3: Modifying your App
+This app was developed as a custom solution for a extraction company.
+Currently is in process to be deployed as a Close Test in Play Store.
 
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+Developed by [Alejandro Kantun](https://github.com/AlejandroKantun)
