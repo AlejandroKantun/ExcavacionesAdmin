@@ -16,16 +16,24 @@ export const getLastRowTickets = async() => {
 
     await (await db).transaction(
         async(tx)=>{
+            console.log('sentence to select: '+selectSentence);
             tx.executeSql(selectSentence,[
             ],
             (res,ResultSet)=>{
                 if (ResultSet.rows.length>0){
-                    //console.log('LAST ROW: '+JSON.stringify(''))
+                    console.log('LAST ROW: '+JSON.stringify(ResultSet.rows.item(0)))
                     nextRow.push(ResultSet.rows.item(0) as nextRowinterface)
+                 }
+                 else{
+                     nextRow.push({
+                        nextRow:1
+                    })
                  } 
 
             },
-            (error)=>{
+            (tx,error)=>{
+                console.log('error : '+JSON.stringify(error))
+
             }
             );
     });

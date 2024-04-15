@@ -16,7 +16,7 @@ const getCompanies=async ()=>{
      try {
    
         (await db).transaction((tx) => {
-          tx.executeSql("SELECT * FROM empresas where activoEmpresa =1 and estadoEmpresa=1", []).then(
+          tx.executeSql("SELECT * FROM empresas where activoEmpresa =1 and estadoEmpresa=1 OR empresaID=1", []).then(
             ([tx,results]) => {
               for (let i = 0; i <results.rows.length; i++) {
                 tempArray.push(results.rows.item(i) as Empresa)

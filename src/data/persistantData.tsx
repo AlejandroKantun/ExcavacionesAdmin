@@ -59,11 +59,15 @@ export async function getUserslogged() {
         async (resolve, reject) => {
 
             try {   
-
                 const session = await EncryptedStorage.getItem(dbUsersInPhone);
+                console.log('trying to extract session: ' + JSON.stringify(session))
+
                 if (session !== undefined) {
+
                     console.log(session)
                     resolve(session)
+                }else{
+                    resolve(null)
                 }
             } catch (error) {
                 console.log(error)

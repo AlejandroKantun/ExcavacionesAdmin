@@ -3,10 +3,7 @@ import { ChangePasswordScreen } from '../screens/ChangePasswordScreen';
 import { LoginScreen } from '../screens/LoginScreen';
 import { SplashScreen } from '../screens/SplashScreen';
 import { MainDrawerNavigator } from './MainDrawerNavigator';
-import { Usuario } from '../interfaces/usuarios';
 import { RefreshDataFromDatabase } from '../screens/RefreshDataFromDatabase';
-import { StackActions } from '@react-navigation/routers';
-import { ReloadScreen } from '../screens/ReloadScreen';
 
 export type RootStackParams={
   SplashScreen: undefined,

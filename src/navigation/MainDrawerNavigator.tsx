@@ -11,7 +11,7 @@ export type RootDrawerParams={
   UpdateTicketScreen:{
     ticket:Vale,
     reloadItem: () => void
-  }
+  },
 }
 
 const Drawer = createDrawerNavigator<RootDrawerParams>();
@@ -24,13 +24,11 @@ export const MainDrawerNavigator = () => {
     <Drawer.Navigator
       screenOptions={{
         drawerType: dimensions.width >= 768 ? 'permanent' : 'front',
-        
+        drawerItemStyle: { display: 'none' },
+        drawerPosition:'right',
+        swipeEnabled:false
       }}
     >
-      {/**
-       * 
-       <Drawer.Screen  name="MainMenuScreen" component={MainMenuScreen}  options={{headerShown: false}} /> 
-       */}
 
       <Drawer.Screen name="NewTicketScreen" component={NewTicketScreen}  options={{headerShown: false}}/>
       <Drawer.Screen name="SearchTicketScreen" component={SearchTicketScreen} options={{headerShown: false}} />

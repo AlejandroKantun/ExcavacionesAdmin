@@ -66,6 +66,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
 
                     </View>
                     <View style={localStyles.interactiveElements}>
+                        
                     <View style={localStyles.materialsQuantityContainer}>
                         <View style={{ alignItems:'center'}}>
                             <CustomText style={localStyles.label}>Selecciona Material:</CustomText>
@@ -246,7 +247,6 @@ const localStyles = StyleSheet.create({
         backgroundColor:'white',
         height:windowheight*0.45,
         width:windowWidth*0.95,
-        //justifyContent:'center',
         alignItems:'center',
         borderRadius:5,
         shadowOffset:{

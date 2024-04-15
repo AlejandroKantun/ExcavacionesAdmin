@@ -75,18 +75,16 @@ interface Props{
       },
       [onDrawingActive, onDrawingStart]
 
-      //setting sign whiledrawing
-
-      
+      //setting sign whiledrawing      
     );
     const onSave=()=>{
       let alertMessageAux=''
-
       if((ticket.folioFisico.length<1)
           ||(!ticket.empresaID)
           ||(!ticket.clienteID)
           ||(!ticket.destinoID)
           ||(!ticket.vehiculoID)
+          ||(!ticket.choferID)
           ||(materialsQty.length<1)
           ){
             if(ticket.folioFisico.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Folio Físico'}
@@ -94,10 +92,12 @@ interface Props{
             if(!ticket.clienteID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Cliente'}
             if(!ticket.destinoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Destino'}
             if(!ticket.vehiculoID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Vehículo'}
+            if(!ticket.choferID){alertMessageAux=alertMessageAux+'\n'+'- Agregar Chofer'}
             if(materialsQty.length<1){alertMessageAux=alertMessageAux+'\n'+'- Agregar Material'}
 
-            setAlertMessage(alertMessageAux)
+            setAlertMessage(alertMessageAux);
             setWarningModalVisible(true);
+
         }
       else {
         const signImage = canvasRef.current?.makeImageSnapshot()
@@ -220,12 +220,14 @@ interface Props{
                     </View>
                       
               </View>
+              <WarningModal
+            visible={warningModalVisible}
+            setIsVisible={setWarningModalVisible}
+            textToShow={alertMessage}
+            />
         </Modal>
-        <WarningModal
-                          visible={warningModalVisible}
-                          setIsVisible={setWarningModalVisible}
-                          textToShow={alertMessage}
-                          />  
+
+        
         </View>
        
       

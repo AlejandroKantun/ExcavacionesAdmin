@@ -13,7 +13,7 @@ export const HeaderTitle = ({title}:Props) => {
 
   return (
     
-          <View style={[localStyles.headerContainer, {top}]} >
+          <View style={[localStyles.headerContainer]} >
               <Text style={localStyles.title }>
                   {title}
               </Text>

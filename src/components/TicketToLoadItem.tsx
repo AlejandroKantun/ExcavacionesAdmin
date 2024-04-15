@@ -1,5 +1,5 @@
 import React, { useContext, useState } from 'react'
-import { Image, TouchableOpacity, View } from 'react-native';
+import { Image, TouchableOpacity, View, Platform } from 'react-native';
 import { Dimensions, StyleSheet } from 'react-native';
 import { Vale } from '../interfaces/vale';
 import CustomText from './CustomText';
@@ -140,7 +140,6 @@ const localStyles = StyleSheet.create({
         flexDirection:'row',
         height:windowHeight*0.15,
         justifyContent:'center',
-
     },
     itemsColumns:{
         flexDirection:'column',
@@ -164,7 +163,6 @@ const localStyles = StyleSheet.create({
         flexDirection:'row',
         flex:1,
         justifyContent:'flex-end'
-        //backgroundColor:'red',
     },
     btnCancel:{
         
@@ -200,7 +198,7 @@ const localStyles = StyleSheet.create({
           width: windowHeight*0.13, 
           resizeMode:'contain'},
     customTextStyle:{
-        fontSize:windowHeight*0.019
+        fontSize:Platform.OS==='ios'?windowHeight*0.0165:windowHeight*0.019,
     },
     isLoadContainer:{
         flexDirection:'row',

@@ -1,12 +1,12 @@
 import React, { useContext } from 'react'
-import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Dimensions, StyleSheet, Text, TouchableOpacity, View,Platform } from 'react-native';
 import globalStyles from '../theme/appTheme';
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
-import { string } from 'yup';
+
 
 interface Props{
   title:string
@@ -119,16 +119,15 @@ const localStyles = StyleSheet.create({
         flex:1,
         flexDirection:'row',
         alignItems:'center',
-        alignSelf:'baseline',
+        alignSelf:Platform.OS==='android'?'baseline':'center',
         borderRadius:2,
         paddingVertical:6,
-        //paddingHorizontal:windowWidth*0.03,
         backgroundColor:globalStyles.colors.primary
       },
       logOutButton:{
         flexDirection:'row',
         alignItems:'center',
-        alignSelf:'baseline',
+        alignSelf:Platform.OS==='android'?'baseline':'center',
         borderRadius:2,
         backgroundColor:globalStyles.colors.primary,
       },

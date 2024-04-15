@@ -53,140 +53,153 @@ export const SearchTicketScreen = () => {
         }, [])
       );
   return (
-    <SafeAreaView style={{flex: 1}}>
-      <View
-                style={localStyles.mainContainer}> 
-                    <HeaderSearchTicket title={'Buscar Vale'}/>
-                    <View style={localStyles.filterOptionsContainer}>
-                    <View style={localStyles.dateFilterOptionscontainer}>
-                      <View style={localStyles.dateAndTextContainer}>
-                          <CustomText>
-                            Fecha Inicial
-                          </CustomText>
-                          <TouchableOpacity 
-                            style={localStyles.datePickerBtn}
-                            onPress={()=>{setDatePickerModalStartVisible(true)}}>
-                            <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
+    <View style={{flex:1,backgroundColor:'rgba('+globalStyles.colors.primaryRGB + ',1)'}}> 
+      <View style={{backgroundColor:globalStyles.colors.primary}}
+      >
+      </View>
+      <SafeAreaView style={{flex: 1}}>
+        <View
+                  style={localStyles.mainContainer}> 
+                      <HeaderSearchTicket title={'Buscar Vale'}/>
+                      <View style={localStyles.filterOptionsContainer}>
+                      <View style={localStyles.dateFilterOptionscontainer}>
+                        <View style={localStyles.dateAndTextContainer}>
                             <CustomText>
-                              {dateMin?
-                              dateFormatedDateFiltered(dateMin)?.substring(0,10)
-                              :'Selecciona'}</CustomText>
-                          </TouchableOpacity>
-                      </View>
-                      <View style={localStyles.dateAndTextContainer}>
-                          <CustomText>
-                            Fecha Final
-                          </CustomText>
-                          <TouchableOpacity 
-                            style={localStyles.datePickerBtn}
-                            onPress={()=>{setDatePickerModalEndVisible(true)}}>
-                            <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
-                            <CustomText>
-                              {dateMax?
-                              dateFormatedDateFiltered(dateMax)?.substring(0,10)
-                              :'Selecciona'}</CustomText>
-                          </TouchableOpacity>
-                      </View>
-                      
-                      </View>
-                      </View>
-                      <View style={localStyles.searchInputContainer}>
-                        <TouchableOpacity
-                        onPress={()=>{reloadItem()}}>
-                          <Icon style={{marginRight:windowWidth*0.001}} name="search-outline" size={windowHeight*0.025 }  color={globalStyles.colors.textLoginPlaceHolder} />
-
-                        </TouchableOpacity>
-
-                        <TextInput
-                          style={localStyles.textInputTextToFilter}
-                          placeholder='Buscar por Folio, Placa ó No Tolva'
-                          placeholderTextColor='rgba(0,0,0,0.5)'
-                          onChangeText={(text)=>{
-                            setTextFilter(text)
-                          }
-                          }>
-                          
-                        </TextInput>
-                      </View>
-                        
-                     
-                    {
-                      ticketsIsloading?
-                      <View>
-                        <ActivityIndicator
-                        animating={true}
-                        size={windowHeight*0.05}
-                        color={globalStyles.colors.primary}
-                        ></ActivityIndicator>
-                      </View>
-                      :<View>
-                        <View >
-                            {tickets.length>0?
-                              <FlatList   ListHeaderComponent={ 
-                                            <View style={localStyles.headerContainer}>
-                                              <CustomText>Total: {tickets.length.toString()}</CustomText>
-                                            </View>
-                                           }
-                                          ItemSeparatorComponent={ItemSeparatorTickets}
-                                          data={tickets}
-                                          horizontal={false}
-                                          keyExtractor={(item) => item.valeID.toString()}
-                                          renderItem={({item,index})=> 
-                                          <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
-                                          }
-                                          ListFooterComponent={(<View style={{height:windowHeight*0.27}}> 
-
-                                          </View>)}
-                              ></FlatList>
-                              :<View>
-                                <CustomText style={localStyles.noDataFoundLabel}>No se encontraron vales</CustomText>
-                              </View>
-                            }
-                            
-
-                          
+                              Fecha Inicial
+                            </CustomText>
+                            <TouchableOpacity 
+                              style={localStyles.datePickerBtn}
+                              onPress={()=>{setDatePickerModalStartVisible(true)}}>
+                              <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
+                              <CustomText>
+                                {dateMin?
+                                dateFormatedDateFiltered(dateMin)?.substring(0,10)
+                                :'Selecciona'}</CustomText>
+                            </TouchableOpacity>
                         </View>
-                      </View>
-                    }
-                     
+                        <View style={localStyles.dateAndTextContainer}>
+                            <CustomText>
+                              Fecha Final
+                            </CustomText>
+                            <TouchableOpacity 
+                              style={localStyles.datePickerBtn}
+                              onPress={()=>{setDatePickerModalEndVisible(true)}}>
+                              <Icon style={{marginRight:10}} name="calendar-outline" size={windowHeight*0.03}  color="#000" />
+                              <CustomText>
+                                {dateMax?
+                                dateFormatedDateFiltered(dateMax)?.substring(0,10)
+                                :'Selecciona'}</CustomText>
+                            </TouchableOpacity>
+                        </View>
+                        
+                        </View>
+                        </View>
+                        <View style={localStyles.searchInputContainer}>
+                          <TouchableOpacity
+                          onPress={()=>{reloadItem()}}>
+                            <Icon style={{marginRight:windowWidth*0.001}} name="search-outline" size={windowHeight*0.025 }  color={globalStyles.colors.textLoginPlaceHolder} />
 
-                    <View>
-              <DateTimePickerModal
-                  mode="date"
-                  isVisible={datePickerModalStartVisible}
-                  onConfirm={(datePicked)=>{
-                    datePicked.setHours(0,0,0,0)
-                    setDateMin(datePicked)
+                          </TouchableOpacity>
 
-                  }}
-                  onCancel={()=>{setDatePickerModalStartVisible(false)
-                                setDatePickerModalStartVisible(false)
+                          <TextInput
+                            style={localStyles.textInputTextToFilter}
+                            placeholder='Buscar por Folio, Placa ó No Tolva'
+                            placeholderTextColor='rgba(0,0,0,0.5)'
+                            onChangeText={(text)=>{
+                              setTextFilter(text)
+                            }
+                            }>
+                            
+                          </TextInput>
+                        </View>
+                          
+                      
+                      {
+                        ticketsIsloading?
+                        <View>
+                          <ActivityIndicator
+                          animating={true}
+                          size={windowHeight*0.05}
+                          color={globalStyles.colors.primary}
+                          ></ActivityIndicator>
+                        </View>
+                        :<View>
+                          <View >
+                              {tickets.length>0?
+                                <FlatList   ListHeaderComponent={ 
+                                              <View style={localStyles.headerContainer}>
+                                                <CustomText>Total: {tickets.length.toString()}</CustomText>
+                                              </View>
+                                            }
+                                            ItemSeparatorComponent={ItemSeparatorTickets}
+                                            data={tickets}
+                                            horizontal={false}
+                                            keyExtractor={(item) => item.valeID.toString()}
+                                            renderItem={({item,index})=> 
+                                            <TicketToLoadItem ticketByID={item} reloadItem={reloadItem}/>
+                                            }
+                                            ListFooterComponent={(<View style={{height:windowHeight*0.27}}> 
 
-                                setDateMin(undefined)
-                              }}
-                    onHide={()=>{setDatePickerModalStartVisible(false)}}
-                />
-              </View>
-              <View>
+                                            </View>)}
+                                ></FlatList>
+                                :<View>
+                                  <CustomText style={localStyles.noDataFoundLabel}>No se encontraron vales</CustomText>
+                                </View>
+                              }
+                              
+
+                            
+                          </View>
+                        </View>
+                      }
+                      
+
+                      <View>
                 <DateTimePickerModal
-                  mode="date"
-                  isVisible={datePickerModalEndVisible}
-                  onConfirm={(datePicked)=>{
-                    datePicked.setHours(23,59,59,997)
-                    setDateMax(datePicked)
-                    setDatePickerModalEndVisible(false)
-                  }}
-                  onCancel={()=>{setDatePickerModalEndVisible(false)
-                                  setDateMax(undefined)
-                                }}
-                  onHide={()=>{setDatePickerModalEndVisible(false)}}
-                />
-              </View>
-                   
-            </View>
-    </SafeAreaView>
+                    mode="date"
+                    isVisible={datePickerModalStartVisible}
+                    onConfirm={(datePicked)=>{
+                      datePicked.setHours(0,0,0,0)
+                      setDateMin(datePicked)
+                      setDatePickerModalStartVisible(false)
 
-            
+                    }}
+                    onCancel={()=>{setDatePickerModalStartVisible(false)
+                                  setDatePickerModalStartVisible(false)
+
+                                  setDateMin(undefined)
+                                }}
+                      onHide={()=>{setDatePickerModalStartVisible(false)}}
+                      confirmTextIOS={'Seleccionar'}
+                      cancelTextIOS={'Cancelar'}
+                      locale='es_MX'
+                  />
+                </View>
+                <View>
+                  <DateTimePickerModal
+                    mode="date"
+                    isVisible={datePickerModalEndVisible}
+                    onConfirm={(datePicked)=>{
+                      datePicked.setHours(23,59,59,997)
+                      setDateMax(datePicked)
+                      setDatePickerModalEndVisible(false)
+                    }}
+                    onCancel={()=>{setDatePickerModalEndVisible(false)
+                                    setDateMax(undefined)
+                                  }}
+                    onHide={()=>{setDatePickerModalEndVisible(false)}}
+                    confirmTextIOS={'Seleccionar'}
+                      cancelTextIOS={'Cancelar'}
+                      locale='es_MX'
+
+                  />
+                </View>
+                    
+              </View>
+      </SafeAreaView>
+
+      </View>
+
   )
 
   

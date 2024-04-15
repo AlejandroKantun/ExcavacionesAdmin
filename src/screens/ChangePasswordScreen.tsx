@@ -1,17 +1,14 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useState } from 'react'
-import {Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
+import {Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native'
 import CustomText from '../components/CustomText'
-import { requestToken } from '../data/UserLogin';
 import globalStyles from '../theme/appTheme';
 import { StackActions } from '@react-navigation/native';
 import { Formik } from "formik";
 import { changePasswordSchema } from '../validationsSchemas/changePasswordSchema';
 import { useEffect } from 'react';
-import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
-
 import DeviceInfo from 'react-native-device-info';
-import { changePassResult, ChangePassWordRequest, postTicketsToDB, requestAndSaveClients, requestAndSaveCompanies, requestAndSaveDestinations, requestAndSaveDrivers, requestAndSaveMaterials, requestAndSaveUsers, requestAndSaveVehicles, requestAndSaveZones, requestAndZonesCompanies } from '../api/operationsToDB';
+import { changePassResult, ChangePassWordRequest, requestAndSaveUsers, requestAndSaveZones, requestAndZonesCompanies } from '../api/operationsToDB';
 import { StackScreenProps } from '@react-navigation/stack';
 import { RootStackParams } from '../navigation/StackNavigator';
 import { SavePassModal } from '../components/SavePassModal';
@@ -20,6 +17,7 @@ import { useUsersDB } from '../hooks/useUsersDB';
 import { storeUser } from '../data/persistantData';
 import { HeaderSearchTicket } from '../components/HeaderSearchTicket';
 import CheckBox from '@react-native-community/checkbox';
+import { Platform } from 'react-native';
 
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
@@ -90,7 +88,7 @@ useEffect( () => {
     
    }, [authState.userName])
   return (
-      <View style={localStyles.totalContainer}>
+      <SafeAreaView style={localStyles.totalContainer}>
           <HeaderSearchTicket
         title={'Cambiar Contraseña'}
         />
@@ -125,7 +123,7 @@ useEffect( () => {
                                 {errors.password &&
                                     <Text style={{ fontSize: 13, color: 'red' }}>{errors.password}</Text>
                                 }
-                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                <View style={localStyles.showPassContainer}>
                                     <CheckBox
                                         disabled={false}
                                         value={showPass}
@@ -157,7 +155,7 @@ useEffect( () => {
                                 {errors.confirmPassword &&
                                     <Text style={{ fontSize: 13, color: 'red' }}>{errors.confirmPassword}</Text>
                                 }
-                                <View style={{flexDirection:'row',alignItems:'center'}}>
+                                <View style={localStyles.showPassContainer}>
                                     <CheckBox
                                         disabled={false}
                                         value={showConfirmPass}
@@ -209,7 +207,7 @@ useEffect( () => {
         <SavePassModal visible={isVisible} setIsVisible={setIsVisible}/>
         
     </View>
-      </View>
+      </SafeAreaView>
     
     
   )
@@ -287,5 +285,11 @@ const localStyles = StyleSheet.create({
     },
     labalShowPass:{
         fontSize:windowHeight*0.016
+    },
+    showPassContainer:{
+        flexDirection:'row',
+        alignItems:'center',
+        width:Platform.OS=='ios'?windowWidth*0.45:windowWidth*0.45,
+        justifyContent:Platform.OS=='ios'?'space-around':'center',
     }
 });

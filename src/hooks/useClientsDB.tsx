@@ -15,7 +15,7 @@ const getClients=async ()=>{
      try {
    
         (await db).transaction((tx) => {
-          tx.executeSql("SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1", []).then(
+          tx.executeSql("SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 OR clienteID=1", []).then(
             ([tx,results]) => {
               for (let i = 0; i <results.rows.length; i++) {
                 tempArray.push(results.rows.item(i) as Cliente)
@@ -39,7 +39,7 @@ const getClientsWithEmpresaID=async (empresaID?:number)=>{
   try {
     let selectSentence="SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 AND clienteID=1"
     if (empresaID){
-          selectSentence = "SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 AND empresaID = "+empresaID.toString();
+          selectSentence = "SELECT * FROM clientes WHERE estadoCliente=1 AND activoCliente=1 AND empresaID = "+empresaID.toString() + " OR clienteID=1";
     }
 
      (await db).transaction((tx) => {

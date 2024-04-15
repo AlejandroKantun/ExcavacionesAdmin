@@ -21,15 +21,12 @@ export const SplashScreen = () => {
         try {   
             const session = await EncryptedStorage.getItem(userSession);
             console.log(session)
-
-            if (session !== undefined) {
-                // data extracted
-                
                     navigation.dispatch(
-                        StackActions.replace(session===null?'LoginScreen':'MainDrawerNavigator')
+                        StackActions.replace('LoginScreen')
+                        //StackActions.replace('MainDrawerNavigator')
                     )
                 
-            }
+            
         } catch (error) {
             console.log(error)
         }
@@ -54,12 +51,11 @@ export const SplashScreen = () => {
     
     useEffect(() => {
         DeviceInfo.getUniqueId().then((result)=>{
-            getIsDBCreated(result) 
-                    validateSession();
-                    setTimeout(() => {
-                    setAnimating(false);
-                
-                    }, 5000);
+            getIsDBCreated(result).then(()=>{
+                validateSession();
+                setTimeout(() => {setAnimating(false);}, 5000);
+            });
+                    
         });
 
         

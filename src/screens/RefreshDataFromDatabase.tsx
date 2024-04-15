@@ -26,8 +26,6 @@ export const RefreshDataFromDatabase = () => {
         recurrentTaskTorefreshItems();
 
       }, (taskId:string) => {
-        // Oh No!  Our task took too long to complete and the OS has signalled
-        // that this task must be finished immediately.
         console.log('[Fetch] TIMEOUT taskId:', taskId);
         BackgroundFetch.finish(taskId);
       });
@@ -54,6 +52,7 @@ export const RefreshDataFromDatabase = () => {
 
             try {
                 refreshAllTables().then(()=>{
+                  console.log('navigating to MainDrawer')
                     navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
                 });
             } catch (error) {
@@ -108,7 +107,7 @@ export const RefreshDataFromDatabase = () => {
    
   return (
     <View style={{justifyContent:'center', alignItems:'center', flex:1}}>
-        <CustomText style={{fontSize:25}}> Sincronizando datos</CustomText>
+        <CustomText style={{fontSize:25}}> Sincronizando</CustomText>
         <ActivityIndicator size={40} color={globalStyles.colors.primary} ></ActivityIndicator>  
        
         

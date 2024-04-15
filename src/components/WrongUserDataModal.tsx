@@ -27,8 +27,11 @@ export const WrongUserDataModal = ({visible,setIsVisible}:Props) => {
                     style={localStyles.modalContainer}
                         >
                     <View style={localStyles.headerContainer}>
-                        <HeaderTitle title='Usuario o Password incorrectos'/>
-
+                        <View style={[localStyles.headerContainerText]} >
+                            <Text style={localStyles.title }>
+                                Usuario o Password incorrectos
+                            </Text>
+                        </View>
                     </View>
                     <View style={localStyles.iconErrorModal}>
                         <Icon style={{marginTop:3}} name="close-circle-outline" size={55} color={globalStyles.colors.danger} />
@@ -60,13 +63,11 @@ const localStyles = StyleSheet.create({
         backgroundColor:'rgba(0,0,0,0.3)',
         alignItems:'center',
         justifyContent:'center',
-      
     },
     modalContainer:{
         backgroundColor:'white',
         height:windowheight*0.35,
         width:windowWidth*0.8,
-        //justifyContent:'center',
         alignItems:'center',
         borderRadius:5,
         shadowOffset:{
@@ -82,10 +83,10 @@ const localStyles = StyleSheet.create({
         borderTopStartRadius:5,
         backgroundColor:globalStyles.colors.primary,
         width:windowWidth*0.8,
-        height:windowheight*0.10,
+        height:windowheight*0.1,
         justifyContent:'center',
         alignItems:'center',
-        marginBottom: windowheight*0.04
+        marginBottom: windowheight*0.04,
     },
     textModal:{
         color:'black',
@@ -108,5 +109,16 @@ const localStyles = StyleSheet.create({
         fontSize:20, 
         color:globalStyles.mainButtonColor.text, 
         textAlign:'center',
+    },
+    title:{
+        fontSize:23,
+        fontWeight:'bold',
+        color:globalStyles.colors.white,
+        textAlign:'center'
+    },
+    headerContainerText:{
+        marginBottom:10,
+        backgroundColor:globalStyles.colors.primary,
+        flexDirection:'row'
     },
 });

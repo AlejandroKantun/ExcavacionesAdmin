@@ -1,10 +1,10 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useEffect, useState } from 'react'
-import { View, StyleSheet, TextInput,TouchableOpacity, Dimensions} from 'react-native';
+import { View, StyleSheet, TextInput, TouchableOpacity, Dimensions, Platform, Button } from 'react-native';
 import CustomText from '../components/CustomText'
 import globalStyles from '../theme/appTheme';
 import { getUserLogin, loginResult } from '../data/UserLogin';
-import { connectToDatabase } from '../data/dbStructure';
+import { connectToDatabase, createDatabaseStructure } from '../data/dbStructure';
 import { WrongUserDataModal } from '../components/WrongUserDataModal';
 import { AuthContext } from '../context/AuthContext';
 import { useTokenByUserPass } from '../hooks/useTokenByUserPass';
@@ -12,9 +12,7 @@ import { useNetInfo } from "@react-native-community/netinfo";
 import { getUserslogged } from '../data/persistantData';
 import DeviceInfo from 'react-native-device-info';
 import { getEmpresaIDwithUserID } from '../data/getEmpresaIDwithUserID';
-import { CustomCheckBox } from '../components/CustomCheckBox';
 import CheckBox from '@react-native-community/checkbox';
-import { Image } from 'react-native';
 
 global.Buffer = require('buffer').Buffer;
 
@@ -28,7 +26,7 @@ export const LoginScreen = () => {
     const [pass, setPass] = useState('');
     const [isVisible, setIsVisible] = useState(false)
     const {token,getToken} =useTokenByUserPass()
-    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID,changeEmpresaID} = useContext(AuthContext)
+    const {changeUserName,changeUserID,changeToken,signIn,changeZoneID,changeUniqueAppID,changeEmpresaID,authState} = useContext(AuthContext)
     const [deviceId, setdeviceId] = useState('')
     const [showPass, setShowPass] = useState(false)
 
@@ -36,7 +34,7 @@ export const LoginScreen = () => {
     const { type, isConnected } = useNetInfo();
 
     const loginHandler=async ()=>{
-        console.log(isConnected)
+        console.log('is connected ' + isConnected)
         if (isConnected){
             //If there is connection to internet
 
@@ -48,12 +46,14 @@ export const LoginScreen = () => {
                       signIn();
                       changeUserName(user);
                       changeUniqueAppID(deviceId);
+
                       getEmpresaIDwithUserID(user).then(
                         (res)=>
                         {   
-                            
+                            console.log('getEmpresaIDwithUserID ' + JSON.stringify(res))
+
                             getUserslogged().then((usersInDB)=>{
-                                console.log('users in phone' + usersInDB)
+                                console.log('users in phone: ' + usersInDB)
                                 if(!usersInDB){
                                     navigation.navigate("ChangePasswordScreen" as never)
                                 }
@@ -127,7 +127,8 @@ export const LoginScreen = () => {
         
     useEffect(() => {
     DeviceInfo.getUniqueId().then((result)=>{
-        setdeviceId(result)
+        setdeviceId(result);
+        console.log('device ID: '+result)
     });
     }, [])
     
@@ -156,7 +157,8 @@ export const LoginScreen = () => {
                     onChangeText={(Text)=>setPass(Text)}
 
                 />
-                <View style={{flexDirection:'row',alignItems:'center'}}>
+                <View style={localStyles.showPassContainer}>
+                    <View style={localStyles.checkBoxContainer}>
                     <CheckBox
                         disabled={false}
                         value={showPass}
@@ -165,9 +167,14 @@ export const LoginScreen = () => {
                             false:'rgba(0,0,0,0.5)'}}
                         tintColor='rgba(0,0,0,0.5)'
                         onCheckColor={globalStyles.colors.primary}
+                        animationDuration={0.05}
+                        lineWidth={1.2}
+                        boxType={'circle'}
                         onValueChange={(newValue) => {setShowPass(newValue)}//onValueChange(newValue)
                         }
-                        />
+                    />
+                    </View>
+                    
                     <CustomText>
                         Mostrar contraseña
                     </CustomText>
@@ -183,9 +190,6 @@ export const LoginScreen = () => {
                         Ingresar ahora
                     </CustomText>
             </TouchableOpacity> 
-            
-
-        
         <WrongUserDataModal             
                 visible={isVisible}
                 setIsVisible={setIsVisible}/>
@@ -277,6 +281,15 @@ const localStyles= StyleSheet.create({
     },
     iconErrorModal:{
         marginBottom:15
+    },
+    showPassContainer:{
+        flexDirection:'row',
+        alignItems:'center',
+        justifyContent:'center',
+
+    },
+    checkBoxContainer:{
+        marginHorizontal:Platform.OS=='ios'?windowWidth*0.015:0
     }
 })
 

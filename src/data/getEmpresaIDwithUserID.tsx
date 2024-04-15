@@ -30,6 +30,9 @@ export const getEmpresaIDwithUserID = async (userID:string) => {
                                    resolve(empresas[0].empresaID);   
                                  }
                                  else {resolve(empresas)}
+                            },
+                            (tx,error)=>{
+                                console.log(JSON.stringify(tx) +' '+ JSON.stringify(error))
                             }
                             )
                             
