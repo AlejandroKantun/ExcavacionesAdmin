@@ -9,7 +9,7 @@ import { MaterialQty } from '../hooks/useMaterialQty';
 import { HeaderTitle } from './HeaderTittle';
 import { useMaterialsByMaterialID } from '../hooks/useMaterialsByMaterialID';
 import { Material } from '../interfaces/material';
-import { number } from 'yup';
+import { number, string } from 'yup';
 import { WarningModal } from './WarningModal';
 
 const windowWidth = Dimensions.get('window').width;
@@ -33,7 +33,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
     const [materialM3, setMaterialM3] = useState(0)
     const{materials:material,getMaterialById}=useMaterialsByMaterialID()
     const [importUpdated, setImportUpdated] = useState(false)
-    const [newImport, setNewImport] = useState(0)
+    const [newImport, setNewImport] = useState<number|string>(0)
     const [warningModalVisible, setWarningModalVisible] = useState(false)
     const [alertMessage, setAlertMessage] = useState('')
     useEffect(() => {
@@ -138,20 +138,17 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                         }
                         {material[0]?
                             <View>
-                                <CustomText style={localStyles.label}>Precio por metro cúbico:</CustomText>  
+                                <CustomText style={localStyles.label}>Precio por metro cúbico: </CustomText>  
                                 <TextInput style={localStyles.textInputDataMaterial}
                                     placeholder=  {'Importe: '}  
                                     maxLength={30}
                                     placeholderTextColor='rgba(0,0,0,0.5)'
-                                    keyboardType='numeric'
+                                    keyboardType='decimal-pad'
                                     value={newImport.toString()}
                                     onChangeText={(text)=>{
                                         setImportUpdated(true)
-                                        if(typeof(Number(text))=='number'){
-                                            setNewImport(Number(text))
-                                        }
-                                        else{
-                                            setNewImport(0)
+                                        if(!(text.split('.').length-1 >1)){
+                                            setNewImport(text)
                                         }
                                     }}>
                                 </TextInput>
@@ -201,7 +198,9 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                         subtotal= subtotal+ (materialsQty[i].quantity*materialsQty[i].newImport)
 
                                     }  
-                                    subtotal= subtotal+ (materialM3*newImport);
+
+                                    const finalImport:number=Number(newImport);
+                                    subtotal= subtotal+ (materialM3*finalImport);
                                     
                                     addMaterialsQty({
                                         ID: lengthData+1,
@@ -209,7 +208,7 @@ export const AddMaterialToTicketModal = ({visible,setIsVisible,addMaterialsQty,l
                                         quantity:materialM3,
                                         materialID: value,
                                         importUpdated:importUpdated,
-                                        newImport:newImport
+                                        newImport:finalImport
                                         })
                                 }
                                 

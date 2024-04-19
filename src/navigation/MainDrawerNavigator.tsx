@@ -8,10 +8,7 @@ import { Vale } from '../interfaces/Vale';
 export type RootDrawerParams={
   NewTicketScreen:undefined,
   SearchTicketScreen:undefined,
-  UpdateTicketScreen:{
-    ticket:Vale,
-    reloadItem: () => void
-  },
+  UpdateTicketScreen:undefined,
 }
 
 const Drawer = createDrawerNavigator<RootDrawerParams>();
@@ -30,9 +27,9 @@ export const MainDrawerNavigator = () => {
       }}
     >
 
-      <Drawer.Screen name="NewTicketScreen" component={NewTicketScreen}  options={{headerShown: false}}/>
-      <Drawer.Screen name="SearchTicketScreen" component={SearchTicketScreen} options={{headerShown: false}} />
-      <Drawer.Screen name="UpdateTicketScreen" component={UpdateTicketScreen} options={{headerShown: false}} />
+      <Drawer.Screen name="NewTicketScreen"     component={NewTicketScreen}  options={{headerShown: false}}/>
+      <Drawer.Screen name="SearchTicketScreen"  component={SearchTicketScreen} options={{headerShown: false}} />
+      <Drawer.Screen name="UpdateTicketScreen"  component={UpdateTicketScreen} options={{headerShown: false}} />
 
       {/* Screens */}
     </Drawer.Navigator>

@@ -8,6 +8,19 @@ import {useNavigation } from '@react-navigation/core';
 import { StackActions } from '@react-navigation/native';
 import NetInfo, { useNetInfo } from '@react-native-community/netinfo';
 import BackgroundFetch from "react-native-background-fetch";
+import { CommonActions } from '@react-navigation/native';
+
+
+const state = {
+  type: 'drawer',
+  key: 'drawer-1',
+  routeNames: ['MainDrawerNavigator'],
+  routes: [
+    { key: 'Main', name: 'MainDrawerNavigator' },
+  ],
+  index: 0,
+  stale: false,
+};
 
 export const RefreshDataFromDatabase = () => {
     const {authState} = useContext(AuthContext)
@@ -53,7 +66,18 @@ export const RefreshDataFromDatabase = () => {
             try {
                 refreshAllTables().then(()=>{
                   console.log('navigating to MainDrawer')
-                    navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+                  
+                    //navigation.dispatch(StackActions.replace("MainDrawerNavigator" as never))
+
+                    navigation.dispatch(
+                      //CommonActions.navigate({name:'MainDrawerNavigator'})
+                      CommonActions.reset({
+                        routes: [
+                          { name: 'MainDrawerNavigator' },
+                        ],
+                      })
+                    );
+                    
                 });
             } catch (error) {
                 console.log('FAIL refresh')

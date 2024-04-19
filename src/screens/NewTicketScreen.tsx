@@ -189,7 +189,7 @@ export const NewTicketScreen = () => {
                       style={localStyles.AmountTextInput}
                       placeholder={''}
                       placeholderTextColor='rgba(0,0,0,0.5)'
-                      keyboardType='number-pad'
+                      keyboardType='decimal-pad'
                       defaultValue={ticket.Importe?.toString()}
                       onChangeText={(text)=>{setPropertyOnTicket("Importe",text)}}
                       ></TextInput>
@@ -224,7 +224,7 @@ export const NewTicketScreen = () => {
                     </TouchableOpacity>
                   </View>              
                   <View style={localStyles.PayInfoRow}>
-                    <CustomText> Nombre de despachador: </CustomText>
+                    <CustomText> Checador: </CustomText>
                     <View>
                       <CustomText> {authState.userName} </CustomText>
                     </View>

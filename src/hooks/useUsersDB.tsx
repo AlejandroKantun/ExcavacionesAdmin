@@ -40,7 +40,7 @@ export const useUsersDB = () => {
       try {
     
           (await db).transaction((tx) => {
-            tx.executeSql("SELECT * FROM usuarios WHERE usuario=? ", [
+            tx.executeSql("SELECT * FROM usuarios WHERE lower(usuario)=? ", [
               userName
             ]).then(
               ([tx,results]) => {

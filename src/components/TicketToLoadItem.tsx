@@ -84,8 +84,6 @@ export const TicketToLoadItem = ({ticketByID,reloadItem}:Props) => {
                         onPress={()=>{
                             ChangeTicket(ticketByID);
                             navigation.navigate("UpdateTicketScreen" as never)
-
-
                         }}>
                         <Icon style={{marginTop:3, paddingRight:10}} 
                         name={ticketByID?.firma?'eye-outline':'pencil-outline'}

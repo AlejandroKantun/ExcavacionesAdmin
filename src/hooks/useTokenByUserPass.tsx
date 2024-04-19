@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
+import { useEffect, useState } from 'react'
 import excavacionesDB from '../api/excavacionesDB'
 interface dataResponse{
     token:string
@@ -42,3 +43,4 @@ export const useTokenByUserPass = () => {
 
 
 }
+

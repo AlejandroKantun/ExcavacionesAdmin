@@ -1,6 +1,6 @@
 import { useNavigation } from '@react-navigation/core';
 import React, { useContext, useState } from 'react'
-import {Alert, Dimensions, StyleSheet, Text, TextInput, TouchableOpacity, View, SafeAreaView } from 'react-native'
+import {Alert, Dimensions, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native'
 import CustomText from '../components/CustomText'
 import globalStyles from '../theme/appTheme';
 import { StackActions } from '@react-navigation/native';
@@ -35,14 +35,13 @@ export const ChangePasswordScreen = ({route}:Props) => {
     const [showConfirmPass, setShowConfirmPass] = useState(false)
 
 const submitChangeRequest=async(newPassValidated:string)=>{
-              
-
+                 
     const  changeResult:changePassResult = await ChangePassWordRequest(
             users[0].usuarioID.toString(),
             newPassValidated,
             authState.token!,
             deviceId);
-       
+    
     if (changeResult.success){
         setIsVisible(true);
         //storing user for next login
@@ -56,7 +55,7 @@ const submitChangeRequest=async(newPassValidated:string)=>{
         }, 2000);
     }
     else{
-        Alert.alert('Ha ocurrido un error en el proceso de actualización');
+        //Alert.alert('Ha ocurrido un error en el proceso de actualización');
     }
 }
 const refreshAllTables=async (appUniqueID:string)=>{
@@ -77,7 +76,8 @@ useEffect( () => {
         setdeviceId(result)
         try {
             refreshAllTables(result).then(()=>{
-                getUserByUserName(authState.userName!);
+                console.log('authstate username: ' + authState.userName)
+                getUserByUserName(authState.userName!.toLowerCase());
             })            
     
         } catch (error) {
@@ -88,6 +88,8 @@ useEffect( () => {
     
    }, [authState.userName])
   return (
+    <View style={{flex:1,backgroundColor:'rgba('+globalStyles.colors.primaryRGB + ',1)'}}> 
+
       <SafeAreaView style={localStyles.totalContainer}>
           <HeaderSearchTicket
         title={'Cambiar Contraseña'}
@@ -104,7 +106,7 @@ useEffect( () => {
 
                         }
                         >
-                        {({ handleChange, handleBlur, handleSubmit, values,errors, }) => (
+                        {({ handleChange, handleBlur, handleSubmit, values,errors }) => (
                             
                         <View style={{flexDirection:'column'}}>
                             
@@ -131,6 +133,8 @@ useEffect( () => {
                                             {{true: globalStyles.colors.primary, 
                                             false:'rgba(0,0,0,0.5)'}}
                                         tintColor='rgba(0,0,0,0.5)'
+                                        lineWidth={1.2}
+                                        animationDuration={0.05}
                                         onCheckColor={globalStyles.colors.primary}
                                         onValueChange={(newValue) => {setShowPass(newValue)}//onValueChange(newValue)
                                         }
@@ -163,6 +167,8 @@ useEffect( () => {
                                             {{true: globalStyles.colors.primary, 
                                             false:'rgba(0,0,0,0.5)'}}
                                         tintColor='rgba(0,0,0,0.5)'
+                                        lineWidth={1.2}
+                                        animationDuration={0.05}
                                         onCheckColor={globalStyles.colors.primary}
                                         onValueChange={(newValue) => {setShowConfirmPass(newValue)}//onValueChange(newValue)
                                         }
@@ -206,21 +212,24 @@ useEffect( () => {
         </View>
         <SavePassModal visible={isVisible} setIsVisible={setIsVisible}/>
         
-    </View>
+        </View>
       </SafeAreaView>
-    
+      </View>
     
   )
 }
 
 const localStyles = StyleSheet.create({
     totalContainer:{
-        flex:1
+        flex:1,
+
     },
     mainCointainer:{
         justifyContent:'center',
         alignContent:'center',
         flex:1,
+        backgroundColor:globalStyles.colors.white,
+
     },
 
     itemsContainer:{
@@ -229,6 +238,7 @@ const localStyles = StyleSheet.create({
         borderRadius:30,
         borderWidth:1,
         borderColor:globalStyles.colors.borderColor,
+        backgroundColor:globalStyles.colors.white,
         paddingVertical:windowHeight*0.05,
         width:windowWidth*0.95,
         alignSelf:'center'

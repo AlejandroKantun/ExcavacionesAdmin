@@ -11,7 +11,7 @@ interface empresaInUser{
 export const getEmpresaIDwithUserID = async (userID:string) => {
     let empresaID=0;
     const selectSentence= "select usuarios.usuarioID,usuarios.bancoID, empresas.empresaID from usuarios INNER JOIN bancosempresas on bancosempresas.bancoID = usuarios.bancoID INNER JOIN empresas on empresas.empresaID =bancosempresas.empresaID "+
-    "WHERE usuarios.usuario=?"
+    "WHERE lower(usuarios.usuario)=?"
     //const selectSentence= "SELECT usuarioID from usuarios WHERE usuario=?"
     var empresas:empresaInUser[]=[];
 
@@ -21,7 +21,7 @@ export const getEmpresaIDwithUserID = async (userID:string) => {
             async(tx)=>{
 
                 
-                         await tx.executeSql(selectSentence, [userID],
+                         await tx.executeSql(selectSentence, [userID.toLowerCase()],
                             (tx,results)=>{
                                 if (results.rows.length >0){
                                     for (let i = 0; i <results.rows.length; i++) {

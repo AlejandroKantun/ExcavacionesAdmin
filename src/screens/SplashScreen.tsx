@@ -38,6 +38,10 @@ export const SplashScreen = () => {
           if(result !=null){
               if (result.includes(':true}')){
                   console.log('DB already created')
+              }else{
+                createDatabaseStructure().then(()=>{
+                    requestResetDeviceID(appUniqueID)
+                })
               }
           }
           else{

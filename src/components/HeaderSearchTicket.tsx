@@ -4,7 +4,7 @@ import globalStyles from '../theme/appTheme';
 import CustomText from './CustomText';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/core';
-import { StackActions } from '@react-navigation/native';
+import { StackActions, CommonActions } from '@react-navigation/native';
 import { AuthContext } from '../context/AuthContext';
 
 
@@ -20,7 +20,13 @@ export const HeaderSearchTicket = ({title}:Props) => {
     const {logOut} = useContext(AuthContext)
 
     const logOutHandler=()=>{
-        navigation.dispatch(StackActions.replace('SplashScreen'))
+        navigation.dispatch(
+          CommonActions.reset({
+            routes: [
+              { name: 'LoginScreen' },
+            ],
+          })
+          )
         logOut();
       }
   return (

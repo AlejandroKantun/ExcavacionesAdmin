@@ -57,7 +57,7 @@ export const LoginScreen = () => {
                                 if(!usersInDB){
                                     navigation.navigate("ChangePasswordScreen" as never)
                                 }
-                                else if(usersInDB.includes(user)){
+                                else if(usersInDB.toLowerCase().includes(user.toLowerCase())){
                                     //it is not the first time
                                     
                                     try {                                    
